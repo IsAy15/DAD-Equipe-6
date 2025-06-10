@@ -47,13 +47,9 @@ jobs:
           cd "$REPO_DIR"
         fi
 
-        cd "$REPO_DIR/DAD-Equipe-6/Backend/api"
+        cd "$REPO_DIR/Backend/api"
         npm postinstall
 
-        cd ~/breezy-api/DAD-Equipe-6
-        git pull origin dev
-        npm install
-
         echo "Starting/restarting application..."
-        pm2 restart server.js || pm2 start server.js
+        pm2 restart src/server.js || pm2 start src/server.js
         '
