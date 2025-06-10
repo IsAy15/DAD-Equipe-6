@@ -48,6 +48,7 @@ jobs:
         fi
 
         cd "$REPO_DIR/Backend/api"
+        npm i
         npm postinstall
 
         echo "Starting/restarting application..."
