@@ -36,7 +36,7 @@ jobs:
         fi
 
         REPO_URL="https://github.com/IsAy15/DAD-Equipe-6.git"
-        BRANCH="main"
+        BRANCH="dev"
         REPO_DIR="$HOME/breezy-api"
 
         if [ -d "$REPO_DIR/.git" ]; then
@@ -51,7 +51,7 @@ jobs:
         npm postinstall
 
         cd ~/breezy-api/DAD-Equipe-6
-        git pull origin main
+        git pull origin dev
         npm install
 
         echo "Starting/restarting application..."
