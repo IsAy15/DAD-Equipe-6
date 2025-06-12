@@ -36,6 +36,7 @@ jobs:
 
         if [ -d "$REPO_DIR/.git" ]; then
           cd "$REPO_DIR"
+          git restore .
           git pull origin "$BRANCH"
         else
           git clone "$REPO_URL" "$REPO_DIR"
