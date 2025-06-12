@@ -43,7 +43,7 @@ jobs:
         fi
 
         cd "$REPO_DIR/Backend"
-        echo "Building Docker images..."
+        echo "Building Docker images...."
         docker compose -f docker-compose.yml build
 
         echo "Stopping and removing existing containers..."
