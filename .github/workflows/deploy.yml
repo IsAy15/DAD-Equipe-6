@@ -44,13 +44,13 @@ jobs:
 
         cd "$REPO_DIR/Backend"
         echo "Building Docker images..."
-        docker-compose -f docker-compose.yml build
+        docker compose -f docker-compose.yml build
 
         echo "Stopping and removing existing containers..."
-        docker-compose -f docker-compose.yml down
+        docker compose -f docker-compose.yml down
 
         echo "Starting containers..."
-        docker-compose -f docker-compose.yml up -d
+        docker compose -f docker-compose.yml up -d
         
         echo "Deployment completed successfully."
         '
