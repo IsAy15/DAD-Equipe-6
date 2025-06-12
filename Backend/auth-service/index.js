@@ -22,6 +22,8 @@ mongoose
 
     app.listen(port, () => {
     console.log(`Auth service listening on port ${port}`)
+    swaggerDocs(app, port);
+    console.log(`Swagger docs available at http://localhost:${port}/auth-service-docs`);
   })
   })
   .catch(err => {
