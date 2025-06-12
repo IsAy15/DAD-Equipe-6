@@ -30,11 +30,6 @@ jobs:
         fi
         nvm install node
 
-        echo "Installing PM2..."
-        if ! command -v pm2 &> /dev/null; then
-        npm install -g pm2
-        fi
-
         REPO_URL="https://github.com/IsAy15/DAD-Equipe-6.git"
         BRANCH="dev"
         REPO_DIR="$HOME/breezy-api"
@@ -47,10 +42,18 @@ jobs:
           cd "$REPO_DIR"
         fi
 
-        cd "$REPO_DIR/Backend/api"
-        npm i
-        npm postinstall
+        cd "$REPO_DIR/Backend"
+        echo "Building Docker images..."
+        docker-compose -f docker-compose.yml build
 
-        echo "Starting/restarting application..."
-        pm2 restart src/server.js || pm2 start src/server.js
-        '
+        echo "Stopping and removing existing containers..."
+        docker-compose -f docker-compose.yml down
+
+        echo "Starting containers..."
+        docker-compose -f docker-compose.yml up -d
+        
+        echo "Deployment completed successfully."
+
+       
+
+        

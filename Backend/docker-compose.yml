@@ -25,7 +25,7 @@ services:
       - app-network
 
   auth-service:
-    build: ./Backend/auth-service
+    build: ./auth-service
     container_name: auth-service
     restart: unless-stopped
     ports:
@@ -34,9 +34,39 @@ services:
       - mongo-auth
     networks:
       - app-network
+    volumes:
+      - ./auth-service/logs:/home/logs/auth-service
+
+  mongo-post:
+    image: mongo
+    container_name: mongo-post
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-post-data:/data/db
+    depends_on:
+      - mongo-auth
+      - auth-service
+    networks:
+      - app-network
+
+  post-service:
+    build: ./post-service
+    container_name: post-service
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mongo-post
+    networks:
+      - app-network
+    volumes:
+      - ./post-service/logs:/home/logs/post-service
 
 volumes:
   mongo-auth-data:
+  mongo-post-data:
 
 networks:
   app-network:
