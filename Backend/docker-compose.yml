@@ -12,6 +12,7 @@ services:
       - app-network
     depends_on:
       - auth-service
+      - post-service
 
   mongo-auth:
     image: mongo
