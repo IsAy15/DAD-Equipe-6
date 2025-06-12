@@ -3,6 +3,7 @@ const app = express()
 const port = 3000
 const mongoose = require('mongoose');
 require("dotenv").config();
+const swaggerDocs = require('./utils/swagger');
 
 // parse requests before starting server
 app.use(express.json());
