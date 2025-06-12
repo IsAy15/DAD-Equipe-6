@@ -1,5 +1,0 @@
-2025-06-12 21:37:43	e5b698b7-e97d-4ab8-8e48-ef40f3760a15	GET	undefined	/post-service-docs/
-2025-06-12 21:37:43	678748fd-b285-4403-8aee-be66468bdf0f	GET	undefined	/post-service-docs/swagger-ui.css
-2025-06-12 21:37:43	d83491e0-6ef1-4628-b5de-25be79606d0e	GET	undefined	/post-service-docs/swagger-ui-bundle.js
-2025-06-12 21:37:43	b8ddf256-ba7f-41f2-8080-04ee092f69ac	GET	undefined	/post-service-docs/swagger-ui-standalone-preset.js
-2025-06-12 21:37:43	40814a69-8ef9-4a0a-b712-2e5aff6899b1	GET	undefined	/post-service-docs/swagger-ui-init.js
