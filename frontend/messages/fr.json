@@ -1,0 +1,13 @@
+{
+  "Index": {
+    "title": "Bienvenue",
+    "description": "Ceci est la page d'accueil"
+  },
+  "Navbar": {
+    "title": "Mon Application",
+    "theme": "Thème",
+    "language": "Langue",
+    "css_components": "Composants CSS",
+    "js_components": "Composants JS"
+  }
+}
