@@ -4,7 +4,7 @@
     "description": "Dies ist die Startseite"
   },
   "Navbar": {
-    "title": "Meine Anwendung",
+    "title": "Breezy",
     "theme": "Thema",
     "language": "Sprache",
     "css_components": "CSS-Komponenten",

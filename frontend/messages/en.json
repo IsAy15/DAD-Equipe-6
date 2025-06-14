@@ -3,8 +3,21 @@
     "title": "Welcome",
     "description": "This is the homepage"
   },
+  "Login": {
+    "title": "Login",
+    "description": "Log in to access your account",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "loginButton": "Log in",
+    "noAccount": "Don't have an account?",
+    "createAccount": "Create an account",
+    "loginWithGoogle": "Log in with Google"
+  },
   "Navbar": {
-    "title": "My Application",
+    "title": "Breezy",
     "theme": "Theme",
     "language": "Language",
     "css_components": "CSS Components",

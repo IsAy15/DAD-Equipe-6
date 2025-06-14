@@ -5,3 +5,10 @@
 @import "flyonui/variants.css";
 @source "../../node_modules/flyonui/flyonui.js";
 @plugin "@iconify/tailwind4";
+
+.btn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn:hover {
+  transform: scale(1.05);
+}

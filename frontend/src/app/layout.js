@@ -1,22 +1,24 @@
 import "./globals.css";
 
 import FlyonuiScript from "../components/FlyonuiScript";
-import NavBar from "../components/NavBar";
 
 import { NextIntlClientProvider } from "next-intl";
 import { getUserLocale } from "../services/locale";
+import { getUserTheme } from "../services/theme";
+import DefaultTheme from "../components/DefaultTheme";
 
 export default async function RootLayout({ children }) {
   const locale = await getUserLocale();
+  const userTheme = await getUserTheme();
 
   // Si arabe, on passe en RTL, sinon LTR
   const dir = locale === "ar" ? "rtl" : "ltr";
   return (
-    <html lang={locale} dir={dir}>
+    <html lang={locale} dir={dir} data-theme={userTheme}>
       <NextIntlClientProvider locale={locale} dir={dir}>
-        <body className="min-h-screen bg-base-200">
-          <NavBar />
-          <div className="p-6">{children}</div>
+        <body>
+          <DefaultTheme />
+          {children}
         </body>
         <FlyonuiScript />
       </NextIntlClientProvider>

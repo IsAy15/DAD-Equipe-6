@@ -4,24 +4,22 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getUserLocale, setUserLocale } from "../services/locale";
+import { getUserTheme, setUserTheme } from "../services/theme";
 
 export default function NavBar() {
   const t = useTranslations("Navbar");
-  const [theme, setTheme] = useState("light");
-  const [language, setLanguage] = useState("en");
+  const [theme, setTheme] = useState(null);
+  const [language, setLanguage] = useState(null);
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem("theme");
-    if (storedTheme) {
-      setTheme(storedTheme);
-      document.documentElement.setAttribute("data-theme", storedTheme);
+    async function fetchTheme() {
+      const storedTheme = await getUserTheme();
+      if (storedTheme) {
+        setTheme(storedTheme);
+      }
     }
+    fetchTheme();
   }, []);
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
 
   useEffect(() => {
     async function fetchLanguage() {
@@ -36,8 +34,7 @@ export default function NavBar() {
   const handleThemeChange = (e) => {
     const selectedTheme = e.target.value;
     setTheme(selectedTheme);
-    document.documentElement.setAttribute("data-theme", selectedTheme);
-    localStorage.setItem("theme", selectedTheme);
+    setUserTheme(selectedTheme);
   };
 
   const handleLanguageChange = async (e) => {
@@ -45,6 +42,9 @@ export default function NavBar() {
     setLanguage(selectedLanguage);
     setUserLocale(selectedLanguage);
   };
+
+  // Optionnel : ne rien afficher tant que la langue n'est pas chargée
+  if (!language) return null;
 
   return (
     <nav className="navbar shadow">
@@ -68,7 +68,7 @@ export default function NavBar() {
               aria-expanded="false"
               aria-label="Dropdown"
             >
-              CSS Components
+              {t("css_components")}
               <span className="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
             </button>
             <ul
@@ -102,7 +102,7 @@ export default function NavBar() {
               aria-expanded="false"
               aria-label="Dropdown"
             >
-              JS Components
+              {t("js_components")}
               <span className="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4 rtl:rotate-180"></span>
             </button>
             <ul
@@ -312,13 +312,13 @@ export default function NavBar() {
           <button
             id="dropdown-default"
             type="button"
-            className="dropdown-toggle btn btn-outline max-sm:btn-square"
+            className="dropdown-toggle btn btn-secondary btn-outline max-sm:btn-square"
             aria-haspopup="menu"
             aria-expanded="false"
             aria-label="Dropdown"
           >
             <span className="max-sm:hidden">{t("language")}</span>
-            <span className="icon-[tabler--aperture] block size-6 sm:hidden"></span>
+            <span className="icon-[tabler--language] block size-6 sm:hidden"></span>
             <span className="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-5 max-sm:hidden"></span>
           </button>
           <ul
