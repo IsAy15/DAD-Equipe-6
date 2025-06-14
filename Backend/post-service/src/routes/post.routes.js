@@ -5,23 +5,31 @@ const postController = require('../controllers/post.controller');
 
 /**
  * @swagger
- * /posts/{username}:
+ * /posts/{user_id}:
  *  get:
  *   tags:
  *    - Posts
- *   summary: Retrieve posts by username
+ *   summary: Retrieve posts by user id
  *   parameters:
  *    - in: path
- *      name: username
+ *      name: id
  *      required: true
  *      schema:
- *       type: string
- *       description: The username of the user whose posts are to be retrieved
+ *       type: objectId
+ *       description: The id of the user whose posts are to be retrieved
  *   responses:
  *    200:
  *     description: A list of posts by the specified user
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: array
+ *        items:
+ *         $ref: '#/components/schemas/Post' 
  *    404:
- *     description: User not found
+ *     description: No posts found for this user
+ *    500:
+ *     description: Failed to retrieve posts
  */
 router.get('/:user_id', postController.getPostsByUserId);
 
@@ -57,20 +65,17 @@ router.get('/:username/feed', postController.getPostsOfSubscribdedTo);
  *    content:
  *     application/json:
  *      schema:
- *       type: object
- *       properties:
- *        title:
- *         type: string
- *         description: The title of the post
- *        content:
- *         type: string
- *         description: The content of the post
- *       required:
- *        - title
- *        - content
+ *       $ref: '#/components/schemas/CreatePostSchema'
+ *       
  *   responses:
  *    201:
  *     description: Post created successfully
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/components/schemas/CreatePostSchema'
+ *    500:
+ *     description: Failed to create post
  */
 router.post('/', postController.createPost);
 
@@ -87,26 +92,22 @@ router.post('/', postController.createPost);
 *      required: true
 *      schema:
 *       type: string
-*       description: The ID of the post to be updated
+*       description: The id of the post to be updated
 *   requestBody:
 *    required: true
 *    content:
 *     application/json:
 *      schema:
-*       type: object
-*       properties:
-*        title:
-*         type: string
-*         description: The new title of the post
-*        content:
-*         type: string
-*         description: The new content of the post
-*       required:
-*        - title
-*        - content
+*       $ref: '#/components/schemas/UpdatePostSchema'
 *   responses:
 *    200:
 *     description: Post updated successfully
+*    400:
+*     description: Bad request, post ID is required
+*    404:
+*     description: Post not found
+*    500:
+*     description: Failed to update post
 */
 router.put('/:post_id', postController.updatePost);
 
@@ -127,6 +128,12 @@ router.put('/:post_id', postController.updatePost);
 *   responses:
 *    204:
 *     description: Post deleted successfully
+*    400:
+*     description: Bad request, post ID is required
+*    404:
+*     description: Post not found
+*    500:
+*     description: Failed to delete post
 */
 router.delete('/:post_id', postController.deletePost);
 

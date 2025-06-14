@@ -13,7 +13,7 @@ app.use(logger);
 
 app.use('/posts', require('./src/routes/post.routes.js'));
 app.use('/posts/:post_id/comments', require('./src/routes/comment.routes.js'));
-app.use('/posts/:post_id/likes', require('./src/routes/like.routes.js'));
+// app.use('/posts/:post_id/likes', require('./src/routes/like.routes.js'));
 
 mongoose
 .connect('mongodb://mongo-post:27017/postdb')
