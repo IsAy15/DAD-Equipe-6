@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const postController = require('../controllers/post.controller');
 
+// Routes for /posts
+
 /**
  * @swagger
  * /posts/{username}:
@@ -21,22 +23,22 @@ const postController = require('../controllers/post.controller');
  *    404:
  *     description: User not found
  */
-router.get('/:username', postController.getPostsByUsername);
+router.get('/:user_id', postController.getPostsByUserId);
 
 /**
  * @swagger
- * /posts/{username}/feed:
+ * /posts/{id}/feed:
  *  get:
  *   tags:
  *    - Posts
  *   summary: Retrieve posts of users that the user is subscribed to
  *   parameters:
  *    - in: path
- *      name: username
+ *      name: id
  *      required: true
  *      schema:
  *       type: string
- *       description: The username of the user whose feed is to be retrieved
+ *       description: The id of the user whose feed is to be retrieved
  *   responses:
  *    200:
  *     description: A list of posts from users that the user is subscribed to
@@ -106,7 +108,7 @@ router.post('/', postController.createPost);
 *    200:
 *     description: Post updated successfully
 */
-router.put('/:id', postController.updatePost);
+router.put('/:post_id', postController.updatePost);
 
 /**
 * @swagger
@@ -126,6 +128,6 @@ router.put('/:id', postController.updatePost);
 *    204:
 *     description: Post deleted successfully
 */
-router.delete('/:id', postController.deletePost);
+router.delete('/:post_id', postController.deletePost);
 
 module.exports = router;

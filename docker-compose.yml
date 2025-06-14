@@ -5,7 +5,7 @@ services:
     image: nginx:latest 
     container_name: gateway
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - "8080:8080" #Nous exposerons sur le port 8080
     networks:
@@ -36,7 +36,7 @@ services:
     networks:
       - app-network
     volumes:
-      - ./auth-service/logs:/home/logs/auth-service
+      - ./Backend/auth-service/logs:/home/logs/auth-service
 
   mongo-post:
     image: mongo
@@ -63,7 +63,7 @@ services:
     networks:
       - app-network
     volumes:
-      - ./post-service/logs:/home/logs/post-service
+      - ./Backend/post-service/logs:/home/logs/post-service
 
 volumes:
   mongo-auth-data:
