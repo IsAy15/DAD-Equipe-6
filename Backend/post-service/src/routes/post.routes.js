@@ -12,10 +12,10 @@ const postController = require('../controllers/post.controller');
  *   summary: Retrieve posts by user id
  *   parameters:
  *    - in: path
- *      name: id
+ *      name: user_id
  *      required: true
  *      schema:
- *       type: objectId
+ *       type: string
  *       description: The id of the user whose posts are to be retrieved
  *   responses:
  *    200:
@@ -25,7 +25,7 @@ const postController = require('../controllers/post.controller');
  *       schema:
  *        type: array
  *        items:
- *         $ref: '#/components/schemas/Post' 
+ *         $ref: '#/components/schemas/UpdatePostSchema' 
  *    404:
  *     description: No posts found for this user
  *    500:

@@ -12,6 +12,10 @@ const mongoose = require('mongoose');
  *      type: string
  *      description: The ID of the user who authored the comment
  *      example: "60c72b2f9b1e8c001c8e4d3a"
+ *     post:
+ *      type: string
+ *      description: The id of the post the comment belongs to
+ *      example: "60c72b2f9b1e8c001c8e4d3b"
  *     content:
  *      type: string
  *      description: The content of the comment
@@ -30,6 +34,7 @@ const mongoose = require('mongoose');
  */
 const CommentSchema = new mongoose.Schema({
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    post: {type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: true },
     content: { type: String, required: true },
     parentComment: { type: mongoose.Schema.Types.ObjectId, ref: 'Comment', default: null },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
