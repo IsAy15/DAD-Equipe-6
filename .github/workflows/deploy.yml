@@ -42,7 +42,7 @@ jobs:
           cd "$REPO_DIR"
         fi
 
-        cd "$REPO_DIR/Backend"
+        cd "$REPO_DIR"
         echo "Building Docker images..."
         docker compose -f docker-compose.yml build
 
