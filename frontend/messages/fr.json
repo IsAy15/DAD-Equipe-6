@@ -1,0 +1,26 @@
+{
+  "Index": {
+    "title": "Bienvenue",
+    "description": "Ceci est la page d'accueil"
+  },
+  "Login": {
+    "title": "Connexion",
+    "description": "Connectez-vous pour accéder à votre compte",
+    "email": "Email",
+    "emailPlaceholder": "Entrez votre email",
+    "password": "Mot de passe",
+    "rememberMe": "Se souvenir de moi",
+    "forgotPassword": "Mot de passe oublié ?",
+    "loginButton": "Se connecter",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "createAccount": "Créer un compte",
+    "loginWithGoogle": "Se connecter avec Google"
+  },
+  "Navbar": {
+    "title": "Breezy",
+    "theme": "Thème",
+    "language": "Langue",
+    "css_components": "Composants CSS",
+    "js_components": "Composants JS"
+  }
+}
