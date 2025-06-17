@@ -1,8 +1,9 @@
 "use client";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 export default function LoginForm() {
-  const t = useTranslations("Login");
+  const t = useTranslations("Auth");
   return (
     <div className="bg-base-100 flex h-auto min-h-screen items-center justify-center overflow-x-hidden py-10">
       <div className="relative flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -17,9 +18,9 @@ export default function LoginForm() {
           </div>
           <div>
             <h3 className="text-base-content mb-1.5 text-2xl font-semibold">
-              {t("title")}
+              {t("loginTitle")}
             </h3>
-            <p className="text-base-content/80">{t("description")}</p>
+            <p className="text-base-content/80">{t("loginDescription")}</p>
           </div>
           <div className="space-y-4">
             <form
@@ -71,27 +72,29 @@ export default function LoginForm() {
                     {t("rememberMe")}
                   </label>
                 </div>
-                <a
+                <Link
                   href="#"
                   className="link link-animated link-primary font-normal"
                 >
                   {t("forgotPassword")}
-                </a>
+                </Link>
               </div>
               <button className="btn btn-lg btn-primary btn-gradient btn-block">
                 {t("loginButton")}
               </button>
             </form>
+            <div className="divider">{t("noAccount")}</div>
             <div className="flex items-center justify-between gap-y-2 flex-col md:flex-row mb-4 text-base-content/80 text-center md:text-left">
-              <span>{t("noAccount")}</span>
-              <a
-                href="#"
-                className="link link-animated link-primary font-normal"
+              {/* <span>{t("noAccount")}</span> */}
+              <Link
+                href="/register"
+                // className="link link-animated link-primary font-normal"
+                className="btn btn-lg btn-primary btn-gradient btn-block"
               >
                 {t("createAccount")}
-              </a>
+              </Link>
             </div>
-            <div className="divider">or</div>
+            <div className="divider">{t("or")}</div>
             <button className="btn btn-text btn-block">
               <img
                 src="https://cdn.flyonui.com/fy-assets/blocks/marketing-ui/brand-logo/google-icon.png"

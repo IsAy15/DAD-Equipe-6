@@ -5,30 +5,39 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getUserLocale, setUserLocale } from "../services/locale";
 import { getUserTheme, setUserTheme } from "../services/theme";
+import clsx from "clsx";
+import AppearanceSettings from "./AppearanceSettings";
+
+const ASIDE_WIDTH = 256; // px
 
 export default function NavBar() {
   const t = useTranslations("Navbar");
   const [theme, setTheme] = useState(null);
   const [language, setLanguage] = useState(null);
+  const [asideOpen, setAsideOpen] = useState(false);
+  const [touchStartX, setTouchStartX] = useState(null);
+  const [touchEndX, setTouchEndX] = useState(null);
+  const [dragX, setDragX] = useState(null);
+  const [showNav, setShowNav] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
+  // Détection mobile (évite le SSR)
   useEffect(() => {
-    async function fetchTheme() {
-      const storedTheme = await getUserTheme();
-      if (storedTheme) {
-        setTheme(storedTheme);
-      }
+    function checkMobile() {
+      setIsMobile(window.innerWidth < 640);
     }
-    fetchTheme();
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Récupération du thème et de la langue
   useEffect(() => {
-    async function fetchLanguage() {
-      const storedLanguage = await getUserLocale();
-      if (storedLanguage) {
-        setLanguage(storedLanguage);
-      }
-    }
-    fetchLanguage();
+    getUserTheme().then((storedTheme) => storedTheme && setTheme(storedTheme));
+    getUserLocale().then(
+      (storedLanguage) => storedLanguage && setLanguage(storedLanguage)
+    );
   }, []);
 
   const handleThemeChange = (e) => {
@@ -37,343 +46,171 @@ export default function NavBar() {
     setUserTheme(selectedTheme);
   };
 
-  const handleLanguageChange = async (e) => {
+  const handleLanguageChange = (e) => {
     const selectedLanguage = e.target.value;
     setLanguage(selectedLanguage);
     setUserLocale(selectedLanguage);
   };
 
-  // Optionnel : ne rien afficher tant que la langue n'est pas chargée
-  if (!language) return null;
+  // Fermer l'aside (avec délai pour l'animation overlay)
+  const handleAsideClose = () => {
+    setTimeout(() => setAsideOpen(false), 300);
+  };
+
+  // Gestion du swipe pour ouvrir/fermer l'aside sur mobile
+  useEffect(() => {
+    if (!isMobile) return;
+    function handleTouchStart(e) {
+      setTouchStartX(e.touches[0].clientX);
+      setDragX(0);
+    }
+    function handleTouchMove(e) {
+      if (touchStartX !== null) {
+        const currentX = e.touches[0].clientX;
+        let delta = currentX - touchStartX;
+        if (!asideOpen) delta = Math.max(0, Math.min(delta, ASIDE_WIDTH));
+        if (asideOpen) delta = Math.min(0, Math.max(delta, -ASIDE_WIDTH));
+        setDragX(delta);
+        setTouchEndX(currentX);
+      }
+    }
+    function handleTouchEnd() {
+      if (touchStartX !== null && touchEndX !== null) {
+        const deltaX = touchEndX - touchStartX;
+        if (!asideOpen && deltaX > 60) setAsideOpen(true);
+        else if (asideOpen && deltaX < -60) setAsideOpen(false);
+      }
+      setTouchStartX(null);
+      setTouchEndX(null);
+      setDragX(null);
+    }
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchmove", handleTouchMove);
+    window.addEventListener("touchend", handleTouchEnd);
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [asideOpen, touchStartX, touchEndX, isMobile]);
+
+  // Style dynamique pour l'aside (mobile uniquement)
+  const asideStyle = isMobile
+    ? {
+        zIndex: 60,
+        transition: dragX === null ? "transform 0.3s" : "none",
+        transform:
+          dragX !== null
+            ? `translateX(${asideOpen ? dragX : -ASIDE_WIDTH + dragX}px)`
+            : asideOpen
+            ? "translateX(0)"
+            : `translateX(-${ASIDE_WIDTH}px)`,
+      }
+    : { zIndex: 60 };
+
+  // Overlay dynamique
+  let openProgress = 0;
+  if (dragX !== null) {
+    openProgress = asideOpen ? 1 + dragX / ASIDE_WIDTH : dragX / ASIDE_WIDTH;
+    openProgress = Math.max(0, Math.min(openProgress, 1));
+  } else {
+    openProgress = asideOpen ? 1 : 0;
+  }
+  const overlayOpacity = 0.4 * openProgress;
+
+  // Navbar mobile hide/show on scroll
+  useEffect(() => {
+    if (!isMobile) return;
+    let ticking = false;
+    function onScroll() {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentY = window.scrollY;
+          setShowNav(currentY < lastScrollY || currentY < 10);
+          setLastScrollY(currentY);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [lastScrollY, isMobile]);
 
   return (
-    <nav className="navbar shadow">
-      <div className="navbar-start">
-        <Link
-          className="link text-base-content/90 link-neutral text-xl font-semibold no-underline"
-          href="/"
-        >
-          {t("title")}
-        </Link>
-      </div>
-
-      <div className="navbar-center max-sm:hidden">
-        <ul className="menu menu-horizontal gap-2 p-0 text-base rtl:ml-20">
-          <li className="dropdown relative inline-flex [--offset:9] [--placement:bottom-end] max-sm:[--placement:bottom]">
-            <button
-              id="dropdown-css-components"
-              type="button"
-              className="dropdown-toggle dropdown-open:bg-base-content/10 dropdown-open:text-base-content max-sm:px-2"
-              aria-haspopup="menu"
-              aria-expanded="false"
-              aria-label="Dropdown"
-            >
-              {t("css_components")}
-              <span className="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
-            </button>
-            <ul
-              className="dropdown-menu  dropdown-open:opacity-100 hidden"
-              role="menu"
-              aria-orientation="vertical"
-              aria-labelledby="ui-components"
-            >
-              <li>
-                <Link className="dropdown-item" href="../button">
-                  Button
+    <>
+      {/* Aside latérale */}
+      <aside
+        className={clsx(
+          "fixed top-0 left-0 h-full w-64 bg-base-100 shadow-lg z-60",
+          "transition-transform duration-300",
+          "sm:translate-x-0"
+        )}
+        style={asideStyle}
+      >
+        <div className="flex flex-col h-full">
+          {/* User */}
+          <div className="flex items-center justify-between p-4 border-b">
+            {/* <img src="/logo.svg" /> */}
+          </div>
+          {/* Menu */}
+          <nav className="flex-1 overflow-y-auto p-4">
+            <ul className="menu menu-horizontal gap-2 p-0 text-base rtl:ml-20">
+              <li className="w-full">
+                <Link href="/home" className="btn btn-text justify-start">
+                  <span className="icon-[tabler--home] size-6"></span>
+                  <span>{t("home")}</span>
                 </Link>
               </li>
-              <li>
-                <Link className="dropdown-item" href="../card">
-                  Card
-                </Link>
-              </li>
-              <li>
-                <Link className="dropdown-item" href="../form-elements">
-                  Form Elements
+              <li className="w-full">
+                <Link href="#" className="btn btn-text justify-start">
+                  <span className="icon-[tabler--user] size-6"></span>
+                  <span>{t("profile")}</span>
                 </Link>
               </li>
             </ul>
-          </li>
-          <li className="dropdown relative [--offset:9] [--placement:bottom-end] max-sm:[--placement:bottom]">
-            <button
-              id="dropdown-js-components"
-              className="dropdown-toggle dropdown-item dropdown-open:bg-base-content/10 dropdown-open:text-base-content justify-between"
-              aria-haspopup="menu"
-              aria-expanded="false"
-              aria-label="Dropdown"
-            >
-              {t("js_components")}
-              <span className="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4 rtl:rotate-180"></span>
-            </button>
-            <ul
-              className="dropdown-menu dropdown-open:opacity-100 hidden"
-              role="menu"
-              aria-orientation="vertical"
-              aria-labelledby="js-components"
-            >
-              <li>
-                <Link className="dropdown-item" href="../accordion">
-                  Accordion
-                </Link>
-              </li>
-              <li>
-                <Link className="dropdown-item" href="../overlays">
-                  Overlays
-                </Link>
-              </li>
-              <li>
-                <Link className="dropdown-item" href="../advance-forms">
-                  Advance Forms
-                </Link>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </div>
+          </nav>
+          {/* Sélecteurs thème/langue */}
+          <div className="flex justify-center p-4 border-t">
+            <AppearanceSettings />
+          </div>
+        </div>
+      </aside>
 
-      <div className="navbar-end items-center gap-4">
-        <div className="dropdown relative inline-flex sm:hidden rtl:[--placement:bottom-end]">
+      {/* Navbar mobile */}
+      <nav
+        className={clsx(
+          "navbar shadow sm:hidden fixed top-0 left-0 right-0 z-50 bg-base-100 transition-transform duration-300",
+          showNav ? "translate-y-0" : "-translate-y-full"
+        )}
+      >
+        <div className="flex w-full items-center justify-between">
           <button
-            id="dropdown-default"
-            type="button"
-            className="dropdown-toggle btn btn-outline btn-secondary btn-square"
-            aria-haspopup="menu"
-            aria-expanded="false"
-            aria-label="Dropdown"
+            className="btn btn-square btn-ghost"
+            onClick={() => setAsideOpen(true)}
+            aria-label="Ouvrir le menu"
           >
-            <span className="icon-[tabler--menu-2] dropdown-open:hidden size-5"></span>
-            <span className="icon-[tabler--x] dropdown-open:block hidden size-5"></span>
+            {/* <img src="" /> */}
           </button>
-          <ul
-            className="dropdown-menu dropdown-open:opacity-100 hidden min-w-60"
-            role="menu"
-            aria-orientation="vertical"
-            aria-labelledby="dropdown-default"
-          >
-            <li className="dropdown relative [--offset:9] [--placement:bottom-end] max-sm:[--placement:bottom]">
-              <button
-                id="dropdown-css-components-2"
-                className="dropdown-toggle dropdown-item dropdown-open:bg-base-content/10 dropdown-open:text-base-content justify-between"
-                aria-haspopup="menu"
-                aria-expanded="false"
-                aria-label="Dropdown"
-              >
-                CSS Components
-                <span className="icon-[tabler--chevron-right] size-4 rtl:rotate-180"></span>
-              </button>
-              <ul
-                className="dropdown-menu  dropdown-open:opacity-100 hidden"
-                role="menu"
-                aria-orientation="vertical"
-                aria-labelledby="ui-components"
-              >
-                <li>
-                  <Link className="dropdown-item" href="../button">
-                    Button
-                  </Link>
-                </li>
-                <li>
-                  <Link className="dropdown-item" href="../card">
-                    Card
-                  </Link>
-                </li>
-                <li>
-                  <Link className="dropdown-item" href="../form-elements">
-                    Form Elements
-                  </Link>
-                </li>
-              </ul>
-            </li>
-            <li className="dropdown relative [--offset:9] [--placement:bottom-end] max-sm:[--placement:bottom]">
-              <button
-                id="dropdown-js-components-2"
-                className="dropdown-toggle dropdown-item dropdown-open:bg-base-content/10 dropdown-open:text-base-content justify-between"
-                aria-haspopup="menu"
-                aria-expanded="false"
-                aria-label="Dropdown"
-              >
-                JS Components
-                <span className="icon-[tabler--chevron-right] size-4 rtl:rotate-180"></span>
-              </button>
-              <ul
-                className="dropdown-menu dropdown-open:opacity-100 hidden"
-                role="menu"
-                aria-orientation="vertical"
-                aria-labelledby="js-components"
-              >
-                <li>
-                  <Link className="dropdown-item" href="../accordion">
-                    Accordion
-                  </Link>
-                </li>
-                <li>
-                  <Link className="dropdown-item" href="../overlays">
-                    Overlays
-                  </Link>
-                </li>
-                <li>
-                  <Link className="dropdown-item" href="../advance-forms">
-                    Advance Forms
-                  </Link>
-                </li>
-              </ul>
-            </li>
-          </ul>
+          <Link className="ml-2 text-xl font-semibold no-underline" href="/">
+            {t("title")}
+          </Link>
         </div>
+        {/* Tu peux ajouter ici les sélecteurs thème/langue si tu veux accès rapide sur mobile */}
+      </nav>
 
-        <div className="dropdown relative inline-flex rtl:[--placement:bottom-end]">
-          <button
-            id="dropdown-default"
-            type="button"
-            className="dropdown-toggle btn btn-primary btn-outline max-sm:btn-square"
-            aria-haspopup="menu"
-            aria-expanded="false"
-            aria-label="Dropdown"
-          >
-            <span className="max-sm:hidden">{t("theme")}</span>
-            <span className="icon-[tabler--aperture] block size-6 sm:hidden"></span>
-            <span className="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-5 max-sm:hidden"></span>
-          </button>
-          <ul
-            className="dropdown-menu dropdown-open:opacity-100 hidden min-w-40"
-            role="menu"
-            aria-orientation="vertical"
-            aria-labelledby="dropdown-default"
-          >
-            <li>
-              <input
-                type="radio"
-                name="theme-dropdown"
-                className="theme-controller btn btn-text w-full justify-start"
-                aria-label="Default"
-                value="light"
-                checked={theme === "light"}
-                onChange={handleThemeChange}
-              />
-            </li>
-            <li>
-              <input
-                type="radio"
-                name="theme-dropdown"
-                className="theme-controller btn btn-text w-full justify-start"
-                aria-label="Dark"
-                value="dark"
-                checked={theme === "dark"}
-                onChange={handleThemeChange}
-              />
-            </li>
-            <li>
-              <input
-                type="radio"
-                name="theme-dropdown"
-                className="theme-controller btn btn-text w-full justify-start"
-                aria-label="Gourmet"
-                value="gourmet"
-                checked={theme === "gourmet"}
-                onChange={handleThemeChange}
-              />
-            </li>
-            <li>
-              <input
-                type="radio"
-                name="theme-dropdown"
-                className="theme-controller btn btn-text w-full justify-start"
-                aria-label="Corporate"
-                value="corporate"
-                checked={theme === "corporate"}
-                onChange={handleThemeChange}
-              />
-            </li>
-            <li>
-              <input
-                type="radio"
-                name="theme-dropdown"
-                className="theme-controller btn btn-text w-full justify-start"
-                aria-label="Luxury"
-                value="luxury"
-                checked={theme === "luxury"}
-                onChange={handleThemeChange}
-              />
-            </li>
-            <li>
-              <input
-                type="radio"
-                name="theme-dropdown"
-                className="theme-controller btn btn-text w-full justify-start"
-                aria-label="Soft"
-                value="soft"
-                checked={theme === "soft"}
-                onChange={handleThemeChange}
-              />
-            </li>
-          </ul>
-        </div>
-        <div className="dropdown relative inline-flex rtl:[--placement:bottom-end]">
-          <button
-            id="dropdown-default"
-            type="button"
-            className="dropdown-toggle btn btn-secondary btn-outline max-sm:btn-square"
-            aria-haspopup="menu"
-            aria-expanded="false"
-            aria-label="Dropdown"
-          >
-            <span className="max-sm:hidden">{t("language")}</span>
-            <span className="icon-[tabler--language] block size-6 sm:hidden"></span>
-            <span className="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-5 max-sm:hidden"></span>
-          </button>
-          <ul
-            className="dropdown-menu dropdown-open:opacity-100 hidden min-w-40"
-            role="menu"
-            aria-orientation="vertical"
-            aria-labelledby="dropdown-default"
-          >
-            <li>
-              <input
-                type="radio"
-                name="language-dropdown"
-                className="language-controller btn btn-text w-full justify-start"
-                aria-label="English"
-                value="en"
-                checked={language === "en"}
-                onChange={handleLanguageChange}
-              />
-            </li>
-            <li>
-              <input
-                type="radio"
-                name="language-dropdown"
-                className="language-controller btn btn-text w-full justify-start"
-                aria-label="Français"
-                value="fr"
-                checked={language === "fr"}
-                onChange={handleLanguageChange}
-              />
-            </li>
-            <li>
-              <input
-                type="radio"
-                name="language-dropdown"
-                className="language-controller btn btn-text w-full justify-start"
-                aria-label="Deutsch"
-                value="de"
-                checked={language === "de"}
-                onChange={handleLanguageChange}
-              />
-            </li>
-            <li>
-              <input
-                type="radio"
-                name="language-dropdown"
-                className="language-controller btn btn-text w-full justify-start"
-                aria-label="العربية"
-                value="ar"
-                checked={language === "ar"}
-                onChange={handleLanguageChange}
-              />
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+      {/* Overlay pour fermer l'aside sur mobile */}
+      {(asideOpen || dragX !== null) && (
+        <div
+          className="fixed inset-0 bg-black z-30 sm:hidden"
+          style={{
+            opacity: overlayOpacity,
+            transition: dragX === null ? "opacity 0.3s" : "none",
+          }}
+          onClick={handleAsideClose}
+          aria-label="Fermer le menu"
+        />
+      )}
+    </>
   );
 }
