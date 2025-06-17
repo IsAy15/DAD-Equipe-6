@@ -2,7 +2,7 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ deployement ]
 
 jobs:
   deploy:
@@ -47,7 +47,7 @@ jobs:
         docker rm -v -f $(docker ps -qa)
 
         echo "Starting containers..."
-        docker compose -f docker-compose.yml up -d --build
+        docker compose -f docker-compose.yml up
         
         echo "Deployment completed successfully."
         '
