@@ -43,13 +43,17 @@ jobs:
         fi
 
         cd "$REPO_DIR"
-        echo "Stopping and removing docker images..."
-        docker rm -v -f $(docker ps -qa)
+        set -e  # stoppe le script si une commande échoue
 
-        echo "Starting containers..."
-        docker compose -f docker-compose.yml up
-        
-        echo "Deployment completed successfully."
+        cd "$REPO_DIR" || exit 1
+
+        echo "Arrêt des anciens conteneurs..."
+        docker compose -f docker-compose.yml down --volumes
+
+        echo "Démarrage des nouveaux conteneurs..."
+        docker compose -f docker-compose.yml up -d --build
+
+        echo "Déploiement terminé avec succès."
         '
 
        
