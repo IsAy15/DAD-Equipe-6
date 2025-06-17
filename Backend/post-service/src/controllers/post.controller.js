@@ -22,8 +22,33 @@ module.exports = {
         }
 
     },
-    getPostsOfSubscribdedTo: (req, res) => {
-        // Controller logic to retrieve posts of subscribed users goes here
+    getPostsOfSubscribdedTo: async (req, res) => {
+        try{
+            const user_id = req.params.user_id;
+
+            if(!user_id){
+                return res.status(400).json({ message: 'User id is required' });
+            }
+
+            const friends_ids = await fetch(`http://localhost:8080/api/user/${user_id}/friends`, {
+                method: 'GET'
+            }).then((response) => response.json());
+
+            if(!friends_ids){
+                return res.status(500).json({ message: 'Unable to get user friends' });
+            }
+
+            const feed = await Post.find().where('author').in(friends_ids).lean().exec();
+
+            if(!feed){
+                return res.status(204).json({ message: 'No feed available' });
+            }
+
+            return feed;
+
+        }catch(err){
+            return res.status(500).json({ message: 'Unable to get user feed', details: err.message });
+        }
     },
     createPost: async (req, res) => {
         // Controller logic to create a new post goes here

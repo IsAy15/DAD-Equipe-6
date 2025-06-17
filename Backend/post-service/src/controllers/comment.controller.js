@@ -11,7 +11,7 @@ module.exports = {
                 return res.status(400).json({ message: 'Post ID is required' });
             }
 
-            const postComments = await Comment.find({ post: post_id }).lean().exec();
+            const postComments = await Comment.find({ post: post_id }).sort({ createdAt: -1 }).lean().exec();
 
             if(postComments?.length === 0) {
                 return res.status(404).json({ message: 'No comments found for this post' });
@@ -100,105 +100,6 @@ module.exports = {
         }
         catch (error) {
             console.error('Error deleting comment:', error);
-            return res.status(500).json({ message: 'Internal server error', error: error.message });
-        }
-    },
-
-    getCommentReplies: async (req, res) => {
-        try{
-            const comment_id = req.params.comment_id;
-
-             if (!comment_id) {
-                return res.status(400).json({ message: 'Comment_id is required' });
-            }
-
-            const comments = await Comment.find({ comment: comment_id}).lean().exec();
-
-            if(comments?.length == 0){
-                return res.status(404).json('No replies found for this comment');
-            }
-
-            return res.status(200).json(comments);
-
-        }catch{
-            console.error('Error getting comment replies', error);
-            return res.status(500).json({message : 'Internal server error', error: error.message})
-        }
-    },
-
-    addReplyToComment: async (req, res) => {
-        try {
-                const { post_id, comment_id } = req.params;
-                const { content, author } = req.body;
-
-                if (!content || !author) {
-                    return res.status(400).json({ message: 'Content and author are required' });
-                }
-
-                // Vérification que le commentaire parent existe
-                const parentComment = await Comment.findById(comment_id).exec();
-                if (!parentComment) {
-                    return res.status(404).json({ message: 'Parent comment not found' });
-                }
-
-                const newReply = new Comment({
-                    content,
-                    author,
-                    post: post_id,
-                    comment: comment_id, // lien au commentaire parent
-                });
-
-                await newReply.save()
-                    .then(reply => res.status(201).json(reply));
-
-                return res.status(201).json(newReply);
-            } catch (error) {
-                console.error('Error adding reply to comment:', error);
-                return res.status(500).json({ message: 'Internal server error', error: error.message });
-            }
-    },
-
-    updateReplyFromComment: async (req, res) => {
-        try {
-            const { post_id, comment_id, reply_id } = req.params;
-            const { content } = req.body;
-
-            if (!content) {
-                return res.status(400).json({ message: 'Content is required for update' });
-            }
-
-            const reply = await Comment.findOneAndUpdate(
-                { comment: comment_id },
-                { content },
-                { new: true }
-            ).exec();
-
-            if (!reply) {
-                return res.status(404).json({ message: 'Reply not found' });
-            }
-
-            return res.status(200).json(reply);
-
-        } catch (error) {
-            console.error('Error updating reply:', error);
-            return res.status(500).json({ message: 'Internal server error', error: error.message });
-        }
-    },
-    deleteReplyFromComment: async (req, res) => {
-        try {
-            const { post_id, comment_id, reply_id } = req.params;
-
-            const deleted = await Comment.findOneAndDelete({
-                comment: comment_id,
-            }).exec();
-
-            if (!deleted) {
-                return res.status(404).json({ message: 'Reply not found' });
-            }
-
-            return res.status(200).json({ message: 'Reply successfully deleted' });
-        } catch (error) {
-            console.error('Error deleting reply:', error);
             return res.status(500).json({ message: 'Internal server error', error: error.message });
         }
     },

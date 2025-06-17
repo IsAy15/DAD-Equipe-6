@@ -1,11 +1,11 @@
 const router = require('express').Router();
 const postController = require('../controllers/post.controller');
 
-// Routes for /posts
+// Routes for /api/posts
 
 /**
  * @swagger
- * /posts/{user_id}:
+ * /api/posts/{user_id}:
  *  get:
  *   tags:
  *    - Posts
@@ -35,7 +35,7 @@ router.get('/:user_id', postController.getPostsByUserId);
 
 /**
  * @swagger
- * /posts/{id}/feed:
+ * /api/posts/{id}/feed:
  *  get:
  *   tags:
  *    - Posts
@@ -55,7 +55,7 @@ router.get('/:username/feed', postController.getPostsOfSubscribdedTo);
 
 /**
  * @swagger
- * /posts/{user_id}:
+ * /api/posts/{user_id}:
  *  post:
  *   tags:
  *    - Posts
@@ -85,7 +85,7 @@ router.post('/:user_id', postController.createPost);
 
 /**
 * @swagger
-* /posts/{id}:
+* /api/posts/{id}:
 *  put:
 *   tags:
 *     - Posts
@@ -117,7 +117,7 @@ router.put('/:post_id', postController.updatePost);
 
 /**
 * @swagger
-* /posts/{id}:
+* /api/posts/{id}:
 *  delete:
 *   tags:
 *    - Posts

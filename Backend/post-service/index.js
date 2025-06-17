@@ -11,8 +11,8 @@ const port = 3003;
 app.use(express.json());
 app.use(logger);
 
-app.use('/posts', require('./src/routes/post.routes.js'));
-app.use('/posts/:post_id/comments', require('./src/routes/comment.routes.js'));
+app.use('api/posts', require('./src/routes/post.routes.js'));
+app.use('api/posts/:post_id/comments', require('./src/routes/comment.routes.js'));
 // app.use('/posts/:post_id/likes', require('./src/routes/like.routes.js'));
 
 mongoose
