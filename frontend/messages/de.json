@@ -3,6 +3,26 @@
     "title": "Willkommen",
     "description": "Dies ist die Startseite"
   },
+  "Auth": {
+    "title": "Anmelden",
+    "registerTitle": "Registrieren",
+    "loginTitle": "Anmelden",
+    "registerDescription": "Erstellen Sie ein Konto, um zu starten",
+    "loginDescription": "Melden Sie sich an, um auf Ihr Konto zuzugreifen",
+    "email": "E-Mail",
+    "emailPlaceholder": "Geben Sie Ihre E-Mail ein",
+    "password": "Passwort",
+    "rememberMe": "Angemeldet bleiben",
+    "forgotPassword": "Passwort vergessen?",
+    "loginButton": "Anmelden",
+    "registerButton": "Registrieren",
+    "noAccount": "Sie haben noch kein Konto?",
+    "alreadyHaveAccount": "Sie haben bereits ein Konto?",
+    "createAccount": "Konto erstellen",
+    "or": "oder",
+    "loginWithGoogle": "Mit Google anmelden",
+    "registerwithGoogle": "Mit Google registrieren"
+  },
   "Navbar": {
     "title": "Breezy",
     "theme": "Thema",
