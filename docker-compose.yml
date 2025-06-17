@@ -71,7 +71,7 @@ services:
       - ./Backend/post-service/logs:/home/logs/post-service
 
   user-service:
-    build: ./user-service
+    build: ./Backend/user-service
     container_name: user-service
     restart: unless-stopped
     ports:
@@ -79,7 +79,7 @@ services:
     networks:
       - app-network
     volumes:
-      - ./user-service/logs:/home/logs/user-service
+      - ./Backend/user-service/logs:/home/logs/user-service
 
 volumes:
   mongo-user-data:
