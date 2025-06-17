@@ -5,7 +5,7 @@ services:
     image: nginx:latest     
     container_name: gateway
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro 
       - ./index.html:/usr/share/nginx/html/index.html:ro
     ports:
       - "8080:8080" #Nous exposerons sur le port 8080

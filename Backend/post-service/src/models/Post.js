@@ -7,9 +7,6 @@ const mongoose = require('mongoose');
  *   CreatePostSchema:
  *    type: object
  *    properties:
- *     author:
- *      type: string
- *      example: "60c72b2f9b1e8c001c8e4d3a"
  *     content:
  *      type: string
  *      example: "This is a sample post content."
