@@ -17,17 +17,9 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-mongoose
-  .connect('mongodb://mongo-auth:27017/authdb')
-  .then(() => {
-    console.log("Connected to the database!");
+app.listen(port, () => {
+  console.log(`Auth Service is running on port ${port}`)
+  swaggerDocs(app, port);
+});
 
-    app.listen(port, () => {
-    console.log(`Auth service listening on port ${port}`)
-    swaggerDocs(app, port);
-    console.log(`Swagger docs available at http://localhost:${port}/auth-service-docs`);
-  })
-  })
-  .catch(err => {
-    console.error("Database connection error:", err);
-  });
+
