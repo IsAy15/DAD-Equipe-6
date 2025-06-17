@@ -32,6 +32,7 @@ export default async function RootLayout({ children }) {
           <body>
             <DefaultTheme /> {/* applique le thème Tailwind/DaisyUI */}
             {children} {/* pages rendues ici */}
+            <script src="../../node_modules/flyonui/flyonui.js"></script>
           </body>
 
           {/* Scripts éventuels de ta lib Flyonui */}

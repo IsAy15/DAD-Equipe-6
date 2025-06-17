@@ -20,10 +20,10 @@ export async function registerUser(email, username, password) {
 }
 
 // Connexion
-export const loginUser = async (username, password) => {
+export const loginUser = async (identifier, password) => {
   try {
     const response = await apiClient.post("/login", {
-      username,
+      identifier,
       password,
     });
     return response.data;

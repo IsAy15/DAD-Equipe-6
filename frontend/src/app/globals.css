@@ -1,9 +1,10 @@
 @import "tailwindcss";
+@plugin "flyonui";
 @plugin "flyonui" {
   themes: all;
 }
-@import "flyonui/variants.css";
-@source "../../node_modules/flyonui/flyonui.js";
+@import "../../node_modules/flyonui/variants.css";
+@source "../../node_modules/flyonui/dist/index.js";
 @plugin "@iconify/tailwind4";
 
 @font-face {

@@ -14,27 +14,27 @@ export default function LoginForm() {
 
   const [error, setError] = useState("");
 
-  const [loginInfo, setLogin] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-    console.log("handleSubmit called");
     e.preventDefault();
     setError("");
     setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
 
     try {
-      console.log("Attempting to authenticate with:", { loginInfo, password });
-      await login(loginInfo, password);
+      await login(identifier, password);
       router.push(searchParams.get("from") || "/home");
     } catch (error) {
-      console.error("Authentication error:", error);
       setError(error.message || "auth failed");
     } finally {
       setLoading(false);
     }
   };
+
+  const handleCloseAlert = () => setError("");
 
   return (
     <div className="bg-base-100 flex h-auto min-h-screen items-center justify-center overflow-x-hidden py-10">
@@ -54,6 +54,25 @@ export default function LoginForm() {
             </h3>
             <p className="text-base-content/80">{t("loginDescription")}</p>
           </div>
+          {/* Affichage de l'alerte en cas d'erreur */}
+          {error && (
+            <div
+              className="alert alert-soft alert-error removing:translate-x-5 removing:opacity-0 flex items-center gap-4 transition duration-300 ease-in-out"
+              role="alert"
+              id="dismiss-alert1"
+            >
+              {error}
+              <button
+                className="ms-auto cursor-pointer leading-none"
+                data-remove-element="#dismiss-alert1"
+                aria-label="Close Button"
+                onClick={handleCloseAlert}
+                type="button"
+              >
+                <span className="icon-[tabler--x] size-5"></span>
+              </button>
+            </div>
+          )}
           <div className="space-y-4">
             <form className="mb-4 space-y-4" onSubmit={handleSubmit}>
               <div>
@@ -62,8 +81,8 @@ export default function LoginForm() {
                 </label>
                 <input
                   type="email"
-                  value={loginInfo}
-                  onChange={(e) => setLogin(e.target.value)}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   placeholder={t("emailPlaceholder")}
                   className="input"
                   id="userEmail"
@@ -119,7 +138,11 @@ export default function LoginForm() {
                 type="submit"
                 disabled={loading}
               >
-                {loading ? t("loginLoading") : t("loginButton")}
+                {loading ? (
+                  <span className="loading loading-dots"></span>
+                ) : (
+                  t("loginButton")
+                )}
               </button>
             </form>
             <div className="divider">{t("noAccount")}</div>
