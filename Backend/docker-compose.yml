@@ -14,25 +14,29 @@ services:
       - auth-service
       - post-service
 
-  mongo-auth:
+  mongo-user:
     image: mongo
-    container_name: mongo-auth
+    container_name: mongo-user
     restart: unless-stopped
     ports:
       - "27017:27017"
     volumes:
-      - mongo-auth-data:/data/db
+      - mongo-user-data:/data/db
     networks:
       - app-network
 
   auth-service:
     build: ./auth-service
     container_name: auth-service
+    environment:
+      - USER_SERVICE_URL=http://user-service:3001
+      - ACCESS_JWT_KEY=dazhbdajbdjadakd
     restart: unless-stopped
     ports:
       - "3000:3000"
     depends_on:
-      - mongo-auth
+      - mongo-user
+      - user-service
     networks:
       - app-network
     volumes:
@@ -47,7 +51,7 @@ services:
     volumes:
       - mongo-post-data:/data/db
     depends_on:
-      - mongo-auth
+      - mongo-user
       - auth-service
     networks:
       - app-network
@@ -65,8 +69,19 @@ services:
     volumes:
       - ./post-service/logs:/home/logs/post-service
 
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    networks:
+      - app-network
+    volumes:
+      - ./user-service/logs:/home/logs/user-service
+
 volumes:
-  mongo-auth-data:
+  mongo-user-data:
   mongo-post-data:
 
 networks:

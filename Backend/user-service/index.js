@@ -3,27 +3,25 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const express = require('express');
 const swaggerDocs = require('./utils/swagger');
+const userAuthRoutes = require('./src/routes/user-auth.routes');
 
 const app = express();
-const port = 3004;
+const port = 3001;
 
 app.use(express.json());
+app.use('/api/users', userAuthRoutes);
 
-app.listen(port, () => {
-        console.log('User Service is running on port', port);
-        swaggerDocs(app, port);
-    });
+mongoose
+    .connect('mongodb://mongo-user:27017/userdb')
+    .then(() => {
+        console.log("Connected to the database!");
 
-// mongoose
-// .connect(process.env.MONGODB_URI)
-// .then(() => {
-//     console.log('Connected to MongoDB for User Service');
-
-//     app.listen(port, () => {
-//         console.log('User Service is running on port', port);
-//         swaggerDocs(app, port);
-//     });
-// })
-// .catch(err => {
-//     console.error('Error connecting to MongoDB for User Service:', err);
-// });
+        app.listen(port, () => {
+            console.log(`User service listening on port ${port}`)
+            swaggerDocs(app, port);
+            console.log(`Swagger docs available at http://localhost:${port}/user-service-docs`);
+        })
+    })
+    .catch(err => {
+        console.error("Database connection error:", err);
+});
