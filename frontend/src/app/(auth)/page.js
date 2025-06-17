@@ -1,30 +1,35 @@
 "use client";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/contexts/authcontext";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import Link from "next/link";
 
-export default function authForm() {
+export default function LoginForm() {
   const t = useTranslations("Auth");
 
-  const { auth } = useAuth();
+  const { login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [error, setError] = useState("");
 
-  const [login, setLogin] = useState("");
+  const [loginInfo, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
+    console.log("handleSubmit called");
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      await auth(login, password);
-      router.push(searchParams.get("from") || "/");
+      console.log("Attempting to authenticate with:", { loginInfo, password });
+      await login(loginInfo, password);
+      router.push(searchParams.get("from") || "/home");
     } catch (error) {
+      console.error("Authentication error:", error);
       setError(error.message || "auth failed");
     } finally {
       setLoading(false);
@@ -57,7 +62,7 @@ export default function authForm() {
                 </label>
                 <input
                   type="email"
-                  value={login}
+                  value={loginInfo}
                   onChange={(e) => setLogin(e.target.value)}
                   placeholder={t("emailPlaceholder")}
                   className="input"
