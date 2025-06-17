@@ -11,6 +11,10 @@ module.exports = {
             .lean()
             .exec();
     
+            if(posts?.length == 0){
+                return res.status(404).json({ message: 'No post found for this user'});
+            }
+
             if(posts) {
                 return res.status(200).json(posts);
             }
@@ -61,7 +65,7 @@ module.exports = {
 
             //TODO : Validate the input data
     
-            const newPost = new Post({user_id,
+            const newPost = new Post({author: user_id,
                                     content,
                                     tags,
                                     imageUrls,

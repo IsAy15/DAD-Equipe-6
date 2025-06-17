@@ -4,33 +4,110 @@ const mongoose = require('mongoose');
 /**
  * @swagger
  * components:
- *  schemas:
- *   Comment:
- *    type: object
- *    properties:
- *     author:
- *      type: string
- *      description: The ID of the user who authored the comment
- *      example: "60c72b2f9b1e8c001c8e4d3a"
- *     post:
- *      type: string
- *      description: The id of the post the comment belongs to
- *      example: "60c72b2f9b1e8c001c8e4d3b"
- *     content:
- *      type: string
- *      description: The content of the comment
- *      example: "This is a sample comment."
- *     parentComment:
- *      type: string
- *      description: The ID of the parent comment if this is a reply to another comment
- *      example: "60c72b2f9b1e8c001c8e4d3b"
- *     likes:
- *      type: array
- *      description: List of user IDs who liked the comment
- *      example: ["60c72b2f9b1e8c001c8e4d3c", "60c72b2f9b1e8c001c8e4d3d"]
- *      items:
- *       type: string
- *       description: The ID of the user who liked the comment
+ *   schemas:
+ *     CommentCreate:
+ *       type: object
+ *       required:
+ *         - author
+ *         - content
+ *       properties:
+ *         author:
+ *           type: string
+ *           format: objectId
+ *           description: User ID who wrote the comment
+ *         content:
+ *           type: string
+ *           description: Comment text
+ *         parentComment:
+ *           type: string
+ *           format: objectId
+ *           nullable: true
+ *           description: Parent comment ID for replies
+ *     CommentUpdate:
+ *       type: object
+ *       required:
+ *         - content
+ *       properties:
+ *         content:
+ *           type: string
+ *           description: Updated comment text
+ *     CommentResponse:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           format: objectId
+ *           example: "60a7c0f4e4b0f9b81d2f4a55"
+ *         author:
+ *           type: string
+ *           format: objectId
+ *           example: "607d1f77bcf86cd799439011"
+ *         post:
+ *           type: string
+ *           format: objectId
+ *           example: "609b8a4e8a6b5b0015e5fbd1"
+ *         content:
+ *           type: string
+ *           example: "This is a comment."
+ *         parentComment:
+ *           type: string
+ *           format: objectId
+ *           nullable: true
+ *           example: null
+ *         likes:
+ *           type: array
+ *           items:
+ *             type: string
+ *             format: objectId
+ *           example: ["607d1f77bcf86cd799439012"]
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2023-01-01T12:00:00Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2023-01-02T15:30:00Z"
+ *
+  *     ReplyCreate:
+ *       type: object
+ *       required:
+ *         - author
+ *         - content
+ *         - parentComment
+ *       properties:
+ *         author:
+ *           type: string
+ *           format: objectId
+ *           description: User ID who wrote the reply
+ *         content:
+ *           type: string
+ *           description: Reply text
+ *         parentComment:
+ *           type: string
+ *           format: objectId
+ *           description: Parent comment ID (must NOT be null)
+ *           example: "60a7c0f4e4b0f9b81d2f4a55"
+ *     ReplyUpdate:
+ *       type: object
+ *       required:
+ *         - content
+ *       properties:
+ *         content:
+ *           type: string
+ *           description: Updated reply text
+ *     ReplyResponse:
+ *       allOf:
+ *         - $ref: '#/components/schemas/CommentResponse'
+ *         - type: object
+ *           required:
+ *             - parentComment
+ *           properties:
+ *             parentComment:
+ *               type: string
+ *               format: objectId
+ *               description: Parent comment ID (never null for replies)
+ *               example: "60a7c0f4e4b0f9b81d2f4a55"
  */
 const CommentSchema = new mongoose.Schema({
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
