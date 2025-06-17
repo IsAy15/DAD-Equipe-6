@@ -55,11 +55,15 @@ router.get('/:username/feed', postController.getPostsOfSubscribdedTo);
 
 /**
  * @swagger
- * /posts:
+ * /posts/{user_id}:
  *  post:
  *   tags:
  *    - Posts
  *   summary: Create a new post
+ *   parameters:
+ *    - in: path
+ *      name: user_id
+ *      required: true
  *   requestBody:
  *    required: true
  *    content:
@@ -77,7 +81,7 @@ router.get('/:username/feed', postController.getPostsOfSubscribdedTo);
  *    500:
  *     description: Failed to create post
  */
-router.post('/', postController.createPost);
+router.post('/:user_id', postController.createPost);
 
 /**
 * @swagger

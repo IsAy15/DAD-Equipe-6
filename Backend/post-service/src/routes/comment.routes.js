@@ -145,13 +145,13 @@ router.delete('/:comment_id', commentController.deleteCommentFromPost);
 
 /**
  * @swagger
- * /posts/{post_id}/comments/{comment_id}/replies
+ * /posts/{post_id}/comments/{comment_id}/replies:
  *  get:
  *   tags:
  *    - Replies
- *   summary: Retrives the replies to a specific comment on a post
+ *   summary: Retrieves the replies to a specific comment on a post
  *   parameters:
- *    - in: path:
+ *    - in: path
  *      name: post_id
  *      required: true
  *      schema:
@@ -162,7 +162,7 @@ router.delete('/:comment_id', commentController.deleteCommentFromPost);
  *      required: true
  *      schema:
  *       type: string
- *       description : The id of the comment that the reply is replying to
+ *       description: The id of the comment that the reply is replying to
  *   responses:
  *    200:
  *     description: A list of the replies to the specified comment
