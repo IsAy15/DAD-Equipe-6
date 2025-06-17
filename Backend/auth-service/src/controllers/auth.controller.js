@@ -62,7 +62,7 @@ exports.login = async (req, res) => {
       process.env.ACCESS_JWT_KEY
     );
 
-    return res.status(200).json({ message: "You are now connected!", accessToken });
+    return res.status(200).json({ message: "You are now connected!", accessToken, userId: user.id });
 
   } catch (err) {
     if (err.response && err.response.status === 404) {
