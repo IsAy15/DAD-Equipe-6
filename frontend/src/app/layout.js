@@ -1,26 +1,42 @@
 import "./globals.css";
 
 import FlyonuiScript from "../components/FlyonuiScript";
-
-import { NextIntlClientProvider } from "next-intl";
-import { getUserLocale } from "../services/locale";
-import { getUserTheme } from "../services/theme";
 import DefaultTheme from "../components/DefaultTheme";
 
-export default async function RootLayout({ children }) {
-  const locale = await getUserLocale();
-  const userTheme = await getUserTheme();
+import { NextIntlClientProvider } from "next-intl";
 
-  // Si arabe, on passe en RTL, sinon LTR
+import { getUserLocale } from "../services/locale";
+import { getUserTheme } from "../services/theme";
+
+import { AuthProvider } from "../contexts/authcontext";
+
+export default async function RootLayout({ children }) {
+  /* ------------------------------------------------------------------ */
+  /* Préférences utilisateur                                            */
+  /* ------------------------------------------------------------------ */
+  const locale = await getUserLocale(); // ex. “fr” ou “en”
+  const userTheme = await getUserTheme(); // ex. “light” / “dark”
+
+  /* RTL pour l’arabe, LTR sinon */
   const dir = locale === "ar" ? "rtl" : "ltr";
+
+  /* ------------------------------------------------------------------ */
+  /* Layout HTML                                                        */
+  /* ------------------------------------------------------------------ */
   return (
     <html lang={locale} dir={dir} data-theme={userTheme}>
+      {/* Provider des traductions */}
       <NextIntlClientProvider locale={locale} dir={dir}>
-        <body>
-          <DefaultTheme />
-          {children}
-        </body>
-        <FlyonuiScript />
+        {/* Provider d’authentification : tout le site a accès à useAuth */}
+        <AuthProvider>
+          <body>
+            <DefaultTheme /> {/* applique le thème Tailwind/DaisyUI */}
+            {children} {/* pages rendues ici */}
+          </body>
+
+          {/* Scripts éventuels de ta lib Flyonui */}
+          <FlyonuiScript />
+        </AuthProvider>
       </NextIntlClientProvider>
     </html>
   );

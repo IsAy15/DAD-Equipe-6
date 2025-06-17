@@ -1,9 +1,36 @@
 "use client";
 import { useTranslations } from "next-intl";
+import { useAuth } from "@/contexts/authcontext";
 import Link from "next/link";
 
-export default function LoginForm() {
+export default function authForm() {
   const t = useTranslations("Auth");
+
+  const { auth } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [error, setError] = useState("");
+
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      await auth(login, password);
+      router.push(searchParams.get("from") || "/");
+    } catch (error) {
+      setError(error.message || "auth failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-base-100 flex h-auto min-h-screen items-center justify-center overflow-x-hidden py-10">
       <div className="relative flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -23,16 +50,15 @@ export default function LoginForm() {
             <p className="text-base-content/80">{t("loginDescription")}</p>
           </div>
           <div className="space-y-4">
-            <form
-              className="mb-4 space-y-4"
-              onSubmit={(e) => e.preventDefault()}
-            >
+            <form className="mb-4 space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="label-text" htmlFor="userEmail">
                   {t("email")}
                 </label>
                 <input
                   type="email"
+                  value={login}
+                  onChange={(e) => setLogin(e.target.value)}
                   placeholder={t("emailPlaceholder")}
                   className="input"
                   id="userEmail"
@@ -47,6 +73,8 @@ export default function LoginForm() {
                   <input
                     id="userPassword"
                     type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="············"
                     required
                   />
@@ -79,8 +107,14 @@ export default function LoginForm() {
                   {t("forgotPassword")}
                 </Link>
               </div>
-              <button className="btn btn-lg btn-primary btn-gradient btn-block">
-                {t("loginButton")}
+              <button
+                className={`btn btn-large btn-primary btn-gradient btn-block ${
+                  loading ? "btn-disabled cursor-not-allowed" : ""
+                }`}
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? t("loginLoading") : t("loginButton")}
               </button>
             </form>
             <div className="divider">{t("noAccount")}</div>

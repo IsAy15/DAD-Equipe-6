@@ -39,6 +39,7 @@
     "rememberMe": "Se souvenir de moi",
     "forgotPassword": "Mot de passe oublié ?",
     "loginButton": "Se connecter",
+    "loginLoading": "Connexion en cours...",
     "registerButton": "S'inscrire",
     "noAccount": "Vous n'avez pas de compte ?",
     "alreadyHaveAccount": "Vous avez déjà un compte ?",
