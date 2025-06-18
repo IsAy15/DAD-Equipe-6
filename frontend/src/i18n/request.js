@@ -5,7 +5,6 @@ export default getRequestConfig(async () => {
   const userCookies = await cookies();
   const locale =
     userCookies.get("BREEZY_LOCALE")?.value ||
-    navigator.language.split("-")[0] ||
     "en";
   return {
     locale,
