@@ -3,8 +3,6 @@
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getUserLocale, setUserLocale } from "../services/locale";
-import { getUserTheme, setUserTheme } from "../services/theme";
 import clsx from "clsx";
 import AppearanceSettings from "./AppearanceSettings";
 
@@ -12,8 +10,6 @@ const ASIDE_WIDTH = 256; // px
 
 export default function NavBar() {
   const t = useTranslations("Navbar");
-  const [theme, setTheme] = useState(null);
-  const [language, setLanguage] = useState(null);
   const [asideOpen, setAsideOpen] = useState(false);
   const [touchStartX, setTouchStartX] = useState(null);
   const [touchEndX, setTouchEndX] = useState(null);
@@ -31,26 +27,6 @@ export default function NavBar() {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
-
-  // Récupération du thème et de la langue
-  useEffect(() => {
-    getUserTheme().then((storedTheme) => storedTheme && setTheme(storedTheme));
-    getUserLocale().then(
-      (storedLanguage) => storedLanguage && setLanguage(storedLanguage)
-    );
-  }, []);
-
-  const handleThemeChange = (e) => {
-    const selectedTheme = e.target.value;
-    setTheme(selectedTheme);
-    setUserTheme(selectedTheme);
-  };
-
-  const handleLanguageChange = (e) => {
-    const selectedLanguage = e.target.value;
-    setLanguage(selectedLanguage);
-    setUserLocale(selectedLanguage);
-  };
 
   // Fermer l'aside (avec délai pour l'animation overlay)
   const handleAsideClose = () => {

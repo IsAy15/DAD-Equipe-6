@@ -4,6 +4,7 @@
     "description": "Ceci est la page d'accueil"
   },
   "Auth": {
+    "title": "Connexion",
     "loginTitle": "Connexion",
     "registerTitle": "Inscription",
     "loginDescription": "Connectez-vous pour accéder à votre compte",
@@ -27,8 +28,8 @@
     "passwordRequirements": "Votre mot de passe doit contenir :",
     "passwordRequirementsList": {
       "min-length": "Au moins 8 caractères",
-      "lowercase": "Au moins une lettre majuscule",
-      "uppercase": "Au moins une lettre minuscule",
+      "lowercase": "Au moins une lettre minuscule",
+      "uppercase": "Au moins une lettre majuscule",
       "numbers": "Au moins un chiffre",
       "special-characters": "Au moins un caractère spécial"
     },
