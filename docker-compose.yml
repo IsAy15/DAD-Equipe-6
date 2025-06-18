@@ -82,7 +82,7 @@ services:
       - ./Backend/user-service/logs:/home/logs/user-service
 
   frontend:
-    build: ./Frontend
+    build: ./frontend
     container_name: frontend
     restart: unless-stopped
     ports:
