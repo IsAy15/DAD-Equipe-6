@@ -43,14 +43,11 @@ jobs:
         fi
 
         cd "$REPO_DIR"
-        echo "Building Docker images..."
-        docker compose -f docker-compose.yml build
-
-        echo "Stopping and removing existing containers..."
-        docker compose -f docker-compose.yml down
+        echo "Stopping and removing docker images..."
+        docker rm -v -f $(docker ps -qa)
 
         echo "Starting containers..."
-        docker compose -f docker-compose.yml up -d
+        docker compose -f docker-compose.yml up -d --build
         
         echo "Deployment completed successfully."
         '

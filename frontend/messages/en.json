@@ -3,18 +3,34 @@
     "title": "Welcome",
     "description": "This is the homepage"
   },
-  "Login": {
+  "Auth": {
     "title": "Login",
-    "description": "Log in to access your account",
+    "registerTitle": "Register",
+    "loginTitle": "Login",
+    "registerDescription": "Create an account to get started",
+    "loginDescription": "Log in to access your account",
     "email": "Email",
     "emailPlaceholder": "Enter your email",
     "password": "Password",
+    "passwordLevel": "Password strength level:",
+    "passwordLevels": [
+      "Empty",
+      "Weak",
+      "Medium",
+      "Strong",
+      "Very strong",
+      "Ultra strong"
+    ],
     "rememberMe": "Remember me",
     "forgotPassword": "Forgot password?",
     "loginButton": "Log in",
+    "registerButton": "Register",
     "noAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
     "createAccount": "Create an account",
-    "loginWithGoogle": "Log in with Google"
+    "or": "or",
+    "loginWithGoogle": "Log in with Google",
+    "registerwithGoogle": "Register with Google"
   },
   "Navbar": {
     "title": "Breezy",

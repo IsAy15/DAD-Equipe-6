@@ -29,13 +29,14 @@ module.exports = {
         // Controller logic to create a new post goes here
 
         try{
-            const { author, content, tags, imageUrls, videoUrls } = req.body;
+            const user_id = req.params.user_id;
+            const { content, tags, imageUrls, videoUrls } = req.body;
     
             //TODO : Check if the author is the same as the logged-in user
 
             //TODO : Validate the input data
     
-            const newPost = new Post({author,
+            const newPost = new Post({user_id,
                                     content,
                                     tags,
                                     imageUrls,

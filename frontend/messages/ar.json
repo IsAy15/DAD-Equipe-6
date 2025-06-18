@@ -1,11 +1,34 @@
 {
   "Index": {
-    "title": "مرحبا",
+    "title": "مرحبا بك",
     "description": "هذه هي الصفحة الرئيسية"
   },
+  "Auth": {
+    "title": "تسجيل الدخول",
+    "registerTitle": "إنشاء حساب",
+    "loginTitle": "تسجيل الدخول",
+    "registerDescription": "أنشئ حسابًا للبدء",
+    "loginDescription": "سجّل الدخول للوصول إلى حسابك",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "password": "كلمة المرور",
+    "rememberMe": "تذكرني",
+    "forgotPassword": "هل نسيت كلمة المرور؟",
+    "loginButton": "تسجيل الدخول",
+    "registerButton": "إنشاء حساب",
+    "noAccount": "ليس لديك حساب؟",
+    "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
+    "createAccount": "إنشاء حساب",
+    "or": "أو",
+    "loginWithGoogle": "تسجيل الدخول باستخدام جوجل",
+    "registerwithGoogle": "إنشاء حساب باستخدام جوجل"
+  },
   "Navbar": {
-    "title": "Breezy",
-    "theme": "السمة",
+    "title": "بريزي",
+    "home": "الرئيسية",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "theme": "المظهر",
     "language": "اللغة",
     "css_components": "مكونات CSS",
     "js_components": "مكونات JS"
