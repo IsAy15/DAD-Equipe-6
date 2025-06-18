@@ -31,7 +31,7 @@ jobs:
         nvm install node
 
         REPO_URL="https://github.com/IsAy15/DAD-Equipe-6.git"
-        BRANCH="dev"
+        BRANCH="deployement"
         REPO_DIR="$HOME/breezy-api"
 
         if [ -d "$REPO_DIR/.git" ]; then
