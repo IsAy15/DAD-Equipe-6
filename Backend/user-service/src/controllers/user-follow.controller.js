@@ -35,3 +35,26 @@ exports.getFollowing = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+// GET /api/users/:userId/friends
+exports.getFriends = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const user = await User.findById(userId).lean();
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const followingSet = new Set(user.following.map(id => id.toString()));
+        const mutualFriends = user.followers.filter(followerId =>
+        followingSet.has(followerId.toString())
+        );
+
+        const friends = await User.find({ _id: { $in: mutualFriends } }, 'username email avatar');
+
+        return res.status(200).json({ friends });
+    } catch (err) {
+        console.error("Error getting friends:", err);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+

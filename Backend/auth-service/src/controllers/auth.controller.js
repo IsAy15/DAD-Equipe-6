@@ -14,27 +14,32 @@ exports.register = async (req, res) => {
     };
 
     const userServiceURL = process.env.USER_SERVICE_URL;
-    await axios.post(`${userServiceURL}/api/users`, userPayload, { timeout: 3000 });
+    const { data: user } = await axios.post(`${userServiceURL}/api/users`, userPayload, { timeout: 3000 });
 
     const accessToken = jwt.sign(
-      { username: userPayload.username, exp: Math.floor(Date.now() / 1000) + 120 },
+      {
+        userId: user.id,
+        username: user.username,
+        exp: Math.floor(Date.now() / 1000) + 600
+      },
       process.env.ACCESS_JWT_KEY
     );
 
     return res.status(201).json({ msg: "New User created!", accessToken });
 
   } catch (err) {
-  if (err.response) {
-    console.error("❌ user-service responded with:", err.response.status, err.response.data);
-    return res.status(err.response.status).json({
-      error: err.response.data.error || "user-service rejected the request"
-    });
-  } else {
-    console.error("❌ user-service unreachable:", err.message);
-    return res.status(500).json({ error: "user-service unreachable" });
+    if (err.response) {
+      console.error("user-service responded with:", err.response.status, err.response.data);
+      return res.status(err.response.status).json({
+        error: err.response.data.error || "user-service rejected the request"
+      });
+    } else {
+      console.error("user-service unreachable:", err.message);
+      return res.status(500).json({ error: "user-service unreachable" });
     }
   }
 };
+
 
 // LOGIN : demande les données à user-service
 exports.login = async (req, res) => {
@@ -58,7 +63,11 @@ exports.login = async (req, res) => {
     }
 
     const accessToken = jwt.sign(
-      { username: user.username, exp: Math.floor(Date.now() / 1000) + 120 },
+      {
+        userId: user.id,
+        username: user.username,
+        exp: Math.floor(Date.now() / 1000) + 600
+      },
       process.env.ACCESS_JWT_KEY
     );
 
