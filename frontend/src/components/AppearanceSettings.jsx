@@ -192,6 +192,17 @@ export default function AppearanceSettings() {
               onChange={handleLanguageChange}
             />
           </li>
+          <li>
+            <input
+              type="radio"
+              name="language-dropdown"
+              className="language-controller btn btn-text w-full justify-start"
+              aria-label="中文"
+              value="zh"
+              checked={language === "zh"}
+              onChange={handleLanguageChange}
+            />
+          </li>
         </ul>
       </div>
     </div>
