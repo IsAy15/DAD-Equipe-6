@@ -1,4 +1,5 @@
 import AppearanceSettings from "@/components/AppearanceSettings";
+
 export default async function AuthLayout({ children }) {
   return (
     <div>

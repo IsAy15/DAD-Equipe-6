@@ -4,12 +4,16 @@ const mongoose = require('mongoose');
 const express = require('express');
 const swaggerDocs = require('./utils/swagger');
 const userAuthRoutes = require('./src/routes/user-auth.routes');
+const userFollowRoutes = require('./src/routes/user-follow.routes')
+const friendRequestRoutes = require('./src/routes/friend-request.routes');
 
 const app = express();
 const port = 3001;
 
 app.use(express.json());
 app.use('/api/users', userAuthRoutes);
+app.use('/api/users', userFollowRoutes);
+app.use('/api/friend-requests', friendRequestRoutes);
 
 mongoose
     .connect('mongodb://mongo-user:27017/userdb')

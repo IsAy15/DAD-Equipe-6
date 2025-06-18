@@ -1,9 +1,41 @@
 "use client";
 import { useTranslations } from "next-intl";
+import { useAuth } from "@/contexts/authcontext";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import Link from "next/link";
 
 export default function LoginForm() {
   const t = useTranslations("Auth");
+
+  const { login } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [error, setError] = useState("");
+
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
+
+    try {
+      await login(identifier, password);
+      router.push(searchParams.get("from") || "/home");
+    } catch (error) {
+      setError(error.message || "auth failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseAlert = () => setError("");
+
   return (
     <div className="bg-base-100 flex h-auto min-h-screen items-center justify-center overflow-x-hidden py-10">
       <div className="relative flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -22,17 +54,35 @@ export default function LoginForm() {
             </h3>
             <p className="text-base-content/80">{t("loginDescription")}</p>
           </div>
-          <div className="space-y-4">
-            <form
-              className="mb-4 space-y-4"
-              onSubmit={(e) => e.preventDefault()}
+          {/* Affichage de l'alerte en cas d'erreur */}
+          {error && (
+            <div
+              className="alert alert-soft alert-error removing:translate-x-5 removing:opacity-0 flex items-center gap-4 transition duration-300 ease-in-out"
+              role="alert"
+              id="dismiss-alert1"
             >
+              {error}
+              <button
+                className="ms-auto cursor-pointer leading-none"
+                data-remove-element="#dismiss-alert1"
+                aria-label="Close Button"
+                onClick={handleCloseAlert}
+                type="button"
+              >
+                <span className="icon-[tabler--x] size-5"></span>
+              </button>
+            </div>
+          )}
+          <div className="space-y-4">
+            <form className="mb-4 space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="label-text" htmlFor="userEmail">
                   {t("email")}
                 </label>
                 <input
                   type="email"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   placeholder={t("emailPlaceholder")}
                   className="input"
                   id="userEmail"
@@ -47,6 +97,8 @@ export default function LoginForm() {
                   <input
                     id="userPassword"
                     type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="············"
                     required
                   />
@@ -79,8 +131,18 @@ export default function LoginForm() {
                   {t("forgotPassword")}
                 </Link>
               </div>
-              <button className="btn btn-lg btn-primary btn-gradient btn-block">
-                {t("loginButton")}
+              <button
+                className={`btn btn-large btn-primary btn-gradient btn-block ${
+                  loading ? "btn-disabled cursor-not-allowed" : ""
+                }`}
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="loading loading-dots"></span>
+                ) : (
+                  t("loginButton")
+                )}
               </button>
             </form>
             <div className="divider">{t("noAccount")}</div>

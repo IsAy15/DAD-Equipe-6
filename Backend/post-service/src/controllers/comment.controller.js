@@ -11,7 +11,7 @@ module.exports = {
                 return res.status(400).json({ message: 'Post ID is required' });
             }
 
-            const postComments = await Comment.find({ post: post_id }).lean().exec();
+            const postComments = await Comment.find({ post: post_id }).sort({ createdAt: -1 }).lean().exec();
 
             if(postComments?.length === 0) {
                 return res.status(404).json({ message: 'No comments found for this post' });
@@ -112,7 +112,7 @@ module.exports = {
                 return res.status(400).json({ message: 'Comment_id is required' });
             }
 
-            const comments = await Comment.find({ comment: comment_id}).lean().exec();
+            const comments = await Comment.find({ parentComment: comment_id}).lean().exec();
 
             if(comments?.length == 0){
                 return res.status(404).json('No replies found for this comment');
@@ -140,12 +140,15 @@ module.exports = {
                 if (!parentComment) {
                     return res.status(404).json({ message: 'Parent comment not found' });
                 }
+                if(parentComment.parentComment){
+                    return res.status(404).json({ message: 'Cannnot add a reply to a reply' });
+                }
 
                 const newReply = new Comment({
                     content,
                     author,
                     post: post_id,
-                    comment: comment_id, // lien au commentaire parent
+                    parentComment: comment_id, // lien au commentaire parent
                 });
 
                 await newReply.save()
@@ -168,7 +171,7 @@ module.exports = {
             }
 
             const reply = await Comment.findOneAndUpdate(
-                { comment: comment_id },
+                { comment: reply_id },
                 { content },
                 { new: true }
             ).exec();
@@ -188,8 +191,14 @@ module.exports = {
         try {
             const { post_id, comment_id, reply_id } = req.params;
 
+            const parentComment = await Comment.findById(comment_id).exec();
+
+            if(!parentComment.parentComment){
+                return res.status(500).json({ message: 'Internal server error', error: 'error' });
+            }
+
             const deleted = await Comment.findOneAndDelete({
-                comment: comment_id,
+                comment: reply_id,
             }).exec();
 
             if (!deleted) {

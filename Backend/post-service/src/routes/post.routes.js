@@ -1,144 +1,171 @@
 const router = require('express').Router();
 const postController = require('../controllers/post.controller');
+const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/validateIds');
 
-// Routes for /posts
-
-/**
- * @swagger
- * /posts/{user_id}:
- *  get:
- *   tags:
- *    - Posts
- *   summary: Retrieve posts by user id
- *   parameters:
- *    - in: path
- *      name: user_id
- *      required: true
- *      schema:
- *       type: string
- *       description: The id of the user whose posts are to be retrieved
- *   responses:
- *    200:
- *     description: A list of posts by the specified user
- *     content:
- *      application/json:
- *       schema:
- *        type: array
- *        items:
- *         $ref: '#/components/schemas/UpdatePostSchema' 
- *    404:
- *     description: No posts found for this user
- *    500:
- *     description: Failed to retrieve posts
- */
-router.get('/:user_id', postController.getPostsByUserId);
+// Routes for /api/posts
 
 /**
  * @swagger
- * /posts/{id}/feed:
- *  get:
- *   tags:
- *    - Posts
- *   summary: Retrieve posts of users that the user is subscribed to
- *   parameters:
- *    - in: path
- *      name: id
- *      required: true
- *      schema:
- *       type: string
- *       description: The id of the user whose feed is to be retrieved
- *   responses:
- *    200:
- *     description: A list of posts from users that the user is subscribed to
+ * tags:
+ *   name: Posts
+ *   description: Endpoints to manage posts 
  */
-router.get('/:username/feed', postController.getPostsOfSubscribdedTo);
 
 /**
  * @swagger
- * /posts/{user_id}:
- *  post:
- *   tags:
- *    - Posts
- *   summary: Create a new post
- *   parameters:
- *    - in: path
- *      name: user_id
- *      required: true
- *   requestBody:
- *    required: true
- *    content:
- *     application/json:
- *      schema:
- *       $ref: '#/components/schemas/CreatePostSchema'
- *       
- *   responses:
- *    201:
- *     description: Post created successfully
- *     content:
- *      application/json:
- *       schema:
- *        $ref: '#/components/schemas/CreatePostSchema'
- *    500:
- *     description: Failed to create post
+ * /api/posts/{user_id}:
+ *   get:
+ *     summary: Get all posts by a user
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         schema:
+ *           type: string
+ *           format: objectId
+ *         required: true
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: List of posts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/PostResponse'
+ *       404:
+ *         description: No posts found for this user
+ *       500:
+ *         description: Server error
+ *   post:
+ *     summary: Create a post for a user
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         schema:
+ *           type: string
+ *           format: objectId
+ *         required: true
+ *         description: Author user ID
+ *     requestBody:
+ *       description: Post data to create
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PostCreate'
+ *     responses:
+ *       201:
+ *         description: Post created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PostResponse'
+ *       500:
+ *         description: Server error
  */
-router.post('/:user_id', postController.createPost);
 
 /**
-* @swagger
-* /posts/{id}:
-*  put:
-*   tags:
-*     - Posts
-*   summary: Update an existing post
-*   parameters:
-*    - in: path
-*      name: id
-*      required: true
-*      schema:
-*       type: string
-*       description: The id of the post to be updated
-*   requestBody:
-*    required: true
-*    content:
-*     application/json:
-*      schema:
-*       $ref: '#/components/schemas/UpdatePostSchema'
-*   responses:
-*    200:
-*     description: Post updated successfully
-*    400:
-*     description: Bad request, post ID is required
-*    404:
-*     description: Post not found
-*    500:
-*     description: Failed to update post
-*/
-router.put('/:post_id', postController.updatePost);
+ * @swagger
+ * /api/posts/{user_id}/feed:
+ *   get:
+ *     summary: Get posts feed from users the given user is subscribed to
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         schema:
+ *           type: string
+ *           format: objectId
+ *         required: true
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: Posts feed retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/PostResponse'
+ *       204:
+ *         description: No content (empty feed)
+ *       500:
+ *         description: Server error
+ */
 
 /**
-* @swagger
-* /posts/{id}:
-*  delete:
-*   tags:
-*    - Posts
-*   summary: Delete a post
-*   parameters:
-*    - in: path
-*      name: id
-*      required: true
-*      schema:
-*       type: string
-*       description: The ID of the post to be deleted
-*   responses:
-*    204:
-*     description: Post deleted successfully
-*    400:
-*     description: Bad request, post ID is required
-*    404:
-*     description: Post not found
-*    500:
-*     description: Failed to delete post
-*/
-router.delete('/:post_id', postController.deletePost);
+ * @swagger
+ * /api/posts/{post_id}:
+ *   put:
+ *     summary: Update a post by ID
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: post_id
+ *         schema:
+ *           type: string
+ *           format: objectId
+ *         required: true
+ *         description: Post ID to update
+ *     requestBody:
+ *       description: Data to update the post
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PostUpdate'
+ *     responses:
+ *       200:
+ *         description: Post updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PostResponse'
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Server error
+ *   delete:
+ *     summary: Delete a post by ID
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: post_id
+ *         schema:
+ *           type: string
+ *           format: objectId
+ *         required: true
+ *         description: Post ID to delete
+ *     responses:
+ *       204:
+ *         description: Post deleted successfully
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Server error
+ */
+
+router.get('/:user_id',
+    validateUrlObjectId('user_id'),
+    postController.getPostsByUserId);
+
+router.get('/:user_id/feed',
+    validateUrlObjectId('user_id'),
+    postController.getPostsOfSubscribdedTo);
+
+router.post('/:user_id', 
+    validateUrlObjectId('user_id'),
+    postController.createPost);
+
+router.put('/:post_id',
+    validateUrlObjectId('post_id'),
+    postController.updatePost);
+
+router.delete('/:post_id',
+    validateUrlObjectId('post_id'),
+    postController.deletePost);
 
 module.exports = router;
