@@ -2,9 +2,12 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { useAuth } from "@/contexts/authcontext";
 
 export default function RegisterForm() {
   const t = useTranslations("Auth");
+
+  const { register } = useAuth();
 
   const [username, setUsername] = useState("");
   const [usernameValid, setUsernameValid] = useState(true);
@@ -13,6 +16,23 @@ export default function RegisterForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordsMatch, setPasswordsMatch] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
+    try {
+      await register(email, username, password);
+      router.push(searchParams.get("from") || "/home");
+    } catch (error) {
+      setError(error.message || "auth failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Vérification nom d'utilisateur en temps réel
   const handleUsernameChange = (e) => {
@@ -65,10 +85,7 @@ export default function RegisterForm() {
             <p className="text-base-content/80">{t("registerDescription")}</p>
           </div>
           <div className="space-y-4">
-            <form
-              className="mb-4 space-y-4"
-              onSubmit={(e) => e.preventDefault()}
-            >
+            <form className="mb-4 space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="label-text" htmlFor="userName">
                   {t("username")}*
@@ -255,8 +272,18 @@ export default function RegisterForm() {
                   </a>
                 </label>
               </div>
-              <button className="btn btn-lg btn-primary btn-gradient btn-block">
-                {t("registerButton")}
+              <button
+                type="submit"
+                disabled={
+                  !usernameValid || !emailValid || !passwordsMatch || loading
+                }
+                className="btn btn-lg btn-primary btn-gradient btn-block"
+              >
+                {loading ? (
+                  <span className="loading loading-dots"></span>
+                ) : (
+                  t("registerButton")
+                )}
               </button>
             </form>
             <div className="divider">{t("alreadyHaveAccount")}</div>

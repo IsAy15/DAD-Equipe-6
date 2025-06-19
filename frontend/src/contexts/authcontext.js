@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // — Inscription
-  const signup = async (email, username, password) => {
+  const register = async (email, username, password) => {
     try {
       const data = await registerUser(email, username, password);
       // Le backend renvoie `accessToken`
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
       setAccessToken(token);
       setIdentifier(username);
     } catch (err) {
-      console.error("Signup error:", err);
+      console.error("Register error:", err);
       throw new Error(err.response?.data?.error || err.message);
     }
   };
@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ accessToken, identifier, signup, login, logout }}
+      value={{ accessToken, identifier, register, login, logout }}
     >
       {children}
     </AuthContext.Provider>
