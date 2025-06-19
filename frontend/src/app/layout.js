@@ -1,7 +1,6 @@
 import "./globals.css";
 
 import FlyonuiScript from "../components/FlyonuiScript";
-import DefaultTheme from "../components/DefaultTheme";
 
 import { NextIntlClientProvider } from "next-intl";
 
@@ -30,11 +29,8 @@ export default async function RootLayout({ children }) {
         {/* Provider d’authentification : tout le site a accès à useAuth */}
         <AuthProvider>
           <body>
-            <DefaultTheme /> {/* applique le thème Tailwind/DaisyUI */}
             {children} {/* pages rendues ici */}
-            <script src="../../node_modules/flyonui/flyonui.js"></script>
           </body>
-
           {/* Scripts éventuels de ta lib Flyonui */}
           <FlyonuiScript />
         </AuthProvider>
