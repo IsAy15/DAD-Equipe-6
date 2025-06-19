@@ -9,6 +9,8 @@
     "registerTitle": "Inscription",
     "loginDescription": "Connectez-vous pour accéder à votre compte",
     "registerDescription": "Créez un compte pour commencer",
+    "identifier": "Nom d'utilisateur ou email",
+    "identifierPlaceholder": "Entrez votre nom d'utilisateur ou email",
     "username": "Nom d'utilisateur",
     "usernamePlaceholder": "Entrez votre nom d'utilisateur",
     "usernameError": "Nom d'utilisateur invalide/déjà pris",
@@ -53,10 +55,20 @@
     "title": "Breezy",
     "home": "Accueil",
     "profile": "Profil",
-    "settings": "Paramètres",
+    "search": "Rechercher",
+    "breeze": "Souffler",
+    "notifications": "Notifications",
+    "messages": "Messages",
     "theme": "Thème",
     "language": "Langue",
-    "css_components": "Composants CSS",
-    "js_components": "Composants JS"
+    "logout": "Se déconnecter"
+  },
+  "AppearanceSettings": {
+    "theme": "Thème",
+    "lightTheme": "Thème clair",
+    "darkTheme": "Thème sombre",
+    "blackTheme": "Thème noir",
+    "systemTheme": "Thème système",
+    "language": "Langue"
   }
 }

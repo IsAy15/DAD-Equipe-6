@@ -1,22 +1,24 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const mongoose = require('mongoose');
-const express = require('express');
+const mongoose = require("mongoose");
+const express = require("express");
 
 const app = express();
+const cors = require("cors");
+app.use(cors());
 const port = 3003;
 
 app.use(express.json());
 
 mongoose
-.connect(process.env.MONGODB_URI)
-.then(() => {
-    console.log('Connected to MongoDB for notification Service');
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("Connected to MongoDB for notification Service");
 
     app.listen(port, () => {
-        console.log('Notification Service is running on port', port);
+      console.log("Notification Service is running on port", port);
     });
-})
-.catch(err => {
-    console.error('Error connecting to MongoDB for Notification Service:', err);
-});
+  })
+  .catch((err) => {
+    console.error("Error connecting to MongoDB for Notification Service:", err);
+  });

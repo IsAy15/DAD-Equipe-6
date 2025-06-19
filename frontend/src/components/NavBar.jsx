@@ -2,13 +2,18 @@
 
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import clsx from "clsx";
 import AppearanceSettings from "./AppearanceSettings";
+import { usePathname } from "next/navigation";
+
+import ProfileCard from "./ProfileCard";
+import { useAuth } from "@/contexts/authcontext";
 
 const ASIDE_WIDTH = 256; // px
 
 export default function NavBar() {
+  const { identifier } = useAuth();
   const t = useTranslations("Navbar");
   const [asideOpen, setAsideOpen] = useState(false);
   const [touchStartX, setTouchStartX] = useState(null);
@@ -17,6 +22,7 @@ export default function NavBar() {
   const [showNav, setShowNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const pathname = usePathname();
 
   // Détection mobile (évite le SSR)
   useEffect(() => {
@@ -127,36 +133,112 @@ export default function NavBar() {
         <div className="flex flex-col h-full">
           {/* User */}
           <div className="flex items-center justify-between p-4 border-b">
-            {/* <img src="/logo.svg" /> */}
+            <ProfileCard identifier={identifier} />
           </div>
           {/* Menu */}
           <nav className="flex-1 overflow-y-auto p-4">
             <ul className="menu menu-horizontal gap-2 p-0 text-base rtl:ml-20">
               <li className="w-full">
                 <Link href="/home" className="btn btn-text justify-start">
-                  <span className="icon-[tabler--home] size-6"></span>
+                  <span
+                    className={clsx(
+                      "size-6",
+                      pathname == "/home"
+                        ? "text-primary icon-[tabler--home-filled]"
+                        : "icon-[tabler--home]"
+                    )}
+                  />
                   <span>{t("home")}</span>
                 </Link>
               </li>
               <li className="w-full">
                 <Link href="#" className="btn btn-text justify-start">
-                  <span className="icon-[tabler--user] size-6"></span>
+                  <span
+                    className={clsx(
+                      "size-6",
+                      pathname == "/profile"
+                        ? "text-primary icon-[tabler--user-filled]"
+                        : "icon-[tabler--user]"
+                    )}
+                  />
                   <span>{t("profile")}</span>
+                </Link>
+              </li>
+              <li className="w-full">
+                <Link href="/search" className="btn btn-text justify-start">
+                  <span
+                    className={clsx(
+                      "icon-[tabler--search] size-6",
+                      pathname === "/search" && "text-primary"
+                    )}
+                  />
+                  <span>{t("search")}</span>
+                </Link>
+              </li>
+              <li className="w-full">
+                <Link href="/breeze" className="btn btn-text justify-start">
+                  <span
+                    className={clsx(
+                      "icon-[tabler--wind] size-6",
+                      pathname === "/breeze" && "text-primary"
+                    )}
+                  />
+                  <span>{t("breeze")}</span>
+                </Link>
+              </li>
+              <li className="w-full">
+                <Link
+                  href="/notifications"
+                  className="btn btn-text justify-start"
+                >
+                  <span
+                    className={clsx(
+                      "size-6",
+                      pathname == "/notifications"
+                        ? "text-primary icon-[tabler--bell-filled]"
+                        : "icon-[tabler--bell]"
+                    )}
+                  />
+                  <span>{t("notifications")}</span>
+                </Link>
+              </li>
+              <li className="w-full">
+                <Link href="/messages" className="btn btn-text justify-start">
+                  <span
+                    className={clsx(
+                      "size-6",
+                      pathname == "/messages"
+                        ? "text-primary icon-[tabler--message-filled]"
+                        : "icon-[tabler--message]"
+                    )}
+                  />
+                  <span>{t("messages")}</span>
                 </Link>
               </li>
             </ul>
           </nav>
           {/* Sélecteurs thème/langue */}
-          <div className="flex justify-center p-4 border-t">
-            <AppearanceSettings />
+          <div className="flex flex-col gap-4 p-4 border-t">
+            <div className="flex justify-around p-4 w-full flex-wrap gap-4">
+              <AppearanceSettings />
+            </div>
+            <div className="flex justify-center">
+              <button
+                className="btn btn-text w-full"
+                onClick={useAuth().logout}
+              >
+                <span className="icon-[tabler--logout-2] size-6" />
+                <span>{t("logout")}</span>
+              </button>
+            </div>
           </div>
         </div>
       </aside>
 
-      {/* Navbar mobile */}
+      {/* Navbar mobile (haut) */}
       <nav
         className={clsx(
-          "navbar shadow sm:hidden fixed top-0 left-0 right-0 z-50 bg-base-100 transition-transform duration-300",
+          "navbar shadow sm:hidden fixed top-0 left-0 right-0 z-30 bg-base-100 transition-transform duration-300",
           showNav ? "translate-y-0" : "-translate-y-full"
         )}
       >
@@ -175,15 +257,87 @@ export default function NavBar() {
         {/* Tu peux ajouter ici les sélecteurs thème/langue si tu veux accès rapide sur mobile */}
       </nav>
 
+      {/* Navbar mobile (bas) */}
+      <nav
+        className={clsx(
+          "navbar shadow sm:hidden fixed bottom-0 left-0 right-0 z-30 bg-base-100 border-t transition-transform duration-300",
+          showNav ? "translate-y-0" : "translate-y-full"
+        )}
+      >
+        <div className="flex w-full justify-around">
+          <Link
+            href="/home"
+            className="btn btn-text flex-1 flex flex-col items-center"
+          >
+            <span
+              className={clsx(
+                "size-6",
+                pathname == "/home"
+                  ? "text-primary icon-[tabler--home-filled]"
+                  : "icon-[tabler--home]"
+              )}
+            ></span>
+          </Link>
+          <Link
+            href="/search"
+            className="btn btn-text flex-1 flex flex-col items-center"
+          >
+            <span
+              className={clsx(
+                "icon-[tabler--search] size-6",
+                pathname === "/search" && "text-primary"
+              )}
+            ></span>
+          </Link>
+          <Link
+            href="/breeze"
+            className="btn btn-text flex-1 flex flex-col items-center"
+          >
+            <span
+              className={clsx(
+                "icon-[tabler--wind] size-6",
+                pathname === "/breeze" && "text-primary"
+              )}
+            ></span>
+          </Link>
+          <Link
+            href="/notifications"
+            className="btn btn-text flex-1 flex flex-col items-center"
+          >
+            <span
+              className={clsx(
+                "size-6",
+                pathname == "/notifications"
+                  ? "text-primary icon-[tabler--bell-filled]"
+                  : "icon-[tabler--bell]"
+              )}
+            ></span>
+          </Link>
+          <Link
+            href="/messages"
+            className="btn btn-text flex-1 flex flex-col items-center"
+          >
+            <span
+              className={clsx(
+                "size-6",
+                pathname == "/messages"
+                  ? "text-primary icon-[tabler--message-filled]"
+                  : "icon-[tabler--message]"
+              )}
+            ></span>
+          </Link>
+        </div>
+      </nav>
+
       {/* Overlay pour fermer l'aside sur mobile */}
       {(asideOpen || dragX !== null) && (
         <div
-          className="fixed inset-0 bg-black z-30 sm:hidden"
+          className="fixed inset-0 bg-black z-50 sm:hidden"
           style={{
             opacity: overlayOpacity,
             transition: dragX === null ? "opacity 0.3s" : "none",
           }}
-          onClick={handleAsideClose}
+          onPointerUp={handleAsideClose}
           aria-label="Fermer le menu"
         />
       )}

@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 const messageRoutes = require('./src/routes/message.routes');
 require('dotenv').config();
 
+
 const app = express();
+const cors = require("cors");
+app.use(cors());
 const port = 3002;
 app.use(express.json());
 app.use('/messages', messageRoutes);
@@ -20,3 +23,4 @@ mongoose
     .catch(err => {
         console.error("Database connection error:", err);
 });
+

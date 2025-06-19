@@ -16,6 +16,7 @@ export default function LoginForm() {
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -25,7 +26,7 @@ export default function LoginForm() {
     await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
 
     try {
-      await login(identifier, password);
+      await login(identifier, password, rememberMe);
       router.push(searchParams.get("from") || "/home");
     } catch (error) {
       setError(error.message || "auth failed");
@@ -76,16 +77,16 @@ export default function LoginForm() {
           <div className="space-y-4">
             <form className="mb-4 space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label className="label-text" htmlFor="userEmail">
-                  {t("email")}
+                <label className="label-text" htmlFor="userIdentifier">
+                  {t("identifier")}
                 </label>
                 <input
-                  type="email"
+                  type="text"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder={t("emailPlaceholder")}
+                  placeholder={t("identifierPlaceholder")}
                   className="input"
-                  id="userEmail"
+                  id="userIdentifier"
                   required
                 />
               </div>
@@ -116,6 +117,8 @@ export default function LoginForm() {
                     type="checkbox"
                     className="checkbox checkbox-primary"
                     id="rememberMe"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
                   />
                   <label
                     className="label-text text-base-content/80 p-0 text-base"

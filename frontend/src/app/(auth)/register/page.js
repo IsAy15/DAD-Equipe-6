@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import AdvanceForms from "@/components/AdvanceForms";
 
 export default function RegisterForm() {
   const t = useTranslations("Auth");
