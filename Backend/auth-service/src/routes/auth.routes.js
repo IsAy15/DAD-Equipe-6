@@ -62,5 +62,5 @@ module.exports = function(app) {
  *     description: Unauthorized, invalid credentials
  */
   app.post("/login", authController.login);
-  app.get("/auth", authController.authenticate);
+  app.get("/auth/verify", authController.verifyToken);
 };
