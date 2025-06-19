@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const express = require("express");
 const swaggerDocs = require("./utils/swagger");
 const userAuthRoutes = require("./src/routes/user-auth.routes");
-const userFollowRoutes = require("./src/routes/user-follow.routes");
+const userFollowRoutes = require("./src/routes/user.routes");
 const friendRequestRoutes = require("./src/routes/friend-request.routes");
 
 const app = express();
