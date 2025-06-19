@@ -26,6 +26,17 @@ services:
     networks:
       - app-network
 
+  mongo-message:
+    image: mongo
+    container_name: mongo-message
+    restart: unless-stopped
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo-message-data:/data/db
+    networks:
+      - app-network
+
   auth-service:
     build: ./Backend/auth-service
     container_name: auth-service
@@ -81,6 +92,21 @@ services:
     volumes:
       - ./Backend/user-service/logs:/home/logs/user-service
 
+  message-service:
+    build: ./Backend/message-service
+    container_name: message-service
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mongo-message
+    environment:
+      - MONGO_URI=mongodb://mongo-message:27017/messages-db
+    networks:
+      - app-network
+    volumes:
+      - ./Backend/message-service/logs:/home/logs/message-service
+
   frontend:
     build: ./frontend
     container_name: frontend
@@ -93,6 +119,7 @@ services:
 volumes:
   mongo-user-data:
   mongo-post-data:
+  mongo-message-data:
 
 networks:
   app-network:
