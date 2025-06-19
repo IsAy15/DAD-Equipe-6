@@ -32,3 +32,10 @@ export const loginUser = async (identifier, password) => {
     throw error;
   }
 };
+
+export async function fetchUserProfile(identifier) {
+  const res = await apiClient.get(
+    "/api/users/auth-data?identifier=" + identifier
+  );
+  return res.data;
+}
