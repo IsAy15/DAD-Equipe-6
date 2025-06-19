@@ -1,24 +1,27 @@
-const jwt = require('jsonwebtoken');
+const axios = require('axios');
 
-module.exports = (req, res, next) => {
-    const authHeader = req.headers.authorization;
+const verifyJWT = async (req, res, next) => {
+  const authHeader = req.headers['authorization'];
 
-    // Vérifie si le header existe et commence par 'Bearer '
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'Missing or invalid authorization header' });
-    }
+  if (!authHeader) {
+    return res.status(401).json({ message: 'Authorization header missing' });
+  }
 
-    const token = authHeader.split(' ')[1];
+  try {
 
-    try {
-        const decoded = jwt.verify(token, process.env.ACCESS_JWT_KEY);
+    const response = await axios.get('http://auth-service:3000/auth/verify', {
+      headers: { Authorization: authHeader },
+    });
 
-        // Stocke l'ID de l'utilisateur dans la requête
-        req.userId = decoded.userId;
+    // Stocke les infos utilisateur pour la suite
+    req.user = response.data.user;
+    req.userId = response.data.user.userId;
 
-        next(); // Passe au contrôleur suivant
-    } catch (err) {
-        console.error("JWT error:", err);
-        return res.status(403).json({ message: 'Invalid or expired token' });
-    }
+
+    next(); // continue
+  } catch (err) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
 };
+
+module.exports = verifyJWT;

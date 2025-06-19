@@ -82,22 +82,20 @@ exports.login = async (req, res) => {
   }
 };
 
+// AUTHENTICATE : vérifie le token JWT
+exports.verifyToken = (req, res) => {
+  const authHeader = req.headers['authorization'];
 
-// AUTHENTICATE
-exports.authenticate = (req, res) => {
-  let token = req.headers["authorization"];
-
-  if (token && token.startsWith("Bearer ")) {
-    token = token.slice(7);
-  } else {
-    return res.status(401).json({ message: "No token provided" });
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'No token provided' });
   }
 
-  jwt.verify(token, process.env.ACCESS_JWT_KEY, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
+  const token = authHeader.slice(7); // Enlève "Bearer "
 
-    return res.status(200).json({ message: "Authenticated successfully", user: decoded });
-  });
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_JWT_KEY);
+    return res.status(200).json({ user: decoded });
+  } catch (err) {
+    return res.status(403).json({ message: 'Invalid or expired token' });
+  }
 };
