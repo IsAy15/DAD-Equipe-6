@@ -1,4 +1,5 @@
 const User = require('../models/user.model');
+const mongoose = require('mongoose');
 
 // GET /api/users/:userId/followers
 exports.getFollowers = async (req, res) => {
@@ -58,3 +59,32 @@ exports.getFriends = async (req, res) => {
     }
 };
 
+exports.getPublicUserInfo = async (req, res) => {
+  const identifier = req.params.userIdOrUsername;
+
+  try {
+    const user = await User.findOne({
+      $or: [
+        { _id: mongoose.Types.ObjectId.isValid(identifier) ? identifier : null },
+        { username: identifier }
+      ]
+    }).populate('followers', '_id').populate('following', '_id');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const publicInfo = {
+      username: user.username,
+      bio: user.bio,
+      avatar: user.avatar,
+      followersCount: user.followers.length,
+      followingCount: user.following.length,
+    };
+
+    return res.status(200).json(publicInfo);
+  } catch (err) {
+    console.error('Error fetching public user info:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
