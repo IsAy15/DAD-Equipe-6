@@ -76,6 +76,7 @@ exports.getPublicUserInfo = async (req, res) => {
 
     const publicInfo = {
       username: user.username,
+      id: user._id,
       bio: user.bio,
       avatar: user.avatar,
       followersCount: user.followers.length,
