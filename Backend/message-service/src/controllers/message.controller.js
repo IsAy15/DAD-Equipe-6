@@ -28,7 +28,6 @@ exports.sendMessage = async (req, res) => {
   }
 };
 
-
 exports.getInbox = async (req, res) => {
   const userId = req.userId;
 
