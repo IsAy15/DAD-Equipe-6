@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const axios = require('axios');
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const axios = require("axios");
 
 exports.register = async (req, res) => {
   try {
@@ -10,28 +10,37 @@ exports.register = async (req, res) => {
       username: req.body.username,
       email: req.body.email,
       password: hashedPassword,
-      role: 'user'
+      role: "user",
     };
 
     const userServiceURL = process.env.USER_SERVICE_URL;
-    const { data: user } = await axios.post(`${userServiceURL}/api/users`, userPayload, { timeout: 3000 });
+    const { data: user } = await axios.post(
+      `${userServiceURL}/api/users`,
+      userPayload,
+      { timeout: 3000 }
+    );
 
     const accessToken = jwt.sign(
       {
-        userId: user.id,
+        userId: user.userId,
         username: user.username,
-        exp: Math.floor(Date.now() / 1000) + 600
+        exp: Math.floor(Date.now() / 1000) + 600,
       },
       process.env.ACCESS_JWT_KEY
     );
 
-    return res.status(201).json({ msg: "New User created!", accessToken, userId: user.id });
-
+    return res
+      .status(201)
+      .json({ msg: "New User created!", accessToken, userId: user.userId });
   } catch (err) {
     if (err.response) {
-      console.error("user-service responded with:", err.response.status, err.response.data);
+      console.error(
+        "user-service responded with:",
+        err.response.status,
+        err.response.data
+      );
       return res.status(err.response.status).json({
-        error: err.response.data.error || "user-service rejected the request"
+        error: err.response.data.error || "user-service rejected the request",
       });
     } else {
       console.error("user-service unreachable:", err.message);
@@ -40,7 +49,6 @@ exports.register = async (req, res) => {
   }
 };
 
-
 // LOGIN : demande les données à user-service
 exports.login = async (req, res) => {
   try {
@@ -48,34 +56,46 @@ exports.login = async (req, res) => {
     console.log("🔍 Login request body:", req.body);
 
     if (!identifier || !password) {
-      return res.status(400).json({ message: "Missing identifier or password" });
+      return res
+        .status(400)
+        .json({ message: "Missing identifier or password" });
     }
 
     // Appel au user-service pour récupérer les données
     const userServiceURL = process.env.USER_SERVICE_URL;
-    const { data: user } = await axios.get(`${userServiceURL}/api/users/auth-data`, {
-      params: { identifier }
-    });
+    const { data: user } = await axios.get(
+      `${userServiceURL}/api/users/auth-data`,
+      {
+        params: { identifier },
+      }
+    );
 
     const isPasswordValid = bcrypt.compareSync(password, user.hashedPassword);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid email/username or password" });
+      return res
+        .status(401)
+        .json({ message: "Invalid email/username or password" });
     }
 
     const accessToken = jwt.sign(
       {
         userId: user.id,
         username: user.username,
-        exp: Math.floor(Date.now() / 1000) + 600
+        exp: Math.floor(Date.now() / 1000) + 600,
       },
       process.env.ACCESS_JWT_KEY
     );
 
-    return res.status(200).json({ message: "You are now connected!", accessToken, userId: user.id });
-
+    return res.status(200).json({
+      message: "You are now connected!",
+      accessToken,
+      userId: user.id,
+    });
   } catch (err) {
     if (err.response && err.response.status === 404) {
-      return res.status(401).json({ message: "Invalid email/username or password" });
+      return res
+        .status(401)
+        .json({ message: "Invalid email/username or password" });
     }
     console.error("Login error:", err.message);
     return res.status(500).json({ message: "Internal server error" });
@@ -84,10 +104,10 @@ exports.login = async (req, res) => {
 
 // AUTHENTICATE : vérifie le token JWT
 exports.verifyToken = (req, res) => {
-  const authHeader = req.headers['authorization'];
+  const authHeader = req.headers["authorization"];
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'No token provided' });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "No token provided" });
   }
 
   const token = authHeader.slice(7); // Enlève "Bearer "
@@ -96,6 +116,6 @@ exports.verifyToken = (req, res) => {
     const decoded = jwt.verify(token, process.env.ACCESS_JWT_KEY);
     return res.status(200).json({ user: decoded });
   } catch (err) {
-    return res.status(403).json({ message: 'Invalid or expired token' });
+    return res.status(403).json({ message: "Invalid or expired token" });
   }
 };

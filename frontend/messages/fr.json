@@ -28,6 +28,7 @@
       "Ultra fort"
     ],
     "passwordRequirements": "Votre mot de passe doit contenir :",
+    "passwordRecommendations": "Recommandations pour un mot de passe fort :",
     "passwordRequirementsList": {
       "min-length": "Au moins 8 caractères",
       "lowercase": "Au moins une lettre minuscule",
