@@ -67,14 +67,20 @@ export default function UserPage({ params }) {
       break;
     case status === "following":
       actionButton = (
-        <button className="btn btn-primary btn-outline px-6 py-2 font-semibold">
+        <button
+          className="btn btn-primary btn-outline px-6 py-2 font-semibold"
+          onClick={() => setStatus("not-following")}
+        >
           {t.raw("status")["following"]}
         </button>
       );
       break;
     case status === "not-following":
       actionButton = (
-        <button className="btn btn-primary px-6 py-2 font-semibold">
+        <button
+          className="btn btn-primary px-6 py-2 font-semibold"
+          onClick={() => setStatus("following")}
+        >
           {t.raw("status")["follow"]}
         </button>
       );
@@ -92,39 +98,26 @@ export default function UserPage({ params }) {
 
   return (
     <div className="flex flex-col items-center gap-4 p-6">
-      <div>
+      <div className="flex gap-4 items-center justify-between w-full">
         <UserAvatar user={userProfile} size="lg" />
+        <h2 className="text-2xl font-bold flex-1">{userProfile.username}</h2>
+        <div className="flex flex-col items-center gap-2">{actionButton}</div>
       </div>
       <div className="w-full">
-        <div className="flex flex-col items-center gap-2">
-          <h2 className="text-2xl font-bold">{userProfile.username}</h2>
-          {actionButton}
-        </div>
         <p className="mt-4 text-lg">{userProfile.bio}</p>
-        <div className="flex gap-4 mt-4 text-gray-500">
-          {userProfile.location && (
-            <span>
-              <i className="fi fi-rr-marker"></i> {userProfile.location}
-            </span>
-          )}
-          {userProfile.joined && (
-            <span>
-              <i className="fi fi-rr-calendar"></i> Inscrit en{" "}
-              {new Date(userProfile.joined).toLocaleDateString("fr-FR", {
-                year: "numeric",
-                month: "long",
-              })}
-            </span>
-          )}
-        </div>
-        <div className="flex gap-6 mt-4 font-semibold">
-          <span>
-            <span className="text-black">{userProfile.followingCount}</span>{" "}
-            abonnements
+        <div className="flex gap-6 mt-4 font-semibold"></div>
+        <div className="flex gap-6 mt-4">
+          <span className="text-base-content/80">
+            <span className="text-base-content font-semibold">
+              {userProfile.followingCount}
+            </span>{" "}
+            {t("followings")}
           </span>
-          <span>
-            <span className="text-black">{userProfile.followersCount}</span>{" "}
-            abonnés
+          <span className="text-base-content/80">
+            <span className="text-base-content font-semibold">
+              {userProfile.followersCount}
+            </span>{" "}
+            {t("followers")}
           </span>
         </div>
       </div>

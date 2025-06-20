@@ -18,11 +18,11 @@ export default function MainLayout({ children }) {
   if (!accessToken) return null; // Optionnel : évite le flash de contenu
 
   return (
-    <div>
+    <>
       <NavBar />
-      <div className="flex justify-center pt-16 sm:pt-6">
-        <div className="p-6">{children}</div>
+      <div className="flex pt-16 sm:pt-0 transition-all h-full sm:ml-64">
+        <div className="w-full h-full">{children}</div>
       </div>
-    </div>
+    </>
   );
 }

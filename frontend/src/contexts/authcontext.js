@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
     const storedIdentifier = Cookies.get("userId");
     if (token) {
       setAccessToken(token);
-      setIdentifier(storedIdentifier || null);
+      setIdentifier(storedIdentifier);
     }
   }, []);
 
@@ -25,9 +25,10 @@ export const AuthProvider = ({ children }) => {
       const data = await registerUser(email, username, password);
       // Le backend renvoie `accessToken`
       const token = data.accessToken;
+      const id = data.userId;
       if (!token) throw new Error("Aucun token reçu à l'inscription");
       setAccessToken(token);
-      setIdentifier(username);
+      setIdentifier(id);
     } catch (err) {
       console.error("Register error:", err);
       throw new Error(err.response?.data?.error || err.message);
