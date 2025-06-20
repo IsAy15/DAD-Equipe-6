@@ -25,7 +25,7 @@ exports.register = async (req, res) => {
       process.env.ACCESS_JWT_KEY
     );
 
-    return res.status(201).json({ msg: "New User created!", accessToken });
+    return res.status(201).json({ msg: "New User created!", accessToken, userId: user.id });
 
   } catch (err) {
     if (err.response) {
