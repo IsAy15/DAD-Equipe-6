@@ -1,3 +1,4 @@
+const axios = require('axios'); 
 const Message = require('../models/message.model');
 
 exports.sendMessage = async (req, res) => {
@@ -11,12 +12,22 @@ exports.sendMessage = async (req, res) => {
   try {
     const message = new Message({ sender, receiver, content });
     await message.save();
+
+    // Appel au service de notification
+    await axios.post('http://notification-service:3004/api/notifications', {
+      userId: receiver,
+      type: 'message',
+      content: `You received a new message.`,
+      link: `/messages`
+    });
+
     res.status(201).json({ message: 'Message sent', messageId: message._id });
   } catch (err) {
     console.error('Error sending message:', err);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 exports.getInbox = async (req, res) => {
   const userId = req.userId;
