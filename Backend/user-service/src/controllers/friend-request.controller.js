@@ -101,7 +101,6 @@ exports.acceptFriendRequest = async (req, res) => {
     }
 };
 
-
 // POST /api/friend-requests/:requestId/refuse
 exports.refuseFriendRequest = async (req, res) => {
     const userId = req.userId;

@@ -1,5 +1,6 @@
 const Post = require('../models/Post.js');
 const mongoose = require('mongoose');
+const axios = require('axios');
 
 module.exports = {
     
@@ -55,32 +56,39 @@ module.exports = {
         }
     },
     createPost: async (req, res) => {
-        // Controller logic to create a new post goes here
+    try {
+        const user_id = req.params.user_id;
+        const { content, tags, imageUrls, videoUrls } = req.body;
 
-        try{
-            const user_id = req.userId;
-            const { content, tags, imageUrls, videoUrls } = req.body;
-    
-            //TODO : Check if the author is the same as the logged-in user
+        // TODO : Check if the author is the same as the logged-in user
+        // TODO : Validate the input data
 
-            //TODO : Validate the input data
-    
-            const newPost = new Post({author: user_id,
-                                    content,
-                                    tags,
-                                    imageUrls,
-                                    videoUrls
-            });     
-    
-            await newPost.save()
-                .then(post => res.status(201).json(post))
-                .catch(err => res.status(500).json({ message: 'Failed to create post', details: err.message }));
+        const newPost = new Post({
+            author: user_id,
+            content,
+            tags,
+            imageUrls,
+            videoUrls
+        });
 
+        const savedPost = await newPost.save();
+
+        // Appel au notification-service
+        try {
+            await axios.post('http://notification-service:8080/api/notifications/on-post-created', {
+                userId: user_id,
+                postId: savedPost._id
+            });
+        } catch (notifyErr) {
+            console.error('Failed to notify followers:', notifyErr.message);
+            // Ne bloque pas la création du post en cas d'erreur de notif
         }
-        catch(err) {
+
+        return res.status(201).json(savedPost);
+
+        } catch (err) {
             return res.status(500).json({ message: 'Failed to create post', details: err.message });
         }
-
     },
     updatePost: async (req, res) => {
         try{
