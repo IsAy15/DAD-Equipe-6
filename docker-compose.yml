@@ -37,6 +37,30 @@ services:
     networks:
       - app-network
 
+  mongo-notification:
+    image: mongo
+    container_name: mongo-notification
+    restart: unless-stopped
+    ports:
+      - "27020:27017"
+    volumes:
+      - mongo-notification-data:/data/db
+    networks:
+      - app-network
+
+  notification-service:
+    build: ./Backend/notification-service
+    container_name: notification-service
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    depends_on:
+      - mongo-notification
+    environment:
+      - MONGO_URI=mongodb://mongo-notification:27017/notification-db
+    networks:
+      - app-network
+
   auth-service:
     build: ./Backend/auth-service
     container_name: auth-service
@@ -120,6 +144,7 @@ volumes:
   mongo-user-data:
   mongo-post-data:
   mongo-message-data:
+  mongo-notification-data:
 
 networks:
   app-network:

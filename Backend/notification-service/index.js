@@ -2,16 +2,18 @@ require("dotenv").config();
 
 const mongoose = require("mongoose");
 const express = require("express");
+const notificationRoutes = require("./src/routes/notification.routes");
 
 const app = express();
 const cors = require("cors");
 app.use(cors());
-const port = 3003;
+const port = 3004;
 
 app.use(express.json());
+app.use("/api/notifications", notificationRoutes);
 
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect("mongodb://mongo-notification:27017/notificationdb")
   .then(() => {
     console.log("Connected to MongoDB for notification Service");
 
