@@ -1,18 +1,19 @@
 "use client";
 import NavBar from "../../components/NavBar";
 import { useAuth } from "@/contexts/authcontext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export default function MainLayout({ children }) {
   const { accessToken } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!accessToken) {
-      router.replace("/"); // Redirige vers la page de login si non connecté
+      router.replace(`/?from=${encodeURIComponent(pathname)}`);
     }
-  }, [accessToken, router]);
+  }, [accessToken, router, pathname]);
 
   if (!accessToken) return null; // Optionnel : évite le flash de contenu
 

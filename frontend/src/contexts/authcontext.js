@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Vérifie si un token est stocké dans les cookies
     const token = Cookies.get("accessToken");
-    const storedIdentifier = Cookies.get("identifier");
+    const storedIdentifier = Cookies.get("userId");
     if (token) {
       setAccessToken(token);
       setIdentifier(storedIdentifier || null);
@@ -39,9 +39,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await loginUser(identifier, password);
       const token = data.accessToken;
+      const id = data.userId;
       if (!token) throw new Error("Aucun token reçu à la connexion");
       setAccessToken(token);
-      setIdentifier(identifier);
+      setIdentifier(id);
       if (rememberMe) {
         // Stocke le token et l'identifiant dans un cookie sécurisé
         Cookies.set("accessToken", token, {
@@ -49,14 +50,14 @@ export const AuthProvider = ({ children }) => {
           sameSite: "strict",
           expires: 7,
         });
-        Cookies.set("identifier", identifier, {
+        Cookies.set("userId", id, {
           secure: true,
           sameSite: "strict",
           expires: 7,
         });
       } else {
         Cookies.remove("accessToken");
-        Cookies.remove("identifier");
+        Cookies.remove("userId");
       }
     } catch (err) {
       console.error("Login error:", err);
@@ -68,7 +69,7 @@ export const AuthProvider = ({ children }) => {
     setAccessToken(null);
     setIdentifier(null);
     Cookies.remove("accessToken");
-    Cookies.remove("identifier");
+    Cookies.remove("userId");
   };
 
   return (

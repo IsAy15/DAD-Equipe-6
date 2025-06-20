@@ -34,8 +34,11 @@ export const loginUser = async (identifier, password) => {
 };
 
 export async function fetchUserProfile(identifier) {
-  const res = await apiClient.get(
-    "/api/users/auth-data?identifier=" + identifier
-  );
+  const res = await apiClient.get("/api/users/" + identifier);
+  return res.data;
+}
+
+export async function fetchUserFollowing(userId) {
+  const res = await apiClient.get("/api/users/" + userId + "/following");
   return res.data;
 }

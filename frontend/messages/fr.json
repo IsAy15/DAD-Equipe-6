@@ -70,5 +70,26 @@
     "blackTheme": "Thème noir",
     "systemTheme": "Thème système",
     "language": "Langue"
+  },
+  "Profile": {
+    "title": "Profil",
+    "editProfile": "Modifier le profil",
+    "changePassword": "Changer le mot de passe",
+    "profilePicture": "Photo de profil",
+    "username": "Nom d'utilisateur",
+    "email": "Email",
+    "bio": "Bio",
+    "saveChanges": "Enregistrer les modifications",
+    "cancel": "Annuler",
+    "follower": "abonné",
+    "followers": "abonnés",
+    "following": "abonnement",
+    "followings": "abonnements",
+    "status": {
+      "follow": "Suivre",
+      "following": "Abonné",
+      "unfollow": "Se désabonner",
+      "friends": "Amis"
+    }
   }
 }

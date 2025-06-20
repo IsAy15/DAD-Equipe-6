@@ -1,16 +1,17 @@
 "use client";
 import AppearanceSettings from "@/components/AppearanceSettings";
 import { useAuth } from "@/contexts/authcontext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 export default function AuthLayout({ children }) {
   const { accessToken } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (accessToken) {
-      router.replace("/home"); // Redirige vers la page principale si déjà connecté
+      router.push(searchParams.get("from") || "/home"); // Redirige vers la page principale si déjà connecté
     }
   }, [accessToken, router]);
 
