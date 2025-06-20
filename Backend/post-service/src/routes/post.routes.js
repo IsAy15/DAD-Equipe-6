@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const postController = require('../controllers/post.controller');
 const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/validateIds');
+const verifyJWT = require('../middlewares/verifyJWT');
+const validateJWT = require('../middlewares/verifyJWT')
 
 // Routes for /api/posts
 
@@ -25,6 +27,8 @@ const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/vali
  *           format: objectId
  *         required: true
  *         description: User ID
+ *     security:
+ *      - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of posts
@@ -34,6 +38,8 @@ const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/vali
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/PostResponse'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
  *       404:
  *         description: No posts found for this user
  *       500:
@@ -49,6 +55,8 @@ const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/vali
  *           format: objectId
  *         required: true
  *         description: Author user ID
+ *     security:
+ *      - bearerAuth: []
  *     requestBody:
  *       description: Post data to create
  *       required: true
@@ -63,6 +71,8 @@ const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/vali
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/PostResponse'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
  *       500:
  *         description: Server error
  */
@@ -81,6 +91,8 @@ const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/vali
  *           format: objectId
  *         required: true
  *         description: User ID
+ *     security:
+ *      - bearerAuth: []
  *     responses:
  *       200:
  *         description: Posts feed retrieved
@@ -92,6 +104,8 @@ const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/vali
  *                 $ref: '#/components/schemas/PostResponse'
  *       204:
  *         description: No content (empty feed)
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
  *       500:
  *         description: Server error
  */
@@ -110,6 +124,8 @@ const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/vali
  *           format: objectId
  *         required: true
  *         description: Post ID to update
+ *     security:
+ *      - bearerAuth: []
  *     requestBody:
  *       description: Data to update the post
  *       required: true
@@ -124,6 +140,8 @@ const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/vali
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/PostResponse'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
  *       404:
  *         description: Post not found
  *       500:
@@ -139,9 +157,13 @@ const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/vali
  *           format: objectId
  *         required: true
  *         description: Post ID to delete
+ *     security:
+ *      - bearerAuth: []
  *     responses:
  *       204:
  *         description: Post deleted successfully
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
  *       404:
  *         description: Post not found
  *       500:
@@ -149,23 +171,28 @@ const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/vali
  */
 
 router.get('/:user_id',
-    validateUrlObjectId('user_id'),
+    [validateUrlObjectId('user_id'),
+    verifyJWT],
     postController.getPostsByUserId);
 
 router.get('/:user_id/feed',
-    validateUrlObjectId('user_id'),
+    [validateUrlObjectId('user_id'),
+    verifyJWT],
     postController.getPostsOfSubscribdedTo);
 
 router.post('/:user_id', 
-    validateUrlObjectId('user_id'),
+    [validateUrlObjectId('user_id'),
+    verifyJWT],
     postController.createPost);
 
 router.put('/:post_id',
-    validateUrlObjectId('post_id'),
+    [validateUrlObjectId('post_id'),
+    verifyJWT],
     postController.updatePost);
 
 router.delete('/:post_id',
-    validateUrlObjectId('post_id'),
+    [validateUrlObjectId('post_id'),
+    verifyJWT],
     postController.deletePost);
 
 module.exports = router;

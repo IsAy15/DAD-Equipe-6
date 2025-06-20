@@ -4,7 +4,7 @@ module.exports = {
     likePost: async (req, res) => {
         try{
             const post_id = req.params.post_id;
-            const { user_id } = req.body
+            const { user_id } = req.userId;
 
             if(!user_id){
                 return res.status(400).json({ message: 'Authour field is requiered in body'});
@@ -37,7 +37,7 @@ module.exports = {
     unlikePost: async (req, res) => {
         try {
             const post_id = req.params.post_id;
-            const { user_id } = req.body;
+            const { user_id } = req.userId;
 
             if (!user_id) {
                 return res.status(400).json({ message: 'User ID is required in body' });

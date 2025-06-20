@@ -5,7 +5,7 @@ module.exports = {
     
     getPostsByUserId: async (req, res) => {
         // Controller logic to retrieve posts by user id goes here
-        const user_id = req.params.user_id;
+        const user_id = req.userId;
         try{
             const posts = await Post.find({ author: user_id })
             .lean()
@@ -28,7 +28,7 @@ module.exports = {
     },
     getPostsOfSubscribdedTo: async (req, res) => {
         try{
-            const user_id = req.params.user_id;
+            const user_id = req.userId;
 
             if(!user_id){
                 return res.status(400).json({ message: 'User id is required' });
@@ -58,7 +58,7 @@ module.exports = {
         // Controller logic to create a new post goes here
 
         try{
-            const user_id = req.params.user_id;
+            const user_id = req.userId;
             const { content, tags, imageUrls, videoUrls } = req.body;
     
             //TODO : Check if the author is the same as the logged-in user
@@ -84,7 +84,7 @@ module.exports = {
     },
     updatePost: async (req, res) => {
         try{
-            const postId = req.params.post_id;
+            const postId = req.userId;
     
             if(!postId) {
                 return res.status(400).json({ message: 'Post id is required' });
@@ -117,7 +117,7 @@ module.exports = {
 
     deletePost: async (req, res) => {
         try{
-            const postId = req.params.post_id;
+            const postId = req.userId;
      
              if(!postId) {
                  return res.status(400).json({ message: 'Post id is required' });

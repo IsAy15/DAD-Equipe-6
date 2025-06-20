@@ -28,7 +28,8 @@ module.exports = {
     addCommentToPost: async (req, res) => {
         try{
             const post_id = req.params.post_id;
-            const { author, content, parentComment } = req.body;
+            const author = req.userId;
+            const {content, parentComment } = req.body;
 
             if (!post_id || !author || !content) {
                 return res.status(400).json({ message: 'Post ID, author, and content are required'});
@@ -58,6 +59,7 @@ module.exports = {
     updateCommentFromPost: async (req, res) => {
         try{
             const commentId = req.params.comment_id;
+            const user_id = req.userId;
             const { content } = req.body;
 
             if (!commentId || !content) {
@@ -83,6 +85,7 @@ module.exports = {
     deleteCommentFromPost: async (req, res) => {
         try{
             const commentId = req.params.comment_id;
+            const user_id = req.userId;
 
             if (!commentId) {
                 return res.status(400).json({ message: 'Comment ID is required' });
@@ -107,6 +110,7 @@ module.exports = {
     getCommentReplies: async (req, res) => {
         try{
             const comment_id = req.params.comment_id;
+            const user_id = req.userId;
 
              if (!comment_id) {
                 return res.status(400).json({ message: 'Comment_id is required' });
@@ -129,7 +133,8 @@ module.exports = {
     addReplyToComment: async (req, res) => {
         try {
                 const { post_id, comment_id } = req.params;
-                const { content, author } = req.body;
+                const { content } = req.body;
+                const author = req.userId;
 
                 if (!content || !author) {
                     return res.status(400).json({ message: 'Content and author are required' });
@@ -165,6 +170,7 @@ module.exports = {
         try {
             const { post_id, comment_id, reply_id } = req.params;
             const { content } = req.body;
+            const user_id = req.userId;
 
             if (!content) {
                 return res.status(400).json({ message: 'Content is required for update' });
@@ -190,7 +196,7 @@ module.exports = {
     deleteReplyFromComment: async (req, res) => {
         try {
             const { post_id, comment_id, reply_id } = req.params;
-
+            const user_id = req.userId;
             const parentComment = await Comment.findById(comment_id).exec();
 
             if(!parentComment.parentComment){

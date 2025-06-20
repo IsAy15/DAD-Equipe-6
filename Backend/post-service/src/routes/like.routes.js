@@ -1,6 +1,7 @@
 const router = require('express').Router({ mergeParams: true });
 const likeController = require('../controllers/like.controller');
 const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/validateIds');
+const verifyJWT = require('../middlewares/verifyJWT')
 
 // Routes for /api/posts/:post_id/likes
 
@@ -54,8 +55,9 @@ const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/vali
  *         description: Internal Server Error
  */
 router.post('/like',
-    validateBodyObjectId('user_id'),
+    [validateBodyObjectId('user_id'),
     validateUrlObjectId(('post_id')),
+    verifyJWT],
     likeController.likePost);
 
 /**
@@ -101,8 +103,9 @@ router.post('/like',
  *         description: Internal Server Error
  */
 router.post('/unlike',
-    validateBodyObjectId('user_id'),
+    [validateBodyObjectId('user_id'),
     validateUrlObjectId(('post_id')),
+    verifyJWT],
     likeController.unlikePost);
 
 module.exports = router;
