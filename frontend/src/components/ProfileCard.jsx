@@ -60,7 +60,7 @@ export default function ProfileCard({ identifier }) {
             <UserAvatar user={user} size="md" />
             <div className="flex flex-col gap-4">
               <Link
-                className="h-4 w-20 text-lg font-semibold"
+                className="h-4 w-20 text-lg font-semibold text-base-content"
                 href={`/profile/${user.username}`}
               >
                 {user?.username}

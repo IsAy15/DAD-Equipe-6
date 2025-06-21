@@ -2,18 +2,27 @@
 
 import { useEffect, useState, use } from "react";
 import UserAvatar from "@/components/UserAvatar";
-import { fetchUserProfile, fetchUserFollowing } from "@/utils/api";
+import {
+  fetchUserProfile,
+  fetchUserFollowing,
+  fetchUserFollowers,
+  fetchUserPosts,
+} from "@/utils/api";
 import { useAuth } from "@/contexts/authcontext";
 import { useTranslations } from "next-intl";
+import Post from "@/components/Post";
 
 export default function UserPage({ params }) {
   const t = useTranslations("Profile");
-  const { identifier } = useAuth();
+  const { identifier, accessToken } = useAuth();
   // Utilisez React.use() pour obtenir les params
   const { username } = use(params);
   const [userProfile, setUserProfile] = useState(null);
   const [error, setError] = useState(null);
   const [status, setStatus] = useState("not-following");
+  // Ajoutez ces deux lignes :
+  const [posts, setPosts] = useState([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
 
   useEffect(() => {
     async function loadProfile() {
@@ -28,6 +37,22 @@ export default function UserPage({ params }) {
       loadProfile();
     }
   }, [username]);
+
+  // Ajoutez ce useEffect pour charger les posts
+  useEffect(() => {
+    async function loadPosts() {
+      if (!userProfile) return;
+      setLoadingPosts(true);
+      try {
+        const userPosts = await fetchUserPosts(userProfile.id, accessToken);
+        setPosts(userPosts || []);
+      } catch (err) {
+        setPosts([]);
+      }
+      setLoadingPosts(false);
+    }
+    loadPosts();
+  }, [userProfile, accessToken]);
 
   useEffect(() => {
     async function loadStatus() {
@@ -121,29 +146,13 @@ export default function UserPage({ params }) {
           </span>
         </div>
       </div>
-      <div className="w-full mt-8">
+      <div className="w-full mt-8 p-4 bg-base-200 card-group shadow">
         <h3 className="text-xl font-bold mb-4">Posts</h3>
         <div className="flex flex-col gap-4">
-          {userProfile.posts && userProfile.posts.length > 0 ? (
-            userProfile.posts.map((post) => (
-              <div key={post.id} className="card bg-base-100 shadow p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <img
-                    src={userProfile.avatarUrl || "/default-avatar.png"}
-                    alt="Avatar"
-                    className="w-8 h-8 rounded-full"
-                  />
-                  <span className="font-semibold">
-                    {userProfile.displayName}
-                  </span>
-                  <span className="text-gray-500 text-sm">
-                    @{userProfile.username} ·{" "}
-                    {new Date(post.createdAt).toLocaleDateString("fr-FR")}
-                  </span>
-                </div>
-                <p>{post.content}</p>
-              </div>
-            ))
+          {loadingPosts ? (
+            <p>Chargement des posts...</p>
+          ) : posts && posts.length > 0 ? (
+            posts.map((post) => <Post key={post._id} post={post} />)
           ) : (
             <p className="text-gray-500">Aucun post pour le moment.</p>
           )}

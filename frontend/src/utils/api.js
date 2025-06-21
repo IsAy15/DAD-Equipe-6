@@ -42,3 +42,17 @@ export async function fetchUserFollowing(userId) {
   const res = await apiClient.get("/api/users/" + userId + "/following");
   return res.data;
 }
+
+export async function fetchUserFollowers(userId) {
+  const res = await apiClient.get("/api/users/" + userId + "/followers");
+  return res.data;
+}
+
+export async function fetchUserPosts(userId, token) {
+  const res = await apiClient.get("/api/posts/" + userId, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+}

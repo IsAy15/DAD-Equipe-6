@@ -4,9 +4,12 @@ import { useAuth } from "@/contexts/authcontext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
+import { useNotyf } from "@/contexts/NotyfContext";
 
 export default function LoginForm() {
   const t = useTranslations("Auth");
+
+  const notyf = useNotyf();
 
   const { login } = useAuth();
   const router = useRouter();
@@ -160,7 +163,12 @@ export default function LoginForm() {
               </Link>
             </div>
             <div className="divider">{t("or")}</div>
-            <button className="btn btn-text btn-block">
+            <button
+              className="btn btn-text btn-block"
+              onClick={() =>
+                notyf.open({type: "warning", message:"Fonctionnalité en cours de développement"})
+              }
+            >
               <img
                 src="https://cdn.flyonui.com/fy-assets/blocks/marketing-ui/brand-logo/google-icon.png"
                 alt="google icon"

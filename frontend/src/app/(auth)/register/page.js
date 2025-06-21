@@ -3,11 +3,14 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useAuth } from "@/contexts/authcontext";
+import { useNotyf } from "@/contexts/NotyfContext";
 
 export default function RegisterForm() {
   const t = useTranslations("Auth");
 
   const { register } = useAuth();
+
+  const notyf = useNotyf();
 
   const [username, setUsername] = useState("");
   const [usernameValid, setUsernameValid] = useState(true);
@@ -144,13 +147,13 @@ export default function RegisterForm() {
                   <span className="text-error text-sm">{t("emailError")}</span>
                 )}
               </div>
-              <div className="max-w-sm">
+              <div>
                 <div className="flex mb-2">
                   <div className="flex-1">
                     <input
                       type="password"
                       id="password-hints"
-                      className="input"
+                      className="input w-full"
                       placeholder={t("password")}
                       value={password}
                       onChange={handlePasswordChange}
@@ -304,7 +307,9 @@ export default function RegisterForm() {
                 disabled={
                   !(
                     usernameValid &&
+                    username != "" &&
                     emailValid &&
+                    email != "" &&
                     confirmPassword != "" &&
                     passwordsMatch &&
                     passwordsRequirements &&
@@ -330,7 +335,15 @@ export default function RegisterForm() {
               </a>
             </p>
             <div className="divider">{t("or")}</div>
-            <button className="btn btn-text btn-block">
+            <button
+              className="btn btn-text btn-block"
+              onClick={() =>
+                notyf.open({
+                  type: "warning",
+                  message: "Fonctionnalité en cours de développement",
+                })
+              }
+            >
               <img
                 src="https://cdn.flyonui.com/fy-assets/blocks/marketing-ui/brand-logo/google-icon.png"
                 alt="google icon"

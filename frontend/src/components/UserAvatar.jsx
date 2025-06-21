@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 export default function UserAvatar({ user, size = "md", link = true }) {
   const router = useRouter();
   const sizes = {
+    xs: "h-8 w-8",
     sm: "h-10 w-10",
     md: "h-16 w-16",
     lg: "h-24 w-24",

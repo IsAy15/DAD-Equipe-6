@@ -160,6 +160,7 @@ export default function NavBar() {
                 pathname={pathname}
                 showOnMobile={false}
               />
+
               <MenuItem
                 label={t("profile")}
                 href={`/profile/${user?.username}`}

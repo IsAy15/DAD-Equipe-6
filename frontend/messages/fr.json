@@ -30,7 +30,7 @@
     "passwordRequirements": "Votre mot de passe doit contenir :",
     "passwordRecommendations": "Recommandations pour un mot de passe fort :",
     "passwordRequirementsList": {
-      "min-length": "Au moins 8 caractères",
+      "min-length": "Au moins 6 caractères",
       "lowercase": "Au moins une lettre minuscule",
       "uppercase": "Au moins une lettre majuscule",
       "numbers": "Au moins un chiffre",
@@ -74,6 +74,7 @@
   },
   "Profile": {
     "title": "Profil",
+    "userNotFound": "Utilisateur non trouvé",
     "editProfile": "Modifier le profil",
     "changePassword": "Changer le mot de passe",
     "profilePicture": "Photo de profil",
