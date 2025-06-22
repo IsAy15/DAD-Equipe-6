@@ -9,8 +9,7 @@ const notificationSchema = new mongoose.Schema({
         type: String,
         required: true,
         enum: [
-        'friend_request',   // quelqu’un t’a envoyé une demande d’ami
-        'friend_accept',    // ta demande d’ami a été acceptée
+        'follow',           // tu as un nouveau follower
         'message',          // tu as reçu un message
         'mention',          // tu as été mentionné
         'friend_post',      // un ami a publié quelque chose
