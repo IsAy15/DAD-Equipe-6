@@ -81,8 +81,7 @@
     "username": "Nom d'utilisateur",
     "email": "Email",
     "bio": "Bio",
-    "saveChanges": "Enregistrer les modifications",
-    "cancel": "Annuler",
+    "joined": "Inscrit depuis",
     "follower": "abonné",
     "followers": "abonnés",
     "following": "abonnement",
@@ -93,5 +92,19 @@
       "unfollow": "Se désabonner",
       "friends": "Amis"
     }
+  },
+  "EditProfile": {
+    "title": "Modifier le profil",
+    "username": "Nom d'utilisateur",
+    "usernamePlaceholder": "Entrez votre nom d'utilisateur",
+    "usernameError": "Nom d'utilisateur invalide/déjà pris",
+    "email": "Email",
+    "emailPlaceholder": "Entrez votre email",
+    "emailError": "Adresse email invalide",
+    "bio": "Bio",
+    "bioPlaceholder": "Parlez de vous en quelques mots",
+    "profilePicture": "Photo de profil",
+    "saveChanges": "Enregistrer",
+    "cancel": "Annuler"
   }
 }

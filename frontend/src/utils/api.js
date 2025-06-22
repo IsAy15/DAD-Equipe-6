@@ -56,3 +56,13 @@ export async function fetchUserPosts(userId, token) {
   });
   return res.data;
 }
+
+export async function fetchUserFeed(userId, token) {
+  const res = await apiClient.get("/api/posts/" + userId + "/feed", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  console.log("fetchUserFeed res", res);
+  return res.data;
+}

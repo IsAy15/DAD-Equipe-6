@@ -2,6 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import UserAvatar from "@/components/UserAvatar";
+import { useLocale } from "next-intl";
 import {
   fetchUserProfile,
   fetchUserFollowing,
@@ -10,7 +11,8 @@ import {
 } from "@/utils/api";
 import { useAuth } from "@/contexts/authcontext";
 import { useTranslations } from "next-intl";
-import Post from "@/components/Post";
+import EditProfile from "@/components/EditProfile";
+import Feed from "@/components/Feed";
 
 export default function UserPage({ params }) {
   const t = useTranslations("Profile");
@@ -85,7 +87,14 @@ export default function UserPage({ params }) {
   switch (true) {
     case userProfile.id === identifier:
       actionButton = (
-        <button className="btn btn-primary btn-outline px-6 py-2 font-semibold">
+        <button
+          type="button"
+          className="btn btn-primary btn-outline px-6 py-2 font-semibold"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="slide-up-animated-modal"
+          data-overlay="#slide-up-animated-modal"
+        >
           {t("editProfile")}
         </button>
       );
@@ -122,42 +131,66 @@ export default function UserPage({ params }) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-4 p-6">
-      <div className="flex gap-4 items-center justify-between w-full">
-        <UserAvatar user={userProfile} size="lg" />
-        <h2 className="text-2xl font-bold flex-1">{userProfile.username}</h2>
-        <div className="flex flex-col items-center gap-2">{actionButton}</div>
-      </div>
+    <div className="flex flex-col items-center max-sm:p-6 p-8 gap-4">
+      <EditProfile />
       <div className="w-full">
-        <p className="mt-4 text-lg">{userProfile.bio}</p>
-        <div className="flex gap-6 mt-4 font-semibold"></div>
-        <div className="flex gap-6 mt-4">
-          <span className="text-base-content/80">
-            <span className="text-base-content font-semibold">
-              {userProfile.followingCount}
-            </span>{" "}
-            {t("followings")}
-          </span>
-          <span className="text-base-content/80">
-            <span className="text-base-content font-semibold">
-              {userProfile.followersCount}
-            </span>{" "}
-            {t("followers")}
-          </span>
+        <div className="flex gap-4 items-center justify-between w-full">
+          <UserAvatar user={userProfile} size="lg" />
+          <h2 className="text-2xl font-bold flex-1">{userProfile.username}</h2>
+          <div className="flex flex-col items-center gap-2">{actionButton}</div>
+        </div>
+        <div className="w-full p-4">
+          <p className="text-lg mb-4">{userProfile.bio}</p>
+
+          <table className="w-full text-left table-auto border-separate border-spacing-y-2">
+            <tbody>
+              <tr>
+                <td className="text-primary/80">
+                  <div className="flex items-center">
+                    <span className="icon-[tabler--wind] size-6 mr-2" />
+                    <span>Breezes {posts.length}</span>
+                  </div>
+                </td>
+                <td className="text-primary/80">
+                  <div className="flex items-center">
+                    <span className="icon-[tabler--calendar-week] size-6 mr-2" />
+                    <span>
+                      {t("joined")}{" "}
+                      <span className="capitalize">
+                        {userProfile.joinedAt
+                          ? new Date(userProfile.joinedAt).toLocaleDateString(
+                              useLocale(),
+                              {
+                                year: "numeric",
+                                month: "long",
+                              }
+                            )
+                          : t("unknownDate")}
+                      </span>
+                    </span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td className="text-base-content/80">
+                  <span className="text-base-content font-semibold">
+                    {userProfile.followingCount}
+                  </span>{" "}
+                  {t("followings")}
+                </td>
+                <td className="text-base-content/80">
+                  <span className="text-base-content font-semibold">
+                    {userProfile.followersCount}
+                  </span>{" "}
+                  {t("followers")}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-      <div className="w-full mt-8 p-4 bg-base-200 card-group shadow">
-        <h3 className="text-xl font-bold mb-4">Posts</h3>
-        <div className="flex flex-col gap-4">
-          {loadingPosts ? (
-            <p>Chargement des posts...</p>
-          ) : posts && posts.length > 0 ? (
-            posts.map((post) => <Post key={post._id} post={post} />)
-          ) : (
-            <p className="text-gray-500">Aucun post pour le moment.</p>
-          )}
-        </div>
-      </div>
+      <hr className="border-t border-base-content/30 w-full" />
+      <Feed posts={posts} loadPosts={loadingPosts} />
     </div>
   );
 }
