@@ -8,6 +8,8 @@ import {
   fetchUserFollowing,
   fetchUserFollowers,
   fetchUserPosts,
+  followUser,
+  unfollowUser,
 } from "@/utils/api";
 import { useAuth } from "@/contexts/authcontext";
 import { useTranslations } from "next-intl";
@@ -16,6 +18,7 @@ import Feed from "@/components/Feed";
 
 export default function UserPage({ params }) {
   const t = useTranslations("Profile");
+  const locale = useLocale();
   const { identifier, accessToken } = useAuth();
   // Utilisez React.use() pour obtenir les params
   const { username } = use(params);
@@ -59,14 +62,17 @@ export default function UserPage({ params }) {
   useEffect(() => {
     async function loadStatus() {
       try {
-        const followings = await fetchUserFollowing(userProfile?.id);
-        // Si followings n'est pas un tableau, on le force à []
-        const list = Array.isArray(followings)
-          ? followings
-          : Array.isArray(followings?.data)
-          ? followings.data
-          : [];
-        if (list.some((user) => user.id === identifier)) {
+        const followings = await fetchUserFollowing(identifier);
+        // Correction de l'extraction de la liste des followings
+        let list = [];
+        if (Array.isArray(followings)) {
+          list = followings;
+        } else if (Array.isArray(followings?.following)) {
+          list = followings.following;
+        } else if (Array.isArray(followings?.data)) {
+          list = followings.data;
+        }
+        if (list.some((user) => user._id === userProfile.id)) {
           setStatus("following");
         } else {
           setStatus("not-following");
@@ -79,6 +85,30 @@ export default function UserPage({ params }) {
       loadStatus();
     }
   }, [userProfile]);
+
+  async function handleActionButtonClick() {
+    if (status === "not-following") {
+      try {
+        await followUser(userProfile.id, accessToken);
+        setStatus("following");
+        // Refresh profile to update counts
+        const updatedProfile = await fetchUserProfile(username);
+        setUserProfile(updatedProfile);
+      } catch (err) {
+        console.error("Error following user:", err);
+      }
+    } else if (status === "following") {
+      try {
+        await unfollowUser(userProfile.id, accessToken);
+        setStatus("not-following");
+        // Refresh profile to update counts
+        const updatedProfile = await fetchUserProfile(username);
+        setUserProfile(updatedProfile);
+      } catch (err) {
+        console.error("Error unfollowing user:", err);
+      }
+    }
+  }
 
   if (error || !userProfile) {
     return <h1>{t("userNotFound")}</h1>;
@@ -103,7 +133,7 @@ export default function UserPage({ params }) {
       actionButton = (
         <button
           className="btn btn-primary btn-outline px-6 py-2 font-semibold"
-          onClick={() => setStatus("not-following")}
+          onClick={() => handleActionButtonClick()}
         >
           {t.raw("status")["following"]}
         </button>
@@ -113,7 +143,7 @@ export default function UserPage({ params }) {
       actionButton = (
         <button
           className="btn btn-primary px-6 py-2 font-semibold"
-          onClick={() => setStatus("following")}
+          onClick={() => handleActionButtonClick()}
         >
           {t.raw("status")["follow"]}
         </button>
@@ -159,7 +189,7 @@ export default function UserPage({ params }) {
                       <span className="capitalize">
                         {userProfile.joinedAt
                           ? new Date(userProfile.joinedAt).toLocaleDateString(
-                              useLocale(),
+                              locale,
                               {
                                 year: "numeric",
                                 month: "long",

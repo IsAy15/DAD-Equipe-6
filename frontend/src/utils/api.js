@@ -34,22 +34,22 @@ export const loginUser = async (identifier, password) => {
 };
 
 export async function fetchUserProfile(identifier) {
-  const res = await apiClient.get("/api/users/" + identifier);
+  const res = await apiClient.get(`/api/users/${identifier}`);
   return res.data;
 }
 
 export async function fetchUserFollowing(userId) {
-  const res = await apiClient.get("/api/users/" + userId + "/following");
+  const res = await apiClient.get(`/api/users/${userId}/following`);
   return res.data;
 }
 
 export async function fetchUserFollowers(userId) {
-  const res = await apiClient.get("/api/users/" + userId + "/followers");
+  const res = await apiClient.get(`/api/users/${userId}/followers`);
   return res.data;
 }
 
 export async function fetchUserPosts(userId, token) {
-  const res = await apiClient.get("/api/posts/" + userId, {
+  const res = await apiClient.get(`/api/posts/${userId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -58,11 +58,37 @@ export async function fetchUserPosts(userId, token) {
 }
 
 export async function fetchUserFeed(userId, token) {
-  const res = await apiClient.get("/api/posts/" + userId + "/feed", {
+  const res = await apiClient.get(`/api/posts/${userId}/feed`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
   console.log("fetchUserFeed res", res);
+  return res.data;
+}
+
+export async function followUser(targetUserId, token) {
+  const res = await apiClient.post(
+    `api/friend-requests/follow/${targetUserId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+}
+
+export async function unfollowUser(targetUserId, token) {
+  const res = await apiClient.post(
+    `api/friend-requests/unfollow/${targetUserId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return res.data;
 }
