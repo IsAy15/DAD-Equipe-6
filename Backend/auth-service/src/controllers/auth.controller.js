@@ -20,7 +20,7 @@ exports.register = async (req, res) => {
       {
         userId: user.id,
         username: user.username,
-        exp: Math.floor(Date.now() / 1000) + 600
+        exp: Math.floor(Date.now() / 1000) + 10800 // 3 hours
       },
       process.env.ACCESS_JWT_KEY
     );

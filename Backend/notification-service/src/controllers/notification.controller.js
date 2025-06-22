@@ -105,14 +105,14 @@ exports.onPostCreated = async (req, res) => {
 
     try {
         // Récupérer les followers depuis le user-service
-        const response = await axios.get(`http://user-service:8080/api/users/${userId}/followers`);
+        const response = await axios.get(`http://user-service:3001/api/users/${userId}/followers`);
         const followers = response.data.followers;
 
         if (!Array.isArray(followers)) {
         return res.status(500).json({ message: "Invalid followers data from user-service" });
         }
 
-        // 🔔 Créer une notification pour chaque follower
+        // Créer une notification pour chaque follower
         const notifications = followers.map(followerId => ({
         userId: followerId,
         type: 'friend_post',

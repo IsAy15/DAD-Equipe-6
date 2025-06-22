@@ -75,8 +75,8 @@ module.exports = {
 
         // Appel au notification-service
         try {
-            await axios.post('http://notification-service:8080/api/notifications/on-post-created', {
-                userId: user_id,
+            await axios.post('http://notification-service:3004/api/notifications/on-post-created', {
+                userId: user_id, // L'utilisateur qui a créé le post
                 postId: savedPost._id
             });
         } catch (notifyErr) {

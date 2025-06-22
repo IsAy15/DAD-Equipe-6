@@ -7,6 +7,6 @@ router.get('/:userId', controller.getUserNotifications);
 router.get('/:userId/count', controller.getNotificationCount);
 router.delete('/:notificationId', controller.readAndDelete);
 router.delete('/all/:userId', controller.readAllAndDelete);
-router.post('/api/notifications/on-post-created', controller.onPostCreated);
+router.post('/on-post-created', controller.onPostCreated);
 
 module.exports = router;
