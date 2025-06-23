@@ -106,3 +106,58 @@ export async function postBreeze(text, image, token) {
   );
   return res.data;
 }
+
+export async function fetchPostComments(postId, token){
+  const res = await apiClient.get(
+    `/api/posts/${postId}/comments`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+}
+
+export async function addCommentToPost(postId, comment_content, token){
+  const res = await apiClient.post(
+    `/api/posts/${postId}/comments`,
+    {
+      content : comment_content,
+      parentComment: null
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res;
+}
+
+export async function updateComment(postId, commentId, new_content, token){
+  const res = await apiClient.put(
+    `/api/posts/${postId}/comments/${commentId}`,
+    {
+      content : new_content,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res;
+}
+
+export async function deleteComment(postId, commentId, token){
+  const res = await apiClient.delete(
+    `/api/posts/${postId}/comments/${commentId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res;
+}

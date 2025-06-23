@@ -335,8 +335,7 @@ router.get('/',
     commentController.getPostComments);
 
 router.post('/',
-    [validateBodyObjectId('author'),
-    validateUrlObjectId('post_id'),
+    [validateUrlObjectId('post_id'),
     verifyJWT],
     commentController.addCommentToPost);
 
