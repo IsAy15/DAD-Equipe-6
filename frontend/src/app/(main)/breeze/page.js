@@ -11,7 +11,7 @@ export default function CreateBreathPage() {
   const [text, setText] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
-  const { identifier } = useAuth();
+  const { identifier, accessToken } = useAuth();
   const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
@@ -31,9 +31,7 @@ export default function CreateBreathPage() {
 
   // Soumettre le “breath”
   const handleSubmit = () => {
-    // TODO : appeler ton endpoint pour créer le “breath”
-    console.log({ text, selectedImage });
-    postBreeze(text, selectedImage)
+    postBreeze(text, selectedImage, accessToken)
       .then(() => {
         // Rediriger vers la page d’accueil ou une autre page après succès
         router.push("/home");

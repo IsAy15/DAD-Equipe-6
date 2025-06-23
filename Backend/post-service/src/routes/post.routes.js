@@ -161,7 +161,7 @@ router.get(
 
 router.get("/feed", verifyJWT, postController.getPostsOfSubscribdedTo);
 
-router.post("/:user_id", verifyJWT, postController.createPost);
+router.post("/", verifyJWT, postController.createPost);
 
 router.put(
   "/:post_id",

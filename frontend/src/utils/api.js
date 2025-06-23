@@ -96,8 +96,7 @@ export async function postBreeze(text, image, token) {
   const res = await apiClient.post(
     "/api/posts/",
     {
-      text,
-      image,
+      content: text,
     },
     {
       headers: {
