@@ -130,3 +130,19 @@ exports.revokeRefreshToken = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.isUsernameTaken = async (req, res) => {
+  const { username } = req.query;
+
+  if (!username) {
+    return res.status(400).json({ message: "Missing username" });
+  }
+
+  try {
+    const existingUser = await User.findOne({ username });
+    return res.status(200).json({ taken: !!existingUser });
+  } catch (err) {
+    console.error("Error checking username:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
