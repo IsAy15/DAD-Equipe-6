@@ -1,10 +1,15 @@
 import { fetchUserProfile } from "@/utils/api";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import UserAvatar from "./UserAvatar";
 
-export default function ProfileCard({ identifier }) {
+export default function ProfileCard({ identifier, full = false }) {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const router = useRouter();
 
   const loadingContent = (
     <div className="flex w-52 flex-col gap-4">
@@ -12,6 +17,7 @@ export default function ProfileCard({ identifier }) {
         <div className="skeleton skeleton-animated h-16 w-16 shrink-0 rounded-full"></div>
         <div className="flex flex-col gap-4">
           <div className="skeleton skeleton-animated h-4 w-20"></div>
+          <div className="skeleton skeleton-animated h-4 w-28"></div>
           <div className="skeleton skeleton-animated h-4 w-28"></div>
         </div>
       </div>
@@ -25,8 +31,10 @@ export default function ProfileCard({ identifier }) {
       return;
     }
     setLoading(true);
+    setError(null);
     const fetchProfile = async () => {
       try {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         const profileData = await fetchUserProfile(identifier);
         setUser(profileData);
         setError(null);
@@ -40,16 +48,6 @@ export default function ProfileCard({ identifier }) {
     fetchProfile();
   }, [identifier]);
 
-  // Récupère les initiales de l'username (ou "??" si absent)
-  const initials = user?.username
-    ? user.username
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
-    : "??";
-
   return (
     <>
       {loading ? (
@@ -57,26 +55,29 @@ export default function ProfileCard({ identifier }) {
       ) : error ? (
         <div className="text-red-500">{error}</div>
       ) : (
-        // <div className="rounded-lg p-4 flex items-center space-x-4">
-        //   <div className="avatar avatar-placeholder">
-        //     <div className="bg-neutral text-neutral-content w-10 h-10 rounded-full flex items-center justify-center">
-        //       <span className="text-md uppercase">{initials}</span>
-        //     </div>
-        //   </div>
-        //   <div>
-        //     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-        //       @{user?.username || "Utilisateur"}
-        //     </h2>
-        //   </div>
-        // </div>
-        <div className="flex w-52 flex-col gap-4">
-          <div className="flex items-center gap-4">
-            <div className="bg-neutral text-neutral-content h-16 w-16 shrink-0 rounded-full flex items-center justify-center">
-              <span className="text-xl uppercase">{initials}</span>
+        <div className="flex items-center gap-4">
+          <UserAvatar user={user} size="md" />
+          <div className="flex flex-col gap-2">
+            <div>
+              <Link
+                className="h-4 w-20 text-lg font-semibold text-base-content"
+                href={`/profile/${user.username}`}
+              >
+                {user?.username}
+              </Link>
+              {full && <p className="text-base-content text-sm">{user.bio}</p>}
             </div>
-            <div className="flex flex-col gap-4">
-              <p className="h-4 w-20 text-lg font-semibold">{user?.username}</p>
-              <div className="skeleton h-4 w-28"></div>
+            <div className="h-4 w-28 text-base-content/80">
+              <span className="text-base-content font-semibold">
+                {user?.followingCount}
+              </span>{" "}
+              abonnements
+            </div>
+            <div className="h-4 w-28 text-base-content/80">
+              <span className="text-base-content font-semibold">
+                {user?.followersCount}
+              </span>{" "}
+              abonnés
             </div>
           </div>
         </div>

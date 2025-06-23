@@ -3,11 +3,14 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useAuth } from "@/contexts/authcontext";
+import { useNotyf } from "@/contexts/NotyfContext";
 
 export default function RegisterForm() {
   const t = useTranslations("Auth");
 
   const { register } = useAuth();
+
+  const notyf = useNotyf();
 
   const [username, setUsername] = useState("");
   const [usernameValid, setUsernameValid] = useState(true);
@@ -16,6 +19,8 @@ export default function RegisterForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordsMatch, setPasswordsMatch] = useState(true);
+  const [passwordsRequirements, setPasswordsRequirements] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -58,12 +63,32 @@ export default function RegisterForm() {
     setPasswordsMatch(
       value === confirmPassword || confirmPassword.length === 0
     );
+
+    // Check if the min-length rule element has the class 'strong-password-active:text-success'
+    const minLengthEl = document.querySelector(
+      '[data-pw-strength-rule="min-length"]'
+    );
+    const lowercaseEl = document.querySelector(
+      '[data-pw-strength-rule="lowercase"]'
+    );
+    if (
+      minLengthEl &&
+      minLengthEl.classList.contains("active") &&
+      lowercaseEl &&
+      lowercaseEl.classList.contains("active")
+    ) {
+      setPasswordsRequirements(true);
+    }
   };
 
   const handleConfirmPasswordChange = (e) => {
     const value = e.target.value;
     setConfirmPassword(value);
     setPasswordsMatch(password === value || value.length === 0);
+  };
+
+  const handleTermsChange = (e) => {
+    setTermsAccepted(e.target.checked);
   };
 
   return (
@@ -122,13 +147,13 @@ export default function RegisterForm() {
                   <span className="text-error text-sm">{t("emailError")}</span>
                 )}
               </div>
-              <div className="max-w-sm">
+              <div>
                 <div className="flex mb-2">
                   <div className="flex-1">
                     <input
                       type="password"
                       id="password-hints"
-                      className="input"
+                      className="input w-full"
                       placeholder={t("password")}
                       value={password}
                       onChange={handlePasswordChange}
@@ -187,6 +212,9 @@ export default function RegisterForm() {
                       ></span>
                       {t.raw("passwordRequirementsList")["lowercase"]}
                     </li>
+                    <h6 className="my-2 text-base font-semibold text-base-content">
+                      {t("passwordRecommendations")}
+                    </h6>
                     <li
                       data-pw-strength-rule="uppercase"
                       className="strong-password-active:text-success flex items-center gap-x-2"
@@ -258,6 +286,8 @@ export default function RegisterForm() {
                   type="checkbox"
                   className="checkbox checkbox-primary"
                   id="policyagreement"
+                  checked={termsAccepted}
+                  onChange={handleTermsChange}
                 />
                 <label
                   className="label-text text-base-content/80 p-0 text-base"
@@ -275,7 +305,16 @@ export default function RegisterForm() {
               <button
                 type="submit"
                 disabled={
-                  !usernameValid || !emailValid || !passwordsMatch || loading
+                  !(
+                    usernameValid &&
+                    username != "" &&
+                    emailValid &&
+                    email != "" &&
+                    confirmPassword != "" &&
+                    passwordsMatch &&
+                    passwordsRequirements &&
+                    termsAccepted
+                  ) || loading
                 }
                 className="btn btn-lg btn-primary btn-gradient btn-block"
               >
@@ -296,7 +335,15 @@ export default function RegisterForm() {
               </a>
             </p>
             <div className="divider">{t("or")}</div>
-            <button className="btn btn-text btn-block">
+            <button
+              className="btn btn-text btn-block"
+              onClick={() =>
+                notyf.open({
+                  type: "warning",
+                  message: "Fonctionnalité en cours de développement",
+                })
+              }
+            >
               <img
                 src="https://cdn.flyonui.com/fy-assets/blocks/marketing-ui/brand-logo/google-icon.png"
                 alt="google icon"

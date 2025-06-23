@@ -3,29 +3,43 @@ const mongoose = require('mongoose');
 const axios = require('axios');
 
 module.exports = {
-    
-    getPostsByUserId: async (req, res) => {
-        // Controller logic to retrieve posts by user id goes here
-        const user_id = req.userId;
-        try{
-            const posts = await Post.find({ author: user_id })
-            .lean()
-            .exec();
-    
-            if(posts?.length == 0){
-                return res.status(404).json({ message: 'No post found for this user'});
-            }
+  getPostsByUserId: async (req, res) => {
+    // Controller logic to retrieve posts by user id goes here
+    const user_id = req.params.user_id;
+    try {
+      const posts = await Post.find({ author: user_id })
+        .sort({ createdAt: -1 })
+        .lean()
+        .exec();
 
-            if(posts) {
-                return res.status(200).json(posts);
-            }
-    
-            return res.status(404).json({ message: 'No posts found for this user' });
+      if (posts?.length == 0) {
+        return res.status(404).json({ message: "No post found for this user" });
+      }
 
-        }catch(err) {
-            return res.status(500).json({ message: 'Failed to retrieve posts', details: err.message });
+      if (posts) {
+        return res.status(200).json(posts);
+      }
+
+      return res.status(404).json({ message: "No posts found for this user" });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: "Failed to retrieve posts", details: err.message });
+    }
+  },
+  getPostsOfSubscribdedTo: async (req, res) => {
+    try {
+      const user_id = req.userId;
+
+      if (!user_id) {
+        return res.status(400).json({ message: "User id is required" });
+      }
+
+      const friends_ids = await fetch(
+        `http://localhost:8080/api/user/${user_id}/friends`,
+        {
+          method: "GET",
         }
-
     },
     getPostsOfSubscribdedTo: async (req, res) => {
         try{

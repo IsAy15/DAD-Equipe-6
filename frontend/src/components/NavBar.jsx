@@ -2,19 +2,33 @@
 
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
 import AppearanceSettings from "./AppearanceSettings";
 import { usePathname } from "next/navigation";
 
 import ProfileCard from "./ProfileCard";
 import { useAuth } from "@/contexts/authcontext";
+import UserAvatar from "./UserAvatar";
+import { fetchUserProfile } from "@/utils/api";
+import MenuItem from "./MenuItem";
 
 const ASIDE_WIDTH = 256; // px
 
 export default function NavBar() {
   const { identifier } = useAuth();
+  const [user, setUser] = useState(null);
   const t = useTranslations("Navbar");
+
+  useEffect(() => {
+    async function fetchUser() {
+      if (identifier) {
+        const fetchedUser = await fetchUserProfile(identifier);
+        setUser(fetchedUser);
+      }
+    }
+    fetchUser();
+  }, [identifier]);
   const [asideOpen, setAsideOpen] = useState(false);
   const [touchStartX, setTouchStartX] = useState(null);
   const [touchEndX, setTouchEndX] = useState(null);
@@ -136,86 +150,77 @@ export default function NavBar() {
             <ProfileCard identifier={identifier} />
           </div>
           {/* Menu */}
-          <nav className="flex-1 overflow-y-auto p-4">
-            <ul className="menu menu-horizontal gap-2 p-0 text-base rtl:ml-20">
-              <li className="w-full">
-                <Link href="/home" className="btn btn-text justify-start">
-                  <span
-                    className={clsx(
-                      "size-6",
-                      pathname == "/home"
-                        ? "text-primary icon-[tabler--home-filled]"
-                        : "icon-[tabler--home]"
-                    )}
-                  />
-                  <span>{t("home")}</span>
-                </Link>
-              </li>
-              <li className="w-full">
-                <Link href="#" className="btn btn-text justify-start">
-                  <span
-                    className={clsx(
-                      "size-6",
-                      pathname == "/profile"
-                        ? "text-primary icon-[tabler--user-filled]"
-                        : "icon-[tabler--user]"
-                    )}
-                  />
-                  <span>{t("profile")}</span>
-                </Link>
-              </li>
-              <li className="w-full">
-                <Link href="/search" className="btn btn-text justify-start">
-                  <span
-                    className={clsx(
-                      "icon-[tabler--search] size-6",
-                      pathname === "/search" && "text-primary"
-                    )}
-                  />
-                  <span>{t("search")}</span>
-                </Link>
-              </li>
-              <li className="w-full">
-                <Link href="/breeze" className="btn btn-text justify-start">
-                  <span
-                    className={clsx(
-                      "icon-[tabler--wind] size-6",
-                      pathname === "/breeze" && "text-primary"
-                    )}
-                  />
-                  <span>{t("breeze")}</span>
-                </Link>
-              </li>
-              <li className="w-full">
-                <Link
-                  href="/notifications"
-                  className="btn btn-text justify-start"
-                >
-                  <span
-                    className={clsx(
-                      "size-6",
-                      pathname == "/notifications"
-                        ? "text-primary icon-[tabler--bell-filled]"
-                        : "icon-[tabler--bell]"
-                    )}
-                  />
-                  <span>{t("notifications")}</span>
-                </Link>
-              </li>
-              <li className="w-full">
-                <Link href="/messages" className="btn btn-text justify-start">
-                  <span
-                    className={clsx(
-                      "size-6",
-                      pathname == "/messages"
-                        ? "text-primary icon-[tabler--message-filled]"
-                        : "icon-[tabler--message]"
-                    )}
-                  />
-                  <span>{t("messages")}</span>
-                </Link>
-              </li>
+          <nav className="flex-1 overflow-y-auto p-4 flex flex-col">
+            <ul className="menu menu-horizontal gap-2 p-0 text-base rtl:ml-20 w-full">
+              <MenuItem
+                label={t("home")}
+                href="/home"
+                icon="home"
+                iconFillable={true}
+                pathname={pathname}
+                showOnMobile={false}
+              />
+
+              <MenuItem
+                label={t("profile")}
+                href={`/profile/${user?.username}`}
+                icon="user"
+                iconFillable={true}
+                pathname={pathname}
+              />
+              <MenuItem
+                label={t("search")}
+                href="/search"
+                icon="search"
+                iconFillable={false}
+                pathname={pathname}
+                showOnMobile={false}
+              />
+              <MenuItem
+                label={t("breeze")}
+                href="/breeze"
+                icon="wind"
+                iconFillable={false}
+                pathname={pathname}
+                showOnMobile={false}
+                showOnDesktop={false}
+              />
+              <MenuItem
+                label={t("notifications")}
+                href="/notifications"
+                icon="bell"
+                iconFillable={true}
+                pathname={pathname}
+                showOnMobile={false}
+              />
+              <MenuItem
+                label={t("messages")}
+                href="/messages"
+                icon="message"
+                iconFillable={true}
+                pathname={pathname}
+                showOnMobile={false}
+              />
+              <MenuItem
+                label="Favoris"
+                href="#"
+                icon="bookmark"
+                iconFillable={true}
+                pathname={pathname}
+              />
             </ul>
+            {/* Add a button fixed at the bottom of the nav */}
+            <div className="flex-1" />
+            {/* Button fixed at the bottom of the nav */}
+            <div className="mb-2 hidden sm:block">
+              <Link
+                href="/breeze"
+                className="btn btn-primary w-full justify-center"
+              >
+                <span className="icon-[tabler--wind] size-6" />
+                <span>{t("breeze")}</span>
+              </Link>
+            </div>
           </nav>
           {/* Sélecteurs thème/langue */}
           <div className="flex flex-col gap-4 p-4 border-t">
@@ -244,11 +249,10 @@ export default function NavBar() {
       >
         <div className="flex w-full items-center justify-between">
           <button
-            className="btn btn-square btn-ghost"
             onClick={() => setAsideOpen(true)}
             aria-label="Ouvrir le menu"
           >
-            {/* <img src="" /> */}
+            <UserAvatar user={user} size="sm" link={false} />
           </button>
           <Link className="ml-2 text-xl font-semibold no-underline" href="/">
             {t("title")}
