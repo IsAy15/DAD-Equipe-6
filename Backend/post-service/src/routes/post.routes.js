@@ -1,8 +1,7 @@
-const router = require('express').Router();
-const postController = require('../controllers/post.controller');
-const {validateBodyObjectId, validateUrlObjectId} = require('../middlewares/validateIds');
-const verifyJWT = require('../middlewares/verifyJWT');
-const validateJWT = require('../middlewares/verifyJWT')
+const router = require("express").Router();
+const postController = require("../controllers/post.controller");
+const { validateUrlObjectId } = require("../middlewares/validateIds");
+const verifyJWT = require("../middlewares/verifyJWT");
 
 // Routes for /api/posts
 
@@ -10,7 +9,7 @@ const validateJWT = require('../middlewares/verifyJWT')
  * @swagger
  * tags:
  *   name: Posts
- *   description: Endpoints to manage posts 
+ *   description: Endpoints to manage posts
  */
 
 /**
@@ -47,14 +46,6 @@ const validateJWT = require('../middlewares/verifyJWT')
  *   post:
  *     summary: Create a post for a user
  *     tags: [Posts]
- *     parameters:
- *       - in: path
- *         name: user_id
- *         schema:
- *           type: string
- *           format: objectId
- *         required: true
- *         description: Author user ID
  *     security:
  *      - bearerAuth: []
  *     requestBody:
@@ -79,18 +70,10 @@ const validateJWT = require('../middlewares/verifyJWT')
 
 /**
  * @swagger
- * /api/posts/{user_id}/feed:
+ * /api/posts/feed:
  *   get:
  *     summary: Get posts feed from users the given user is subscribed to
  *     tags: [Posts]
- *     parameters:
- *       - in: path
- *         name: user_id
- *         schema:
- *           type: string
- *           format: objectId
- *         required: true
- *         description: User ID
  *     security:
  *      - bearerAuth: []
  *     responses:
@@ -170,29 +153,26 @@ const validateJWT = require('../middlewares/verifyJWT')
  *         description: Server error
  */
 
-router.get('/:user_id',
-    [validateUrlObjectId('user_id'),
-    verifyJWT],
-    postController.getPostsByUserId);
+router.get(
+  "/:user_id",
+  [validateUrlObjectId("user_id"), verifyJWT],
+  postController.getPostsByUserId
+);
 
-router.get('/:user_id/feed',
-    [validateUrlObjectId('user_id'),
-    verifyJWT],
-    postController.getPostsOfSubscribdedTo);
+router.get("/feed", verifyJWT, postController.getPostsOfSubscribdedTo);
 
-router.post('/:user_id', 
-    [validateUrlObjectId('user_id'),
-    verifyJWT],
-    postController.createPost);
+router.post("/:user_id", verifyJWT, postController.createPost);
 
-router.put('/:post_id',
-    [validateUrlObjectId('post_id'),
-    verifyJWT],
-    postController.updatePost);
+router.put(
+  "/:post_id",
+  [validateUrlObjectId("post_id"), verifyJWT],
+  postController.updatePost
+);
 
-router.delete('/:post_id',
-    [validateUrlObjectId('post_id'),
-    verifyJWT],
-    postController.deletePost);
+router.delete(
+  "/:post_id",
+  [validateUrlObjectId("post_id"), verifyJWT],
+  postController.deletePost
+);
 
 module.exports = router;

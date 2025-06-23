@@ -92,3 +92,18 @@ export async function unfollowUser(targetUserId, token) {
   );
   return res.data;
 }
+export async function postBreeze(text, image, token) {
+  const res = await apiClient.post(
+    "/api/posts/",
+    {
+      text,
+      image,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+}
