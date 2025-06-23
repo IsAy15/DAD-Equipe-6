@@ -14,7 +14,9 @@ const notificationSchema = new mongoose.Schema({
         'mention',          // tu as été mentionné
         'friend_post',      // un ami a publié quelque chose
         'post_reply',       // quelqu’un a répondu à ton post
-        'comment_reply'     // quelqu’un a répondu à ton commentaire
+        'comment_reply',     // quelqu’un a répondu à ton commentaire
+        'comment_post'      // quelqu’un a commenté ton post
+
         ]
     },
     content: {
