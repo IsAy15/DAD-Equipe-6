@@ -36,22 +36,25 @@ module.exports = {
         return res.status(400).json({ message: 'User id is required' });
         }
 
-        const response = await fetch(`http://localhost:8080/api/user/${user_id}/friends`, {
-        method: 'GET'
-        });
-        const friends_ids = await response.json();
+            const friends_ids = await fetch(`http://localhost:8080/api/user/${user_id}/following`, {
+                method: 'GET'
+            }).then((response) => response.json());
 
-        if (!friends_ids) {
-        return res.status(500).json({ message: 'Unable to get user friends' });
-        }
+            if(!friends_ids){
+                return res.status(500).json({ message: 'Unable to get who the user is following' });
+            }
+
+            if(friends_ids.length == 0){
+                return res.status(500).json({ message: 'The user does not follow anyone' });
+            }
 
         const feed = await Post.find().where('author').in(friends_ids).lean().exec();
 
-        if (!feed) {
-        return res.status(204).json({ message: 'No feed available' });
-        }
+            if(!feed){
+                return res.status(204).json({ message: 'No feed available for user' });
+            }
 
-        return res.status(200).json(feed);
+            return res.status(200).json({ feed : feed });
 
     } catch (err) {
         return res.status(500).json({ message: 'Unable to get user feed', details: err.message });
