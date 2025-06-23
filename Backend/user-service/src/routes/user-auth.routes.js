@@ -8,5 +8,6 @@ router.post('/', userAuthController.createUser);
 router.post('/:userId/refreshTokens', userAuthController.storeRefreshToken);
 router.post('/:userId/refreshTokens/validate', userAuthController.validateRefreshToken);
 router.delete('/:userId/refreshTokens', userAuthController.revokeRefreshToken);
+router.get('/check-username', userAuthController.isUsernameTaken);
 
 module.exports = router;
