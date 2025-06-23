@@ -33,20 +33,15 @@ module.exports = {
         const user_id = req.userId;
 
         if (!user_id) {
-        return res.status(400).json({ message: 'User id is required' });
+            return res.status(400).json({ message: 'User id is required' });
         }
 
-            const friends_ids = await fetch(`http://localhost:8080/api/user/${user_id}/following`, {
-                method: 'GET'
-            }).then((response) => response.json());
+        const response = await axios.get(`http://gateway:8080/api/users/${user_id}/following`);
+        const friends_ids = response.data.following;
 
-            if(!friends_ids){
-                return res.status(500).json({ message: 'Unable to get who the user is following' });
-            }
-
-            if(friends_ids.length == 0){
-                return res.status(500).json({ message: 'The user does not follow anyone' });
-            }
+        if (!friends_ids || friends_ids.length === 0) {
+            return res.status(404).json({ message: 'The user does not follow anyone' });
+        }
 
         const feed = await Post.find().where('author').in(friends_ids).lean().exec();
 
