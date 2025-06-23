@@ -4,12 +4,8 @@ const router = express.Router();
 const controller = require('../controllers/friend-request.controller');
 const verifyJWT = require('../middlewares/verifyJWT');
 
-router.post('/send/:receiverId', verifyJWT, controller.sendFriendRequest);
-router.post('/:requestId/accept', verifyJWT, controller.acceptFriendRequest);
-router.post('/:requestId/refuse', verifyJWT, controller.refuseFriendRequest);
-
-router.get('/received', verifyJWT, controller.getReceivedRequests);
-router.get('/sent', verifyJWT, controller.getSentRequests);
+router.post('/follow/:targetUserId', verifyJWT, controller.followUser);
+router.post('/unfollow/:targetUserId', verifyJWT, controller.unfollowUser);
 
 
 module.exports = router;

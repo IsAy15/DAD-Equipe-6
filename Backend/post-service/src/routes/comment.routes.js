@@ -350,12 +350,12 @@ router.delete('/:comment_id',
     verifyJWT], 
     commentController.deleteCommentFromPost);
 
-    
-router.get(':comment_id/replies',
+
+router.get('/:comment_id/replies',
     verifyJWT,
     commentController.getCommentReplies);
 
-router.post(':comment_id/replies',
+router.post('/:comment_id/replies',
     verifyJWT,
     commentController.addReplyToComment);
 

@@ -1,5 +1,6 @@
-const Post = require("../models/Post.js");
-const mongoose = require("mongoose");
+const Post = require('../models/Post.js');
+const mongoose = require('mongoose');
+const axios = require('axios');
 
 module.exports = {
   getPostsByUserId: async (req, res) => {
@@ -39,119 +40,122 @@ module.exports = {
         {
           method: "GET",
         }
-      ).then((response) => response.json());
+    },
+    getPostsOfSubscribdedTo: async (req, res) => {
+        try{
+            const user_id = req.userId;
 
-      if (!friends_ids) {
-        return res.status(500).json({ message: "Unable to get user friends" });
-      }
+            if(!user_id){
+                return res.status(400).json({ message: 'User id is required' });
+            }
 
-      const feed = await Post.find()
-        .where("author")
-        .in(friends_ids)
-        .sort({ createdAt: -1 })
-        .lean()
-        .exec();
+            const friends_ids = await fetch(`http://localhost:8080/api/user/${user_id}/friends`, {
+                method: 'GET'
+            }).then((response) => response.json());
 
-      if (!feed) {
-        return res.status(204).json({ message: "No feed available" });
-      }
+            if(!friends_ids){
+                return res.status(500).json({ message: 'Unable to get user friends' });
+            }
 
-      return feed;
-    } catch (err) {
-      return res
-        .status(500)
-        .json({ message: "Unable to get user feed", details: err.message });
-    }
-  },
-  createPost: async (req, res) => {
-    // Controller logic to create a new post goes here
+            const feed = await Post.find().where('author').in(friends_ids).lean().exec();
 
+            if(!feed){
+                return res.status(204).json({ message: 'No feed available' });
+            }
+
+            return feed;
+
+        }catch(err){
+            return res.status(500).json({ message: 'Unable to get user feed', details: err.message });
+        }
+    },
+    createPost: async (req, res) => {
     try {
-      const user_id = req.userId;
-      const { content, tags, imageUrls, videoUrls } = req.body;
+        const user_id = req.params.user_id;
+        const { content, tags, imageUrls, videoUrls } = req.body;
 
-      //TODO : Check if the author is the same as the logged-in user
+        // TODO : Check if the author is the same as the logged-in user
+        // TODO : Validate the input data
 
-      //TODO : Validate the input data
+        const newPost = new Post({
+            author: user_id,
+            content,
+            tags,
+            imageUrls,
+            videoUrls
+        });
 
-      const newPost = new Post({
-        author: user_id,
-        content,
-        tags,
-        imageUrls,
-        videoUrls,
-      });
+        const savedPost = await newPost.save();
 
-      await newPost
-        .save()
-        .then((post) => res.status(201).json(post))
-        .catch((err) =>
-          res
-            .status(500)
-            .json({ message: "Failed to create post", details: err.message })
-        );
-    } catch (err) {
-      return res
-        .status(500)
-        .json({ message: "Failed to create post", details: err.message });
-    }
-  },
-  updatePost: async (req, res) => {
-    try {
-      const postId = req.userId;
+        // Appel au notification-service
+        try {
+            await axios.post('http://notification-service:3004/api/notifications/on-post-created', {
+                userId: user_id, // L'utilisateur qui a créé le post
+                postId: savedPost._id
+            });
+        } catch (notifyErr) {
+            console.error('Failed to notify followers:', notifyErr.message);
+            // Ne bloque pas la création du post en cas d'erreur de notif
+        }
 
-      if (!postId) {
-        return res.status(400).json({ message: "Post id is required" });
-      }
+        return res.status(201).json(savedPost);
 
-      const { content, tags, imageUrls, videoUrls } = req.body;
+        } catch (err) {
+            return res.status(500).json({ message: 'Failed to create post', details: err.message });
+        }
+    },
+    updatePost: async (req, res) => {
+        try{
+            const postId = req.userId;
+    
+            if(!postId) {
+                return res.status(400).json({ message: 'Post id is required' });
+            }
+            
+            const { content, tags, imageUrls, videoUrls } = req.body;
+            
+            const updatedPost = await Post.findByIdAndUpdate(
+                new mongoose.Types.ObjectId(postId), 
+                {
+                    content,
+                    tags,
+                    imageUrls,
+                    videoUrls
+                },
+                { new: true }
+            )
+            .lean()
+            .exec();
 
-      const updatedPost = await Post.findByIdAndUpdate(
-        new mongoose.Types.ObjectId(postId),
-        {
-          content,
-          tags,
-          imageUrls,
-          videoUrls,
-        },
-        { new: true }
-      )
-        .lean()
-        .exec();
+            if(!updatedPost) {
+                return res.status(404).json({ message: 'Post not found' });
+            }
+            return res.status(200).json(updatedPost);
+        }
+        catch(err) {
+            return res.status(500).json({ message: 'Failed to update post', details: err.message });
+        }
+    },
 
-      if (!updatedPost) {
-        return res.status(404).json({ message: "Post not found" });
-      }
-      return res.status(200).json(updatedPost);
-    } catch (err) {
-      return res
-        .status(500)
-        .json({ message: "Failed to update post", details: err.message });
-    }
-  },
+    deletePost: async (req, res) => {
+        try{
+            const postId = req.userId;
+     
+             if(!postId) {
+                 return res.status(400).json({ message: 'Post id is required' });
+             }
+     
+             const deletedPost = await Post.findByIdAndDelete( new mongoose.Types.ObjectId(postId))
+             .lean()
+             .exec();
 
-  deletePost: async (req, res) => {
-    try {
-      const postId = req.userId;
-
-      if (!postId) {
-        return res.status(400).json({ message: "Post id is required" });
-      }
-
-      const deletedPost = await Post.findByIdAndDelete(
-        new mongoose.Types.ObjectId(postId)
-      )
-        .lean()
-        .exec();
-
-      if (!deletedPost) {
-        return res.status(404).json({ message: "Post not found" });
-      }
-      return res.status(204).json({ message: "Post deleted successfully" });
-    } catch (err) {
-      return res
-        .status(500)
-        .json({ message: "Failed to delete post", details: err.message });
-    }
-  },
-};
+            if(!deletedPost) {
+                return res.status(404).json({ message: 'Post not found' });
+            }
+            return res.status(204).json({ message: 'Post deleted successfully' });
+        }
+        catch(err) {
+            return res.status(500).json({ message: 'Failed to delete post', details: err.message });
+        }
+    },
+}

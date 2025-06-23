@@ -1,6 +1,7 @@
 const Comment = require('../models/Comment.js');
 const Post = require('../models/Post.js');
 const mongoose = require('mongoose');
+const axios = require('axios');
 
 module.exports = {
     getPostComments: async (req,res) => {
@@ -26,35 +27,52 @@ module.exports = {
     },
 
     addCommentToPost: async (req, res) => {
-        try{
-            const post_id = req.params.post_id;
-            const author = req.userId;
-            const {content, parentComment } = req.body;
+    try {
+        const post_id = req.params.post_id;
+        const author = req.userId;
+        const { content, parentComment } = req.body;
 
-            if (!post_id || !author || !content) {
-                return res.status(400).json({ message: 'Post ID, author, and content are required'});
-            }
-
-            const postExists = await Post.exists({ _id: post_id }).lean().exec();
-            if (!postExists) {
-                return res.status(404).json({ message: 'Post not found' });
-            }
-
-            const newComment = new Comment({
-                author,
-                post: post_id,
-                content,
-                parentComment
-            });
-
-            await newComment.save()
-                .then(comment => res.status(201).json(comment))
+        if (!post_id || !author || !content) {
+            return res.status(400).json({ message: 'Post ID, author, and content are required' });
         }
-        catch (error) {
-            console.error('Error in addCommentToPost:', error);
-            return res.status(500).json({ message: 'Internal server error', error: error.message });
+
+        const post = await Post.findById(post_id).lean().exec();
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        const newComment = new Comment({
+            author,
+            post: post_id,
+            content,
+            parentComment
+        });
+
+        const savedComment = await newComment.save();
+
+        // Crée une notification pour l'auteur du post si ce n'est pas lui qui commente
+        if (post.author.toString() !== author) {
+            try {
+                await axios.post('http://notification-service:3004/api/notifications', {
+                    userId: post.author,
+                    type: 'comment_post',
+                    content: `Someone commented on your post.`,
+                    link: `/posts/${post_id}`
+                });
+            } catch (notifyErr) {
+                console.error('Failed to notify post author:', notifyErr.message);
+                // ne bloque pas la suite
+            }
+        }
+
+        return res.status(201).json(savedComment);
+
+    } catch (error) {
+        console.error('Error in addCommentToPost:', error);
+        return res.status(500).json({ message: 'Internal server error', error: error.message });
         }
     },
+
 
     updateCommentFromPost: async (req, res) => {
         try{
@@ -131,39 +149,53 @@ module.exports = {
     },
 
     addReplyToComment: async (req, res) => {
-        try {
-                const { post_id, comment_id } = req.params;
-                const { content } = req.body;
-                const author = req.userId;
+    try {
+        const { post_id, comment_id } = req.params;
+        const { content } = req.body;
+        const author = req.userId;
 
-                if (!content || !author) {
-                    return res.status(400).json({ message: 'Content and author are required' });
-                }
+        if (!content || !author) {
+            return res.status(400).json({ message: 'Content and author are required' });
+        }
 
-                // Vérification que le commentaire parent existe
-                const parentComment = await Comment.findById(comment_id).exec();
-                if (!parentComment) {
-                    return res.status(404).json({ message: 'Parent comment not found' });
-                }
-                if(parentComment.parentComment){
-                    return res.status(404).json({ message: 'Cannnot add a reply to a reply' });
-                }
+        // Vérifie que le commentaire parent existe
+        const parentComment = await Comment.findById(comment_id).exec();
+        if (!parentComment) {
+            return res.status(404).json({ message: 'Parent comment not found' });
+        }
+        if (parentComment.parentComment) {
+            return res.status(400).json({ message: 'Cannot add a reply to a reply' });
+        }
 
-                const newReply = new Comment({
-                    content,
-                    author,
-                    post: post_id,
-                    parentComment: comment_id, // lien au commentaire parent
+        const newReply = new Comment({
+            content,
+            author,
+            post: post_id,
+            parentComment: comment_id,
+        });
+
+        await newReply.save();
+
+        // Envoie une notification à l’auteur du commentaire parent
+        if (parentComment.author.toString() !== author) { // éviter l'auto-notif
+            try {
+                await axios.post('http://notification-service:3004/api/notifications', {
+                    userId: parentComment.author,
+                    type: 'comment_reply',
+                    content: `Someone replied to your comment.`,
+                    link: `/posts/${post_id}#comment-${comment_id}`
                 });
-
-                await newReply.save()
-                    .then(reply => res.status(201).json(reply));
-
-                return res.status(201).json(newReply);
-            } catch (error) {
-                console.error('Error adding reply to comment:', error);
-                return res.status(500).json({ message: 'Internal server error', error: error.message });
+            } catch (notifyErr) {
+                console.error('Failed to send reply notification:', notifyErr.message);
             }
+        }
+
+        return res.status(201).json(newReply);
+
+    } catch (error) {
+        console.error('Error adding reply to comment:', error);
+        return res.status(500).json({ message: 'Internal server error', error: error.message });
+        }
     },
 
     updateReplyFromComment: async (req, res) => {
