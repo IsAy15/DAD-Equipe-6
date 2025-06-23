@@ -35,9 +35,29 @@ exports.getInbox = async (req, res) => {
     const messages = await Message.find({
       receiver: userId,
       isDeleted: false
-    }).sort({ createdAt: -1 });
+    }).sort({ createdAt: -1 }).select('_id sender');
 
-    return res.status(200).json({ inbox: messages });
+    if (!messages || messages.length === 0) {
+      return res.status(404).json({ message: 'No messages found in inbox.' });
+    }
+    
+    // Group messages by expeditor
+    const grouped = {};
+    messages.forEach(msg => {
+      const sender = msg.sender;
+      if (!grouped[sender]) {
+        grouped[sender] = [];
+      }
+      grouped[sender].push(msg._id);
+    });
+
+    // Transform the object to an array
+    const inbox = Object.entries(grouped).map(([sender, messageIds]) => ({
+      sender,
+      messages: messageIds
+    }));
+
+    return res.status(200).json({ inbox });
   } catch (err) {
     console.error('Error fetching inbox:', err);
     return res.status(500).json({ message: 'Internal server error' });
