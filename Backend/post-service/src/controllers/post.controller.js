@@ -3,72 +3,61 @@ const mongoose = require('mongoose');
 const axios = require('axios');
 
 module.exports = {
-  getPostsByUserId: async (req, res) => {
-    // Controller logic to retrieve posts by user id goes here
-    const user_id = req.params.user_id;
-    try {
-      const posts = await Post.find({ author: user_id })
-        .sort({ createdAt: -1 })
-        .lean()
-        .exec();
+    getPostsByUserId: async (req, res) => {
+        // Controller logic to retrieve posts by user id goes here
+        const user_id = req.params.user_id;
+        try {
+        const posts = await Post.find({ author: user_id })
+            .sort({ createdAt: -1 })
+            .lean()
+            .exec();
 
-      if (posts?.length == 0) {
-        return res.status(404).json({ message: "No post found for this user" });
-      }
+        if (posts?.length == 0) {
+            return res.status(404).json({ message: "No post found for this user" });
+        }
 
-      if (posts) {
-        return res.status(200).json(posts);
-      }
+        if (posts) {
+            return res.status(200).json(posts);
+        }
 
-      return res.status(404).json({ message: "No posts found for this user" });
-    } catch (err) {
-      return res
-        .status(500)
-        .json({ message: "Failed to retrieve posts", details: err.message });
-    }
-  },
-  getPostsOfSubscribdedTo: async (req, res) => {
-    try {
-      const user_id = req.userId;
-
-      if (!user_id) {
-        return res.status(400).json({ message: "User id is required" });
-      }
-
-      const friends_ids = await fetch(
-        `http://localhost:8080/api/user/${user_id}/friends`,
-        {
-          method: "GET",
+        return res.status(404).json({ message: "No posts found for this user" });
+        } catch (err) {
+        return res
+            .status(500)
+            .json({ message: "Failed to retrieve posts", details: err.message });
         }
     },
+
     getPostsOfSubscribdedTo: async (req, res) => {
-        try{
-            const user_id = req.userId;
+    try {
+        const user_id = req.userId;
 
-            if(!user_id){
-                return res.status(400).json({ message: 'User id is required' });
-            }
-
-            const friends_ids = await fetch(`http://localhost:8080/api/user/${user_id}/friends`, {
-                method: 'GET'
-            }).then((response) => response.json());
-
-            if(!friends_ids){
-                return res.status(500).json({ message: 'Unable to get user friends' });
-            }
-
-            const feed = await Post.find().where('author').in(friends_ids).lean().exec();
-
-            if(!feed){
-                return res.status(204).json({ message: 'No feed available' });
-            }
-
-            return feed;
-
-        }catch(err){
-            return res.status(500).json({ message: 'Unable to get user feed', details: err.message });
+        if (!user_id) {
+        return res.status(400).json({ message: 'User id is required' });
         }
+
+        const response = await fetch(`http://localhost:8080/api/user/${user_id}/friends`, {
+        method: 'GET'
+        });
+        const friends_ids = await response.json();
+
+        if (!friends_ids) {
+        return res.status(500).json({ message: 'Unable to get user friends' });
+        }
+
+        const feed = await Post.find().where('author').in(friends_ids).lean().exec();
+
+        if (!feed) {
+        return res.status(204).json({ message: 'No feed available' });
+        }
+
+        return res.status(200).json(feed);
+
+    } catch (err) {
+        return res.status(500).json({ message: 'Unable to get user feed', details: err.message });
+    }
     },
+
     createPost: async (req, res) => {
     try {
         const user_id = req.params.user_id;
@@ -104,6 +93,7 @@ module.exports = {
             return res.status(500).json({ message: 'Failed to create post', details: err.message });
         }
     },
+
     updatePost: async (req, res) => {
         try{
             const postId = req.userId;
@@ -140,14 +130,14 @@ module.exports = {
     deletePost: async (req, res) => {
         try{
             const postId = req.userId;
-     
-             if(!postId) {
-                 return res.status(400).json({ message: 'Post id is required' });
-             }
-     
-             const deletedPost = await Post.findByIdAndDelete( new mongoose.Types.ObjectId(postId))
-             .lean()
-             .exec();
+
+            if(!postId) {
+                return res.status(400).json({ message: 'Post id is required' });
+            }
+
+            const deletedPost = await Post.findByIdAndDelete( new mongoose.Types.ObjectId(postId))
+            .lean()
+            .exec();
 
             if(!deletedPost) {
                 return res.status(404).json({ message: 'Post not found' });
