@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { MessageCircle, Heart, Pencil, Check, X, Trash2 } from "lucide-react";
 import { useAuth } from "@/contexts/authcontext";
+import { fetchUserProfile } from "@/utils/api"
 
 const fetchWithTimeout = (url, timeout = 3000) =>
   new Promise((resolve, reject) => {
@@ -25,6 +26,9 @@ export default function Comment({
   onDeleteComment,
 }) {
   const { identifier } = useAuth();
+  const [username, setUsername] = useState(null);
+  const [usernameLoading, setUsernameLoading] = useState(true);
+
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [avatarLoading, setAvatarLoading] = useState(true);
   const [avatarFallback, setAvatarFallback] = useState(null);
@@ -55,6 +59,26 @@ export default function Comment({
         setAvatarFallback(comment.author[0]?.toUpperCase() || "?");
       })
       .finally(() => setAvatarLoading(false));
+  }, [comment.author]);
+
+   useEffect(() => {
+    if (!comment?.author) return;
+
+    setUsernameLoading(true);
+    fetchUserProfile(comment.author)
+      .then((data) => {
+        if (data?.username) {
+          setUsername(data.username);
+        } else {
+          setUsername(comment.author); // fallback
+        }
+      })
+      .catch(() => {
+        setUsername(comment.author); // fallback en cas d'erreur
+      })
+      .finally(() => {
+        setUsernameLoading(false);
+      });
   }, [comment.author]);
 
   const handleSave = async () => {
@@ -130,11 +154,17 @@ export default function Comment({
       </div>
 
       <div className="flex flex-col flex-grow">
-        <div className="text-sm font-semibold">
-          {comment.author}{" "}
-          <span className="text-xs text-base-content">
-            · {new Date(comment.createdAt).toDateString()}
-          </span>
+        <div className="text-sm font-semibold flex items-center gap-1">
+          {usernameLoading ? (
+            <div className="w-24 h-4 bg-gray-300 rounded animate-pulse" />
+          ) : (
+            <>
+              {username}
+              <span className="text-xs text-base-content font-normal">
+                · {new Date(comment.createdAt).toDateString()}
+              </span>
+            </>
+          )}
         </div>
 
         {isEditing ? (
