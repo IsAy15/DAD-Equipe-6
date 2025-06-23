@@ -40,16 +40,16 @@ module.exports = {
         const friends_ids = response.data.following;
 
         if (!friends_ids || friends_ids.length === 0) {
-            return res.status(404).json({ message: 'The user does not follow anyone' });
+            return res.status(200).json({ feed : [] });
         }
 
         const feed = await Post.find().where('author').in(friends_ids).lean().exec();
 
-            if(!feed){
-                return res.status(204).json({ message: 'No feed available for user' });
-            }
+        if(!feed){
+            return res.status(200).json({ feed : [] });
+        }
 
-            return res.status(200).json({ feed : feed });
+        return res.status(200).json({ feed : feed });
 
     } catch (err) {
         return res.status(500).json({ message: 'Unable to get user feed', details: err.message });
