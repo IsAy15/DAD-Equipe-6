@@ -92,3 +92,18 @@ export async function unfollowUser(targetUserId, token) {
   );
   return res.data;
 }
+export async function fetchUserMessages(token) {
+  // On suppose que ton service tourne à /api/messages/inbox
+  const res = await apiClient.get("/messages/inbox", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data; // { inbox: [ { sender, messages: [...] } ] }
+}
+
+export async function fetchMessageById(messageId, token) {
+  // On passe aussi par apiClient pour utiliser le même baseURL
+  const res = await apiClient.get(`/messages/${messageId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data; // { content, createdAt, read, ... }
+}
