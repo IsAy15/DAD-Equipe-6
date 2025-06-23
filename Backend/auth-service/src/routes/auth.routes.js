@@ -63,4 +63,6 @@ module.exports = function(app) {
  */
   app.post("/login", authController.login);
   app.get("/auth/verify", authController.verifyToken);
+  app.post("/auth/refresh-token", authController.refreshToken);
+  app.post("/auth/logout", authController.logout);
 };

@@ -5,4 +5,8 @@ const router = express.Router();
 router.get('/auth-data', userAuthController.getAuthData);
 router.post('/', userAuthController.createUser);
 
+router.post('/:userId/refreshTokens', userAuthController.storeRefreshToken);
+router.post('/:userId/refreshTokens/validate', userAuthController.validateRefreshToken);
+router.delete('/:userId/refreshTokens', userAuthController.revokeRefreshToken);
+
 module.exports = router;

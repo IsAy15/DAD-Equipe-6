@@ -65,3 +65,68 @@ exports.createUser = async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+exports.storeRefreshToken = async (req, res) => {
+  const { userId } = req.params;
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(400).json({ message: "Missing refresh token" });
+  }
+
+  try {
+    const user = await User.findById(userId); // 👈 ICI
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    return res.status(200).json({ message: "Refresh token stored" });
+
+  } catch (err) {
+    console.error("Failed to store refresh token:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+exports.validateRefreshToken = async (req, res) => {
+  const { userId } = req.params;
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(400).json({ message: "Missing refresh token" });
+  }
+
+  try {
+    const user = await User.findById(userId); // 👈 ICI aussi
+    if (!user || user.refreshToken !== refreshToken) {
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
+
+    return res.status(200).json({ message: "Refresh token is valid" });
+
+  } catch (err) {
+    console.error("Failed to validate refresh token:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.revokeRefreshToken = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.refreshToken = null;
+    await user.save();
+
+    return res.status(200).json({ message: "Refresh token revoked" });
+
+  } catch (err) {
+    console.error("Failed to revoke refresh token:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
