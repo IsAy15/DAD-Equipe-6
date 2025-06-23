@@ -106,5 +106,15 @@
     "profilePicture": "Photo de profil",
     "saveChanges": "Enregistrer",
     "cancel": "Annuler"
+  },
+  "Messages": {
+    "title": "Messages",
+    "noMessages": "Aucun message trouvé",
+    "newMessage": "Nouveau message",
+    "searchPlaceholder": "Rechercher des messages ou des utilisateurs",
+    "sendMessage": "Envoyer un message",
+    "typeMessage": "Tapez votre message ici...",
+    "send": "Envoyer",
+    "loading": "Chargement des messages..."
   }
 }

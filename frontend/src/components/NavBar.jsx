@@ -16,19 +16,9 @@ import MenuItem from "./MenuItem";
 const ASIDE_WIDTH = 256; // px
 
 export default function NavBar() {
-  const { identifier } = useAuth();
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const t = useTranslations("Navbar");
 
-  useEffect(() => {
-    async function fetchUser() {
-      if (identifier) {
-        const fetchedUser = await fetchUserProfile(identifier);
-        setUser(fetchedUser);
-      }
-    }
-    fetchUser();
-  }, [identifier]);
   const [asideOpen, setAsideOpen] = useState(false);
   const [touchStartX, setTouchStartX] = useState(null);
   const [touchEndX, setTouchEndX] = useState(null);
@@ -147,7 +137,7 @@ export default function NavBar() {
         <div className="flex flex-col h-full">
           {/* User */}
           <div className="flex items-center justify-between p-4 border-b">
-            <ProfileCard identifier={identifier} />
+            <ProfileCard user={user} />
           </div>
           {/* Menu */}
           <nav className="flex-1 overflow-y-auto p-4 flex flex-col">
