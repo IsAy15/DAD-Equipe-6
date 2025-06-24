@@ -1,10 +1,19 @@
 import ProfileCard from "./ProfileCard";
 import UserAvatar from "./UserAvatar";
+import LikeButton from "./LikeButton";
+
 import { fetchUserProfile } from "@/utils/api";
 import React, { useEffect, useState } from "react";
 
 export default function Post({ post }) {
   const [author, setAuthor] = useState(null);
+
+  const [isLike, setIsLike] = useState(false);
+
+  const handleLike = () => {
+    setIsLike(!isLike);
+    
+  }
 
   useEffect(() => {
     async function loadAuthor() {
@@ -18,6 +27,8 @@ export default function Post({ post }) {
     }
     loadAuthor();
   }, [post.author]);
+
+
 
   return (
     <div className="">
@@ -46,6 +57,9 @@ export default function Post({ post }) {
           })}
         >
           {new Date(post.createdAt).toLocaleDateString("fr-FR")}
+
+          <LikeButton active={false} count={10} likeURL={"/api/posts/"+post.id+"/likes/like"} dislikeURL={"/api/posts/"+post.id+"/likes/unlike"} />
+
         </span>
       </div>
       <p>{post.content}</p>
