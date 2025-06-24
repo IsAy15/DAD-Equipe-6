@@ -1,10 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { fetchTaggedPosts, fetchPosts } from "@/utils/api";
+import { useAuth } from "@/contexts/authcontext";
+import Post from "@/components/Post";
 
 export default function SearchPage() {
+  const { accessToken } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
   const [recentSearches, setRecentSearches] = useState([]);
+  const [taggedPosts, setTaggedPosts] = useState([]);
 
   // Focus sur l'input au raccourci ⌘+K ou Ctrl+K
   useEffect(() => {
@@ -18,8 +25,38 @@ export default function SearchPage() {
     return () => document.removeEventListener("keydown", handler);
   }, []);
 
-  const onChange = (e) => {
+  const onChange = async (e) => {
     setQuery(e.target.value);
+    setLoading(true);
+    setError(null);
+    if (e.target.value.trim() === "" || e.target.value.trim() === "#") {
+      setTaggedPosts([]);
+      setLoading(false);
+      return;
+    }
+    // if e.target.value starts with #, fetch posts by tag
+    if (e.target.value.startsWith("#")) {
+      try {
+        const postsListRaw = await fetchTaggedPosts(
+          e.target.value.slice(1), // remove the #
+          accessToken
+        );
+        if (!postsListRaw || postsListRaw.length === 0) {
+          setTaggedPosts([]);
+          return;
+        }
+        const postsList = await Promise.all(
+          postsListRaw.map((postId) => fetchPosts(postId, accessToken))
+        );
+        setTaggedPosts(postsList);
+      } catch (err) {
+        console.error("Erreur lors de la récupération des posts tagués :", err);
+        setError("Failed to fetch tagged posts");
+        setTaggedPosts([]);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const onSubmit = (e) => {
@@ -81,17 +118,24 @@ export default function SearchPage() {
         ) : (
           <div className="text-gray-700">
             Résultats pour <strong>"{query}"</strong> …
+            <ul className="mt-4 space-y-2">
+              {loading ? (
+                <li className="animate-pulse">Loading...</li>
+              ) : error ? (
+                <li className="text-red-500">{error}</li>
+              ) : taggedPosts.length > 0 ? (
+                taggedPosts.map((post) => (
+                  <li key={post._id} className="border p-4 rounded-lg">
+                    <Post post={post} />
+                  </li>
+                ))
+              ) : (
+                <li>No posts found for this tag</li>
+              )}
+            </ul>
           </div>
         )}
       </main>
-
-      {/* Nav bas */}
-      <nav className="h-14 bg-white border-t flex justify-around items-center">
-        <button className="icon-[tabler--home] size-6 text-gray-400"></button>
-        <button className="icon-[tabler--search] size-6 text-blue-500"></button>
-        <button className="icon-[tabler--bell] size-6 text-gray-400"></button>
-        <button className="icon-[tabler--message] size-6 text-gray-400"></button>
-      </nav>
     </div>
   );
 }

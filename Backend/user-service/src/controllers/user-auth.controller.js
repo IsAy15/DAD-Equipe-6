@@ -155,12 +155,12 @@ exports.searchUsersByUsername = async (req, res) => {
   }
 
   try {
-    const regex = new RegExp(query.trim(), 'i'); // i = ignore case
+    const regex = new RegExp(query.trim(), 'i'); 
 
     console.log("Requête utilisateur :", query);
     const users = await User.find({ username: { $regex: regex } })
-      .select('username avatar _id') // on ne retourne pas email / mot de passe
-      .limit(20); // pour éviter de surcharger la réponse
+      .select('username avatar _id') 
+      .limit(20); 
 
     console.log("Utilisateurs trouvés :", users.length);
 
