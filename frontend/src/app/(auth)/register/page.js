@@ -295,7 +295,9 @@ export default function RegisterForm() {
                 >
                   {t("acceptTermsText")}{" "}
                   <a
-                    href="#"
+                    href="/register/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="link link-animated link-primary font-normal"
                   >
                     {t("acceptTermsLink")}
