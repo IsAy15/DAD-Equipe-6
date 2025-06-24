@@ -10,15 +10,30 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import UserAvatar from "./UserAvatar";
 
-export default function ProfileCard({ identifier, full = false }) {
-  const [user, setUser] = useState(null);
+export default function ProfileCard({ user, full = false }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("not-following"); // Ajouté
 
-  const { identifier: myId, accessToken } = useAuth(); // Ajouté
+  const { user.id: myId, accessToken } = useAuth(); // Ajouté
 
   const router = useRouter();
+  useEffect(() => {
+    if (!user) {
+      setLoading(true);
+      setError("Utilisateur introuvable");
+      return;
+    }
+    if (user?.username) {
+      setTimeout(() => {
+        setLoading(false);
+        setError(null);
+      }, 1000);
+    } else {
+      setLoading(true);
+      setError("Chargement du profil...");
+    }
+  }, [user]);
 
   const loadingContent = (
     <div className="flex w-52 flex-col gap-4">

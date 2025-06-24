@@ -19,7 +19,7 @@ import Feed from "@/components/Feed";
 export default function UserPage({ params }) {
   const t = useTranslations("Profile");
   const locale = useLocale();
-  const { identifier, accessToken } = useAuth();
+  const { user, accessToken } = useAuth();
   // Utilisez React.use() pour obtenir les params
   const { username } = use(params);
   const [userProfile, setUserProfile] = useState(null);
@@ -62,7 +62,7 @@ export default function UserPage({ params }) {
   useEffect(() => {
     async function loadStatus() {
       try {
-        const followings = await fetchUserFollowing(identifier);
+        const followings = await fetchUserFollowing(user.id);
         // Correction de l'extraction de la liste des followings
         let list = [];
         if (Array.isArray(followings)) {
@@ -115,7 +115,7 @@ export default function UserPage({ params }) {
   }
   let actionButton = null;
   switch (true) {
-    case userProfile.id === identifier:
+    case userProfile.id === user.id:
       actionButton = (
         <button
           type="button"
