@@ -29,7 +29,7 @@ export default function Post({ post }) {
             role="popover"
           >
             <div className="tooltip-body bg-base-200 max-w-xs card p-4 text-start outline-solid">
-              <ProfileCard identifier={post.author} full={true} />
+              <ProfileCard user={author} full={true} />
             </div>
           </div>
         </div>

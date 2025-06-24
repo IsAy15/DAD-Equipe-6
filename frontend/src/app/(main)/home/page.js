@@ -25,7 +25,7 @@ export default function Index() {
   }, [identifier, accessToken]);
 
   return (
-    <main style={{ minHeight: "1000vh" }}>
+    <main className="p-6">
       <Feed posts={posts} loadingPosts={loadingPosts} />
     </main>
   );
