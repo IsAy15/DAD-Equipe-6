@@ -13,9 +13,11 @@ import UserAvatar from "./UserAvatar";
 export default function ProfileCard({ user, full = false }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState("not-following"); // Ajouté
+  const [status, setStatus] = useState("not-following");
 
-  const { user.id: myId, accessToken } = useAuth(); // Ajouté
+  const { user: myUser, accessToken } = useAuth();
+
+  const [userProfile, setUserProfile] = useState(user);
 
   const router = useRouter();
   useEffect(() => {
@@ -49,26 +51,19 @@ export default function ProfileCard({ user, full = false }) {
   );
 
   useEffect(() => {
-    if (!identifier) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-    console.log("ProfileCard identifier:", identifier);
     setLoading(true);
     setError(null);
     const fetchProfile = async () => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const profileData = await fetchUserProfile(identifier);
-        console.log("ProfileCard profileData:", profileData);
-        setUser(profileData);
+        if (!full) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
         setError(null);
 
         // Charger le statut de suivi
-        if (myId && profileData && profileData.id !== myId) {
+        if (myUser && user && user.id !== myUser.id) {
           try {
-            const followings = await fetchUserFollowing(myId);
+            const followings = await fetchUserFollowing(myUser.id);
             let list = [];
             if (Array.isArray(followings)) {
               list = followings;
@@ -77,7 +72,7 @@ export default function ProfileCard({ user, full = false }) {
             } else if (Array.isArray(followings?.data)) {
               list = followings.data;
             }
-            if (list.some((u) => u._id === profileData.id)) {
+            if (list.some((u) => u._id === user.id)) {
               setStatus("following");
             } else {
               setStatus("not-following");
@@ -95,7 +90,7 @@ export default function ProfileCard({ user, full = false }) {
     };
 
     fetchProfile();
-  }, [identifier, myId]);
+  }, [myUser, user, userProfile]);
 
   async function handleFollowClick() {
     if (!user) return;
@@ -107,9 +102,8 @@ export default function ProfileCard({ user, full = false }) {
         await unfollowUser(user.id, accessToken);
         setStatus("not-following");
       }
-      // Recharge le profil pour mettre à jour le compteur d'abonnés
-      const updatedProfile = await fetchUserProfile(identifier);
-      setUser(updatedProfile);
+      const updatedUser = await fetchUserProfile(user.id);
+      setUserProfile(updatedUser);
     } catch (err) {
       setError("Erreur lors du suivi/désabonnement");
     }
@@ -121,39 +115,45 @@ export default function ProfileCard({ user, full = false }) {
         loadingContent
       ) : error ? (
         <div className="text-red-500">{error}</div>
+      ) : !userProfile ? (
+        <div className="text-red-500">Utilisateur introuvable</div>
       ) : (
         <div className="flex items-center gap-4">
-          <UserAvatar user={user} size="md" />
+          <UserAvatar user={userProfile} size="md" />
           <div className="flex flex-col gap-2 flex-1">
             <div>
               <Link
                 className="h-4 w-20 text-lg font-semibold text-base-content"
-                href={`/profile/${user.username}`}
+                href={`/profile/${userProfile.username}`}
               >
-                {user?.username}
+                {userProfile?.username}
               </Link>
-              {full && <p className="text-base-content text-sm">{user.bio}</p>}
+              {full && userProfile.bio && (
+                <p className="text-base-content text-sm">{userProfile.bio}</p>
+              )}
             </div>
             <div className="h-4 w-28 text-base-content/80">
               <span className="text-base-content font-semibold">
-                {user?.followingCount}
+                {userProfile?.followingCount}
               </span>{" "}
               abonnements
             </div>
             <div className="h-4 w-28 text-base-content/80">
               <span className="text-base-content font-semibold">
-                {user?.followersCount}
+                {userProfile?.followersCount}
               </span>{" "}
               abonnés
             </div>
           </div>
           {/* Bouton suivre/désabonner à droite */}
-          {full && user.id !== myId && (
+          {full && userProfile.id && myUser && userProfile.id !== myUser.id && (
             <button
-              className="btn btn-primary px-4 py-1 font-semibold ml-auto"
+              className={`btn btn-primary px-4 py-1 font-semibold ml-auto ${
+                status === "following" ? "btn-outline" : ""
+              }`}
               onClick={handleFollowClick}
             >
-              {status === "following" ? "Se désabonner" : "Suivre"}
+              {status === "following" ? "Abonné" : "Suivre"}
             </button>
           )}
         </div>
