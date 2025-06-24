@@ -176,3 +176,24 @@ exports.getMessageById = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.getConversations = async (req, res) => {
+  const userId = req.userId;
+  const otherUserId = req.params.userId;
+
+  try {
+    // Vérifie si l'utilisateur est l'expéditeur ou le destinataire
+    const messages = await Message.find({
+      $or: [
+        { sender: userId, receiver: otherUserId },
+        { sender: otherUserId, receiver: userId },
+      ],
+      isDeleted: false,
+    }).sort({ createdAt: -1 }); // Par défaut, tous les champs sont sélectionnés
+
+    return res.status(200).json(messages);
+  } catch (err) {
+    console.error("Error fetching messages by user:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};

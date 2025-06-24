@@ -3,9 +3,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import UserAvatar from "@/components/UserAvatar";
-import { fetchUserMessages, fetchMessageById, sendMessage } from "@/utils/api";
+import { sendMessage, getConversations, fetchUserProfile } from "@/utils/api";
 import { useAuth } from "@/contexts/authcontext";
-import { FiSend } from "react-icons/fi";
 
 export default function ConversationPage() {
   const { userId: conversationId } = useParams();
@@ -18,50 +17,75 @@ export default function ConversationPage() {
   const bottomRef = useRef(null);
 
   useEffect(() => {
+    const navbars = document.querySelectorAll(".navbar");
+    navbars.forEach((nav) => {
+      nav.classList.add("hidden");
+    });
+  }, []);
+
+  useEffect(() => {
+    function updateBodyScrollLock() {
+      const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+      const isMobile = window.innerWidth <= 768;
+      const navbars = document.querySelectorAll(".navbar");
+      if (isPortrait && isMobile) {
+        navbars.forEach((nav) => nav.classList.add("hidden"));
+        setTimeout(() => {
+          document.body.style.overflow = "hidden";
+          window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "auto",
+          });
+        }, 100);
+      } else {
+        document.body.style.overflow = "auto";
+        navbars.forEach((nav) => nav.classList.remove("hidden"));
+      }
+    }
+    updateBodyScrollLock();
+    window.addEventListener("resize", updateBodyScrollLock);
+    window.addEventListener("orientationchange", updateBodyScrollLock);
+    return () => {
+      document.body.style.overflow = "auto";
+      window.removeEventListener("resize", updateBodyScrollLock);
+      window.removeEventListener("orientationchange", updateBodyScrollLock);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!accessToken || !conversationId) return;
 
     (async () => {
       try {
-        // 1) on récupère le tableau
-        const inbox = await fetchUserMessages(accessToken);
-        console.log("inbox raw:", inbox);
-
-        // 2) on cherche la conversation par `user`
-        const conv = inbox.find((c) => c.user === conversationId);
-        console.log("conv:", conv);
+        const conv = await getConversations(conversationId, accessToken);
 
         if (!conv) {
           setMessages([]);
           return;
         }
 
-        // 3a) si le backend renvoie juste un aperçu lastMessage
-        if (conv.lastMessage) {
-          const m = conv.lastMessage;
-          setMessages([
-            {
-              id: m._id || m.id,
-              sender: m.sender,
-              content: m.content,
-              timestamp: new Date(m.createdAt || m.timestamp),
-            },
-          ]);
-        }
-        // 3b) sinon s’il y a un tableau conv.messages
-        else if (Array.isArray(conv.messages)) {
-          const full = await Promise.all(
-            conv.messages.map((mid) => fetchMessageById(mid, accessToken))
-          );
-          const sorted = full
-            .map((m) => ({
-              id: m._id || m.id,
-              sender: m.sender,
-              content: m.content,
-              timestamp: new Date(m.createdAt || m.timestamp),
-            }))
-            .sort((a, b) => a.timestamp - b.timestamp);
-          setMessages(sorted);
-        }
+        // Fetch user profiles for all unique senders
+        const uniqueSenderIds = [...new Set(conv.map((msg) => msg.sender))];
+        const senderProfiles = {};
+        await Promise.all(
+          uniqueSenderIds.map(async (id) => {
+            senderProfiles[id] = await fetchUserProfile(id);
+          })
+        );
+
+        const formattedConv = conv.map((msg) => {
+          return {
+            id: msg._id,
+            sender: msg.sender,
+            senderProfile: senderProfiles[msg.sender],
+            content: msg.content,
+            timestamp: new Date(msg.createdAt),
+          };
+        });
+
+        setMessages(formattedConv);
+
+        // On récupère les messages de la conversation
       } catch (err) {
         console.error("Failed to load conversation:", err);
       } finally {
@@ -114,52 +138,62 @@ export default function ConversationPage() {
       {/* Header */}
       <header className="flex items-center border-b bg-base-100 px-4 py-3">
         <button
-          onClick={() => router.back()}
+          onClick={() => {
+            // Ré-affiche les navbars avant de naviguer
+            document
+              .querySelectorAll(".navbar")
+              .forEach((nav) => nav.classList.remove("hidden"));
+            router.push("/messages");
+          }}
           className="btn btn-text btn-square mr-3"
         >
           <span className="icon-[tabler--arrow-left] size-6" />
         </button>
         <h2 className="text-lg font-semibold">Conversation</h2>
       </header>
-
-      {/* Bulles de chat */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((msg) => {
-          const isMe = msg.sender === user.id;
-          return (
-            <div
-              key={msg.id}
-              className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-            >
-              {!isMe && (
-                <UserAvatar
-                  user={msg.sender}
-                  size="sm"
-                  className="mr-2 self-end"
-                />
-              )}
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        {messages
+          .slice() // copie pour ne pas muter l'état
+          .sort((a, b) => a.timestamp - b.timestamp) // tri du plus ancien au plus récent
+          .map((msg) => {
+            const isMe = msg.sender === user.id;
+            return (
               <div
-                className={[
-                  "max-w-[70%] px-4 py-2 rounded-2xl shadow-sm",
-                  isMe
-                    ? "bg-primary text-primary-content rounded-br-none"
-                    : "bg-base-100 text-base-content rounded-bl-none",
-                ].join(" ")}
+                key={msg.id}
+                className={`flex gap-2 items-center ${
+                  isMe ? "justify-end" : "justify-start"
+                }`}
               >
-                <p className="whitespace-pre-wrap">{msg.content}</p>
-                <div className="mt-1 text-right text-xs text-gray-400">
-                  {msg.timestamp.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                {!isMe && (
+                  <UserAvatar
+                    user={msg.senderProfile}
+                    size="sm"
+                    className="mr-2 self-end"
+                    link={false}
+                  />
+                )}
+                <div
+                  className={[
+                    "max-w-[70%] px-4 py-2 rounded-2xl shadow-sm",
+                    isMe
+                      ? "bg-primary text-primary-content rounded-br-none"
+                      : "bg-base-100 text-base-content rounded-bl-none",
+                  ].join(" ")}
+                >
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                  <div className="mt-1 text-right text-xs text-gray-400">
+                    {msg.timestamp.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
         <div ref={bottomRef} />
       </div>
-
       {/* Barre de saisie */}
       <div className="flex items-center border-t bg-base-100 px-4 py-2 gap-2">
         <input
