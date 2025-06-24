@@ -54,6 +54,7 @@ const verifyJWT = require('../middlewares/verifyJWT')
  *       500:
  *         description: Internal Server Error
  */
+
 router.post('/posts/:post_id/like',
     [validateUrlObjectId(('post_id')),
     verifyJWT],

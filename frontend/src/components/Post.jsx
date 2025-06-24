@@ -50,7 +50,7 @@ export default function Post({ post }) {
           })}
         >
           {new Date(post.createdAt).toLocaleDateString("fr-FR")}
-          <LikeButton active={true} count={post.likesCount} onLike={likeBreeze} idToLike={post._id}  />
+          <LikeButton active={post.isLiked} count={post.likesCount} onLike={likeBreeze} idToLike={post._id}  />
         </span>
       </div>
       <p>{post.content}</p>

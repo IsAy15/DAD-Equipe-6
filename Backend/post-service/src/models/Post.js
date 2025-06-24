@@ -112,6 +112,7 @@ PostSchema.virtual('likesCount').get(function () {
     return this.likes.length;
 });
 
+
 PostSchema.virtual('commentsCount').get(function () {
     return this.comments.length;
 });

@@ -111,9 +111,11 @@ export async function likeBreeze(setLiked, postID, token) {
 
   const res = await apiClient.post(
     setLiked?
-    "/api/posts/"+postID+"/likes/like":
-    "/api/posts/"+postID+"/likes/unlike",
+    "/api/posts/likes/posts/"+postID+"/like":
+     "/api/posts/likes/posts/"+postID+"/unlike",
+      {},
     {
+     
       headers: {
         Authorization: `Bearer ${token}`,
       },
