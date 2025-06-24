@@ -1,4 +1,10 @@
-import { fetchUserProfile } from "@/utils/api";
+import { useAuth } from "@/contexts/authcontext";
+import {
+  fetchUserProfile,
+  followUser,
+  unfollowUser,
+  fetchUserFollowing,
+} from "@/utils/api";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -8,6 +14,9 @@ export default function ProfileCard({ identifier, full = false }) {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState("not-following"); // Ajouté
+
+  const { identifier: myId, accessToken } = useAuth(); // Ajouté
 
   const router = useRouter();
 
@@ -30,14 +39,39 @@ export default function ProfileCard({ identifier, full = false }) {
       setLoading(false);
       return;
     }
+    console.log("ProfileCard identifier:", identifier);
     setLoading(true);
     setError(null);
     const fetchProfile = async () => {
       try {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         const profileData = await fetchUserProfile(identifier);
+        console.log("ProfileCard profileData:", profileData);
         setUser(profileData);
         setError(null);
+
+        // Charger le statut de suivi
+        if (myId && profileData && profileData.id !== myId) {
+          try {
+            const followings = await fetchUserFollowing(myId);
+            let list = [];
+            if (Array.isArray(followings)) {
+              list = followings;
+            } else if (Array.isArray(followings?.following)) {
+              list = followings.following;
+            } else if (Array.isArray(followings?.data)) {
+              list = followings.data;
+            }
+            if (list.some((u) => u._id === profileData.id)) {
+              setStatus("following");
+            } else {
+              setStatus("not-following");
+            }
+          } catch (err) {
+            console.error("Erreur lors du fetchUserFollowing:", err);
+            setStatus("not-following");
+          }
+        }
       } catch (err) {
         setError("Erreur lors de la récupération du profil");
       } finally {
@@ -46,7 +80,25 @@ export default function ProfileCard({ identifier, full = false }) {
     };
 
     fetchProfile();
-  }, [identifier]);
+  }, [identifier, myId]);
+
+  async function handleFollowClick() {
+    if (!user) return;
+    try {
+      if (status === "not-following") {
+        await followUser(user.id, accessToken);
+        setStatus("following");
+      } else if (status === "following") {
+        await unfollowUser(user.id, accessToken);
+        setStatus("not-following");
+      }
+      // Recharge le profil pour mettre à jour le compteur d'abonnés
+      const updatedProfile = await fetchUserProfile(identifier);
+      setUser(updatedProfile);
+    } catch (err) {
+      setError("Erreur lors du suivi/désabonnement");
+    }
+  }
 
   return (
     <>
@@ -57,7 +109,7 @@ export default function ProfileCard({ identifier, full = false }) {
       ) : (
         <div className="flex items-center gap-4">
           <UserAvatar user={user} size="md" />
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 flex-1">
             <div>
               <Link
                 className="h-4 w-20 text-lg font-semibold text-base-content"
@@ -80,6 +132,15 @@ export default function ProfileCard({ identifier, full = false }) {
               abonnés
             </div>
           </div>
+          {/* Bouton suivre/désabonner à droite */}
+          {full && user.id !== myId && (
+            <button
+              className="btn btn-primary px-4 py-1 font-semibold ml-auto"
+              onClick={handleFollowClick}
+            >
+              {status === "following" ? "Se désabonner" : "Suivre"}
+            </button>
+          )}
         </div>
       )}
     </>

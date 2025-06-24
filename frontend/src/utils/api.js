@@ -124,3 +124,12 @@ export async function fetchPosts(postId, token) {
   });
   return res.data;
 }
+
+export async function fetchUsersByUsername(query, token) {
+  const res = await apiClient.get(`/api/users/search?query=${query}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+}
