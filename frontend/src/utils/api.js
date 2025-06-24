@@ -200,3 +200,29 @@ export async function addReplyToComment(postId, commentId, reply_content, reply_
   );
   return res;
 }
+
+export async function likeComment(commentId, token){
+  const res = await apiClient.post(
+    `/api/posts/likes/comments/${commentId}/like`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+}
+
+export async function unlikeComment(commentId, token){
+  const res = await apiClient.post(
+    `/api/posts/likes/comments/${commentId}/unlike`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+}

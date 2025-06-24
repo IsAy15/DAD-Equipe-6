@@ -10,7 +10,6 @@ export default function Feed({ posts, loadingPosts }) {
         posts.map((post) => <Post key={post._id} post={post} />)
       ) : (
         <div>
-          <CommentsExpander/>
           <p className="text-center text-gray-500">Aucun post pour le moment.</p>
         </div>
       )}

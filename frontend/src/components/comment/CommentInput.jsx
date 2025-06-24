@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { addCommentToPost } from '@/utils/api';
 import { useAuth } from "@/contexts/authcontext";
-
+import { Image, Video, Smile } from 'lucide-react';
 
 export default function CommentInput({ post_id, onAddComment }) {
   const { accessToken } = useAuth();
@@ -17,7 +17,7 @@ export default function CommentInput({ post_id, onAddComment }) {
     setError(null);
 
     try {
-      const response = await addCommentToPost('685998752925fb31103216de', content, accessToken);
+      const response = await addCommentToPost(post_id, content, accessToken);
 
       if (response.status === 201 || response.status === 200) {
         const newComment = response.data;
@@ -28,46 +28,65 @@ export default function CommentInput({ post_id, onAddComment }) {
       }
     } catch (err) {
       console.error("Erreur lors de l'envoi du commentaire :", err);
-      setError("Une erreur est survenue.");
+      setError("Une erreur est survenue lors de l'envoie du commentaire.");
     } finally {
       setSending(false);
     }
   };
 
   return (
-    <>
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col md:flex-row gap-2 w-full items-center"
-      >
-        <input
-          type="text"
+    <form onSubmit={handleSubmit} className="w-full">
+      <div className="border border-neutral rounded-lg p-2 m-4 flex flex-col gap-2 focus-within:ring-2 focus-within:ring-primary transition">
+        {/* Zone de texte */}
+        <textarea
           placeholder="Poster votre réponse"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           disabled={sending}
-          className="w-full md:flex-grow p-2 border text-neutral rounded text-base disabled:opacity-50 disabled:cursor-not-allowed"
+          rows={3}
+          className="resize-none w-full p-2 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
         />
-        <button
-          type="submit"
-          disabled={!content.trim() || sending}
-          className={`
-            w-full md:w-auto px-4 py-2 rounded 
-            font-bold 
-            bg-primary text-base-content
-            disabled:opacity-50 disabled:cursor-not-allowed
-            transition-colors duration-200
-            ${content.trim() && !sending ? 'cursor-pointer hover:bg-primary-focus' : ''}
-          `}
-        >
-          {sending ? 'Envoi...' : 'Répondre'}
-        </button>
-      </form>
-      {error && (
-        <div className="text-error text-sm mt-1 w-full">
-          {error}
+
+        {/* Footer interne avec icônes à gauche et bouton à droite */}
+        <div className="flex justify-between items-center">
+          <div className="flex gap-4 text-gray-500">
+            <button
+              type="button"
+              title="Ajouter une image"
+              className="hover:text-blue-600 transition"
+              onClick={() => alert('Coming soon')}
+            >
+              <Image size={20} />
+            </button>
+            <button
+              type="button"
+              title="Ajouter une vidéo"
+              className="hover:text-green-600 transition"
+              onClick={() => alert('Coming soon')}
+            >
+              <Video size={20} />
+            </button>
+            <button
+              type="button"
+              title="Ajouter un emoji"
+              className="hover:text-yellow-500 transition"
+              onClick={() => alert('Coming soon')}
+            >
+              <Smile size={20} />
+            </button>
+          </div>
+
+          <button
+            type="submit"
+            disabled={!content.trim() || sending}
+            className="px-4 py-2 rounded-full bg-primary text-base-content font-semibold text-sm hover:bg-primary-focus transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {sending ? '...' : 'Répondre'}
+          </button>
         </div>
-      )}
-    </>
+      </div>
+
+      {error && <div className="text-error text-sm mt-1 ml-4">{error}</div>}
+    </form>
   );
 }

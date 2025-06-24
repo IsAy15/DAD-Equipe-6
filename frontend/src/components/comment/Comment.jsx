@@ -2,22 +2,9 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { MessageCircle, Heart, Pencil, Check, X, Trash2 } from "lucide-react";
 import { useAuth } from "@/contexts/authcontext";
-import { fetchUserProfile, getCommentRepliesCount, addReplyToComment } from "@/utils/api"
+import UserAvatar from "../UserAvatar";
+import { fetchUserProfile, getCommentRepliesCount, addReplyToComment, likeComment, unlikeComment } from "@/utils/api"
 import Link from "next/link";
-
-const fetchWithTimeout = (url, timeout = 3000) =>
-  new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error("timeout")), timeout);
-    fetch(url)
-      .then((res) => {
-        clearTimeout(timer);
-        resolve(res);
-      })
-      .catch((err) => {
-        clearTimeout(timer);
-        reject(err);
-      });
-  });
 
 export default function Comment({
   postId,
@@ -30,6 +17,7 @@ export default function Comment({
 }) {
   const { identifier, accessToken } = useAuth();
   const [username, setUsername] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [usernameLoading, setUsernameLoading] = useState(true);
 
   const [avatarUrl, setAvatarUrl] = useState(null);
@@ -44,7 +32,29 @@ export default function Comment({
   const [repliesCount, setRepliesCount] = useState(null);
   const [showReplyBox, setShowReplyBox] = useState(false);
   const [replyContent, setReplyContent] = useState("");
-  
+
+  const [likes, setLikes] = useState(comment.likes || []);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        setAvatarLoading(true);
+        if(!username) return;
+        const profile = await fetchUserProfile(username);
+        setUserProfile(profile);
+      } catch (err) {
+        setError(err);
+      }
+      finally{
+        setAvatarLoading(false);
+      }
+    }
+    if (username) {
+      loadProfile();
+    }
+  }, [username]);
+
  useEffect(() => {
     if (isEditing) {
       setEditedContent(comment.content);
@@ -64,22 +74,6 @@ export default function Comment({
       FetchCommentRepliesCount();
     }
   }, [comment, postId, accessToken]);
-
-  useEffect(() => {
-    if (!comment?.author) return;
-
-    setAvatarLoading(true);
-    fetchWithTimeout(`/api/avatar?author=${comment.author}`, 3000)
-      .then((res) => res.blob())
-      .then((blob) => {
-        const url = URL.createObjectURL(blob);
-        setAvatarUrl(url);
-      })
-      .catch(() => {
-        setAvatarFallback(comment.author[0]?.toUpperCase() || "?");
-      })
-      .finally(() => setAvatarLoading(false));
-  }, [comment.author]);
 
    useEffect(() => {
     if (!comment?.author) return;
@@ -101,8 +95,34 @@ export default function Comment({
       });
   }, [comment.author]);
 
+  const handleLike = async () => {
+    try {
+      setError(null)
+      const alreadyLiked = likes.includes(identifier);
+
+      if (alreadyLiked) {
+        const result = await unlikeComment(comment._id, accessToken);
+        if (result.success) {
+          setLikes((prev) => prev.filter((id) => id !== identifier));
+        }
+      } else {
+        const result = await likeComment(comment._id, accessToken);
+        if (result.success) {
+          setLikes((prev) => [...prev, identifier]);
+        }
+      }
+    } catch (error) {
+      setError('Impossible de liker/unliker le commentaire.')
+
+    }
+  };
+
   const handleCommentReply = async () => {
-    if (!replyContent.trim()) return;
+    setError(null);
+    if (!replyContent.trim()){
+        setError('Le réponse ne peut pas être vide.')
+        return; 
+    } 
 
     try {
       const response = await addReplyToComment(postId, comment._id, replyContent, username, accessToken);
@@ -117,24 +137,28 @@ export default function Comment({
       setReplyContent("");
       setShowReplyBox(false);
     } catch (error) {
-      // Tu peux afficher un message d’erreur ici si besoin
+      setError('Impossible de répondre au commentaire.')
     }
   };
 
   const handleSave = async () => {
     if (editedContent.trim() === "") return;
     setSaving(true);
+    setError(null);
+
     try {
       await onUpdateComment(comment._id, editedContent);
       setEditingCommentId(null);
     } catch (error) {
-      console.error("Erreur lors de la mise à jour", error);
+      setError("Impossible d'enregistrer le commentaire.")
+
     } finally {
       setSaving(false);
     }
   };
 
   const handleCancel = () => {
+    setError(null)
     setEditingCommentId(null);
     setEditedContent(comment.content);
   };
@@ -142,13 +166,16 @@ export default function Comment({
   const handleDelete = async () => {
     if (!confirm("Voulez-vous vraiment supprimer ce commentaire ?")) return;
     setDeleting(true);
+    setError(null)
+
     try {
       await onDeleteComment(comment._id);
       if (editingCommentId === comment._id) {
         setEditingCommentId(null);
       }
     } catch (error) {
-      console.error("Erreur lors de la suppression", error);
+      setError("Impossible de supprimer le commentaire.")
+
     } finally {
       setDeleting(false);
     }
@@ -183,17 +210,9 @@ export default function Comment({
       <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-gray-200 text-gray-600 font-bold text-sm shrink-0">
         {avatarLoading ? (
           <div className="w-6 h-6 rounded-full bg-base-content animate-pulse" />
-        ) : avatarUrl ? (
-          <Image
-            src={avatarUrl}
-            alt="Avatar"
-            width={40}
-            height={40}
-            className="rounded-full object-cover"
-          />
-        ) : (
-          avatarFallback
-        )}
+        ) :
+        <UserAvatar user={userProfile} />
+      }
       </div>
 
       {/* Username + date */}
@@ -277,7 +296,19 @@ export default function Comment({
           </button>
 
           <div className="flex items-center gap-1">
-            <Heart size={14} /> {comment.likes.length}
+            <button
+              onClick={handleLike}
+              className="flex items-center gap-1 hover:opacity-80 transition"
+            >
+              <div
+                className={`p-1 rounded-full ${
+                  likes.includes(identifier) ? "text-red-600" : "bg-transparent text-base-content"
+                }`}
+              >
+                <Heart size={14} fill={likes.includes(identifier) ? "currentColor" : "none"} />
+              </div>
+              {likes.length}
+            </button>
           </div>
           <button
             onClick={() => setShowReplyBox((prev) => !prev)}
@@ -305,6 +336,7 @@ export default function Comment({
               </button>
               <button
                 onClick={() => {
+                  setError(null);
                   setReplyContent("");
                   setShowReplyBox(false);
                 }}
@@ -315,6 +347,11 @@ export default function Comment({
             </div>
           </div>
         )}
+
+        {error && (
+          <div className="text-error text-xs mb-1 px-1">{error}</div>
+        )}
+
       </div>
     </div>
   </div>

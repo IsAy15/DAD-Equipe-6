@@ -9,6 +9,8 @@ export default function CommentExpander({ postId }) {
   const [comments, setComments] = useState(null);
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(5);
+  const [error, setError] = useState(null);
+  
 
   // État global du commentaire en édition
   const [editingCommentId, setEditingCommentId] = useState(null);
@@ -31,12 +33,13 @@ export default function CommentExpander({ postId }) {
   useEffect(() => {
     async function FetchPostComments() {
       try {
+        setError(null)
         if (!postId) {
-          const comments = await fetchPostComments('685998752925fb31103216de', accessToken);
+          const comments = await fetchPostComments(postId, accessToken);
           setComments(comments);
         }
       } catch (error) {
-        console.error("Failed to fetch comments for post", error);
+        setError('Impossible de charger les commentaires.');
       } finally {
         setLoading(false);
       }
@@ -69,7 +72,7 @@ export default function CommentExpander({ postId }) {
     setComments((prev) =>
       prev.map((c) => (c._id === commentId ? { ...c, content: newContent } : c))
     );
-    await updateComment('685998752925fb31103216de', commentId, newContent, accessToken);
+    await updateComment(postId, commentId, newContent, accessToken);
     setEditingCommentId(null);
   };
 
@@ -77,7 +80,7 @@ export default function CommentExpander({ postId }) {
   const handleDeleteComment = async (commentId) => {
     // Optionnel : confirmation ici ou dans le composant Comment
     try {
-      await deleteComment('685998752925fb31103216de', commentId, accessToken);
+      await deleteComment(postId, commentId, accessToken);
       setComments((prev) => prev.filter((c) => c._id !== commentId));
       if (editingCommentId === commentId) {
         setEditingCommentId(null);
@@ -93,11 +96,22 @@ export default function CommentExpander({ postId }) {
 
   if (loading) return loadingContent;
 
+  if(error){
+    return (
+      <div>
+        <CommentInput post_id={postId} onAddComment={handleAddComment} />
+        <div className="text-error text-sm mt-1 ml-4">
+         {error}
+        </div>  
+      </div>
+    );
+  }
+
   if (!comments || comments.length === 0) {
     return (
       <div>
         <CommentInput post_id={postId} onAddComment={handleAddComment} />
-        <div className="p-4 text-sm text-gray-500 italic">
+        <div className="p-4 text-sm text-primary italic">
           Aucun commentaire pour ce post
         </div>  
       </div>
@@ -108,12 +122,12 @@ export default function CommentExpander({ postId }) {
   const hasMore = comments.length > visibleCount;
 
   return (
-    <div>
+    <div className="mt-4">
       <CommentInput post_id={postId} onAddComment={handleAddComment} />
       <div className="flex flex-col p-2">
         {visibleComments.map((comment) => (
           <Comment
-            postId='685998752925fb31103216de'
+            postId={postId}
             key={comment._id}
             comment={comment}
             editingCommentId={editingCommentId}
@@ -128,7 +142,7 @@ export default function CommentExpander({ postId }) {
         <div className="text-center my-2">
           <button
             onClick={handleShowMore}
-            className="text-sm text-blue-600 hover:underline"
+            className="text-sm text-accent hover:underline"
           >
             Afficher plus de commentaires
           </button>

@@ -55,8 +55,7 @@ const verifyJWT = require('../middlewares/verifyJWT')
  *         description: Internal Server Error
  */
 router.post('/posts/:post_id/like',
-    [validateBodyObjectId('user_id'),
-    validateUrlObjectId(('post_id')),
+    [validateUrlObjectId(('post_id')),
     verifyJWT],
     likeController.likePost);
 
@@ -103,12 +102,11 @@ router.post('/posts/:post_id/like',
  *         description: Internal Server Error
  */
 router.post('/posts/:post_id/unlike',
-    [validateBodyObjectId('user_id'),
-    validateUrlObjectId(('post_id')),
+    [validateUrlObjectId(('post_id')),
     verifyJWT],
     likeController.unlikePost);
 
-router.post('/comments/:comment/like',
+router.post('/comments/:comment_id/like',
     [validateUrlObjectId(('comment_id')),
     verifyJWT],
     likeController.likeComment);
