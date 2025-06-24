@@ -77,7 +77,7 @@ export default function MessagesPage() {
   }, [accessToken, user?.id]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-base-100">
+    <div className="flex flex-col bg-base-100">
       {/* Header */}
       <div className="p-4 bg-base-100 shadow flex items-center">
         <h1 className="text-xl font-bold flex-1">Messages</h1>

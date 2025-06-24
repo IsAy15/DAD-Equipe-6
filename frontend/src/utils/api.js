@@ -153,23 +153,20 @@ export async function fetchMessageById(messageId, token) {
   return res.data;
 }
 
-export async function fetchPostComments(postId, token){
-  const res = await apiClient.get(
-    `/api/posts/${postId}/comments`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+export async function fetchPostComments(postId, token) {
+  const res = await apiClient.get(`/api/posts/${postId}/comments`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return res.data;
 }
 
-export async function addCommentToPost(postId, comment_content, token){
+export async function addCommentToPost(postId, comment_content, token) {
   const res = await apiClient.post(
     `/api/posts/${postId}/comments`,
     {
-      content : comment_content,
+      content: comment_content,
     },
     {
       headers: {
@@ -180,11 +177,11 @@ export async function addCommentToPost(postId, comment_content, token){
   return res;
 }
 
-export async function updateComment(postId, commentId, new_content, token){
+export async function updateComment(postId, commentId, new_content, token) {
   const res = await apiClient.put(
     `/api/posts/${postId}/comments/${commentId}`,
     {
-      content : new_content,
+      content: new_content,
     },
     {
       headers: {
@@ -195,7 +192,7 @@ export async function updateComment(postId, commentId, new_content, token){
   return res;
 }
 
-export async function deleteComment(postId, commentId, token){
+export async function deleteComment(postId, commentId, token) {
   const res = await apiClient.delete(
     `/api/posts/${postId}/comments/${commentId}`,
     {
@@ -207,7 +204,7 @@ export async function deleteComment(postId, commentId, token){
   return res;
 }
 
-export async function getCommentReplies(postId, commentId, token){
+export async function getCommentReplies(postId, commentId, token) {
   const res = await apiClient.get(
     `/api/posts/${postId}/comments/${commentId}/replies`,
     {
@@ -219,7 +216,7 @@ export async function getCommentReplies(postId, commentId, token){
   return res.data;
 }
 
-export async function getCommentRepliesCount(postId, commentId, token){
+export async function getCommentRepliesCount(postId, commentId, token) {
   const res = await apiClient.get(
     `/api/posts/${postId}/comments/${commentId}/repliesCount`,
     {
@@ -231,12 +228,18 @@ export async function getCommentRepliesCount(postId, commentId, token){
   return res;
 }
 
-export async function addReplyToComment(postId, commentId, reply_content, reply_username, token){
+export async function addReplyToComment(
+  postId,
+  commentId,
+  reply_content,
+  reply_username,
+  token
+) {
   const res = await apiClient.post(
     `/api/posts/${postId}/comments/${commentId}/replies`,
     {
       content: reply_content,
-      replyUsername: reply_username
+      replyUsername: reply_username,
     },
     {
       headers: {
@@ -247,7 +250,7 @@ export async function addReplyToComment(postId, commentId, reply_content, reply_
   return res;
 }
 
-export async function likeComment(commentId, token){
+export async function likeComment(commentId, token) {
   const res = await apiClient.post(
     `/api/posts/likes/comments/${commentId}/like`,
     {},
@@ -260,12 +263,29 @@ export async function likeComment(commentId, token){
   return res.data;
 }
 
-export async function unlikeComment(commentId, token){
+export async function unlikeComment(commentId, token) {
   const res = await apiClient.post(
     `/api/posts/likes/comments/${commentId}/unlike`,
     {},
     {
       headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+}
+
+export async function sendMessage(receiverId, content, token) {
+  const res = await apiClient.post(
+    "/messages/send",
+    {
+      receiver: receiverId,
+      content: content,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     }
