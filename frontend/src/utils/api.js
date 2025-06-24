@@ -152,3 +152,34 @@ export async function fetchMessageById(messageId, token) {
   });
   return res.data;
 }
+
+/*
+  @param {string} receiverId
+ * @param {string} content
+ * @param {string} token   // JWT
+ */
+export async function sendMessage(receiverId, content, token) {
+  if (!token) {
+    throw new Error("No auth token");
+  }
+
+  // ===> UTILISATION D'UN POST, PAS D'UN GET <===
+  const res = await apiClient.post(
+    "/messages/send", // endpoint
+    {
+      // body
+      receiver: receiverId,
+      content: content,
+    },
+    {
+      // headers
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  // on renvoie { message: "Message sent", messageId: "..." }
+  return res.data;
+}
