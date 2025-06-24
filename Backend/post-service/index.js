@@ -25,9 +25,10 @@ mongoose
       require("./src/routes/comment.routes.js")
     );
     app.use(
-      "/api/posts/:post_id/likes",
+      "/api/posts/likes",
       require("./src/routes/like.routes.js")
     );
+
     app.listen(port, () => {
       console.log("Post Service is running on port", port);
     });
