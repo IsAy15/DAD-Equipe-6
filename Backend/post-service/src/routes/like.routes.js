@@ -54,7 +54,7 @@ const verifyJWT = require('../middlewares/verifyJWT')
  *       500:
  *         description: Internal Server Error
  */
-router.post('/like',
+router.post('/posts/:post_id/like',
     [validateBodyObjectId('user_id'),
     validateUrlObjectId(('post_id')),
     verifyJWT],
@@ -102,11 +102,63 @@ router.post('/like',
  *       500:
  *         description: Internal Server Error
  */
-router.post('/unlike',
+router.post('/posts/:post_id/unlike',
     [validateBodyObjectId('user_id'),
     validateUrlObjectId(('post_id')),
     verifyJWT],
     likeController.unlikePost);
+
+router.post('/comments/:comment/like',
+    [validateUrlObjectId(('comment_id')),
+    verifyJWT],
+    likeController.likeComment);
+
+/**
+ * @swagger
+ * /api/posts/{post_id}/likes/unlike:
+ *   post:
+ *     summary: Unlike a post
+ *     tags:
+ *       - Likes
+ *     parameters:
+ *       - in: path
+ *         name: post_id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the post to unlike
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - user_id
+ *             properties:
+ *               user_id:
+ *                 type: string
+ *                 description: ID of the user who unlikes the post
+ *     responses:
+ *       200:
+ *         description: Like removed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Like removed
+ *       400:
+ *         description: Bad Request (missing user_id)
+ *       500:
+ *         description: Internal Server Error
+ */
+router.post('/comments/:comment_id/unlike',
+    [validateUrlObjectId(('comment_id')),
+    verifyJWT],
+    likeController.unlikeComment);
 
 module.exports = router;
 

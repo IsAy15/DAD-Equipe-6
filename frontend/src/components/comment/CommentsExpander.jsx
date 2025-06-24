@@ -45,6 +45,20 @@ export default function CommentExpander({ postId }) {
     FetchPostComments();
   }, [postId, accessToken]);
 
+  const handleAddReply = (comment_id, reply) => {
+    setComments((prevComments) =>
+      prevComments.map(comment => {
+        if (comment._id === comment_id) {
+          return {
+            ...comment,
+            repliesCount: (comment.repliesCount || 0) + 1
+          };
+        }
+        return comment;
+      }).concat(reply) 
+    );
+  };
+
   const handleAddComment = (newComment) => {
     setComments((prev) => [newComment, ...(prev || [])]);
     setVisibleCount((prev) => prev + 1); // Affiche aussi le nouveau si on est à la limite
@@ -99,12 +113,14 @@ export default function CommentExpander({ postId }) {
       <div className="flex flex-col p-2">
         {visibleComments.map((comment) => (
           <Comment
+            postId='685998752925fb31103216de'
             key={comment._id}
             comment={comment}
             editingCommentId={editingCommentId}
             setEditingCommentId={setEditingCommentId}
             onUpdateComment={handleUpdateComment}
-            onDeleteComment={handleDeleteComment} // <-- ajout ici
+            onDeleteComment={handleDeleteComment}
+            onAddReply={handleAddReply}
           />
         ))}
       </div>

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { addCommentToPost } from '@/utils/api';
 import { useAuth } from "@/contexts/authcontext";
+
 
 export default function CommentInput({ post_id, onAddComment }) {
   const { accessToken } = useAuth();
