@@ -21,6 +21,7 @@ export default function ProfileCard({ user, full = false }) {
 
   const router = useRouter();
   useEffect(() => {
+    setUserProfile(user);
     if (!user) {
       setLoading(true);
       setError("Utilisateur introuvable");
