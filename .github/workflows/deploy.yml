@@ -1,0 +1,61 @@
+name: Deploy to EC2 server
+
+on:
+  push:
+    branches: [ deployement ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Deploy to EC2
+      env:
+        PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+        HOST: ${{ secrets.EC2_HOST }}
+        USER: ${{ secrets.EC2_USER }}
+      run: |
+        echo "$PRIVATE_KEY" > github-ec2.pem && chmod 600 github-ec2.pem
+        ssh -o StrictHostKeyChecking=no -i github-ec2.pem ${USER}@${HOST} '
+        echo "Current directory: $(pwd)"
+        echo "Listing home directory:"
+        ls -la ~
+
+        echo "Installing Node.js..."
+        if ! command -v nvm &> /dev/null; then
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+        fi
+        nvm install node
+
+        REPO_URL="https://github.com/IsAy15/DAD-Equipe-6.git"
+        BRANCH="deployement"
+        REPO_DIR="$HOME/breezy-api"
+
+        if [ -d "$REPO_DIR/.git" ]; then
+          cd "$REPO_DIR"
+          git pull origin "$BRANCH"
+        else
+          git clone "$REPO_URL" "$REPO_DIR"
+          cd "$REPO_DIR"
+        fi
+
+        cd "$REPO_DIR"
+        set -e  # stoppe le script si une commande échoue
+
+        cd "$REPO_DIR" || exit 1
+
+        echo "Arrêt des anciens conteneurs..."
+        docker compose -f docker-compose.yml down --volumes
+
+        echo "Démarrage des nouveaux conteneurs..."
+        docker compose -f docker-compose.yml up -d --build
+
+        echo "Déploiement terminé avec succès."
+        '
+
+       
+
+        

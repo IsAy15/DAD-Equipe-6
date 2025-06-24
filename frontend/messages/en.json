@@ -1,0 +1,62 @@
+{
+  "Index": {
+    "title": "Welcome",
+    "description": "This is the homepage"
+  },
+  "Auth": {
+    "title": "Login",
+    "registerTitle": "Register",
+    "loginTitle": "Login",
+    "registerDescription": "Create an account to get started",
+    "loginDescription": "Log in to access your account",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "usernameError": "Invalid/Already taken username",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "emailError": "Invalid email address",
+    "password": "Password",
+    "passwordLevel": "Password strength level:",
+    "passwordLevels": [
+      "Empty",
+      "Weak",
+      "Medium",
+      "Strong",
+      "Very strong",
+      "Ultra strong"
+    ],
+    "passwordRequirements": "Your password must contain:",
+    "passwordRequirementsList": {
+      "min-length": "At least 8 characters",
+      "lowercase": "At least one lowercase letter",
+      "uppercase": "At least one uppercase letter",
+      "numbers": "At least one number",
+      "special-characters": "At least one special character"
+    },
+    "passwordConfirmation": "Confirm password",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "acceptTermsText": "I accept the",
+    "acceptTermsLink": "privacy policy",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "loginButton": "Log in",
+    "loginLoading": "Logging in...",
+    "registerButton": "Register",
+    "noAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "createAccount": "Create an account",
+    "or": "or",
+    "loginWithGoogle": "Log in with Google",
+    "registerwithGoogle": "Register with Google"
+  },
+  "Navbar": {
+    "title": "Breezy",
+    "home": "Home",
+    "profile": "Profile",
+    "settings": "Settings",
+    "theme": "Theme",
+    "language": "Language",
+    "css_components": "CSS Components",
+    "js_components": "JS Components"
+  }
+}

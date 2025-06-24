@@ -1,0 +1,59 @@
+{
+  "Index": {
+    "title": "مرحبا بك",
+    "description": "هذه هي الصفحة الرئيسية"
+  },
+  "Auth": {
+    "title": "تسجيل الدخول",
+    "registerTitle": "إنشاء حساب",
+    "loginTitle": "تسجيل الدخول",
+    "registerDescription": "أنشئ حسابًا للبدء",
+    "loginDescription": "سجّل الدخول للوصول إلى حسابك",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "emailError": "بريد إلكتروني غير صالح",
+    "password": "كلمة المرور",
+    "passwordLevel": "مستوى قوة كلمة المرور:",
+    "passwordLevels": [
+      "فارغ",
+      "ضعيف",
+      "متوسط",
+      "قوي",
+      "قوي جدًا",
+      "قوي للغاية"
+    ],
+    "passwordRequirements": "يجب أن تحتوي كلمة المرور على:",
+    "passwordRequirementsList": {
+      "min-length": "ثمانية أحرف على الأقل",
+      "lowercase": "حرف صغير واحد على الأقل",
+      "uppercase": "حرف كبير واحد على الأقل",
+      "numbers": "رقم واحد على الأقل",
+      "special-characters": "رمز خاص واحد على الأقل"
+    },
+    "passwordConfirmation": "تأكيد كلمة المرور",
+    "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين",
+    "rememberMe": "تذكرني",
+    "forgotPassword": "هل نسيت كلمة المرور؟",
+    "loginButton": "تسجيل الدخول",
+    "loginLoading": "جاري تسجيل الدخول...",
+    "registerButton": "إنشاء حساب",
+    "noAccount": "ليس لديك حساب؟",
+    "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
+    "createAccount": "إنشاء حساب",
+    "acceptTermsText": "أوافق على",
+    "acceptTermsLink": "سياسة الخصوصية",
+    "or": "أو",
+    "loginWithGoogle": "تسجيل الدخول باستخدام جوجل",
+    "registerwithGoogle": "إنشاء حساب باستخدام جوجل"
+  },
+  "Navbar": {
+    "title": "بريزي",
+    "home": "الرئيسية",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "theme": "المظهر",
+    "language": "اللغة",
+    "css_components": "مكونات CSS",
+    "js_components": "مكونات JS"
+  }
+}
