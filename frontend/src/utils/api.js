@@ -107,6 +107,21 @@ export async function postBreeze(text, image, token) {
   return res.data;
 }
 
+export async function likeBreeze(setLiked, postID, token) {
+
+  const res = await apiClient.post(
+    setLiked?
+    "/api/posts/"+postID+"/likes/like":
+    "/api/posts/"+postID+"/likes/unlike",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+}
+
 export async function fetchTaggedPosts(tag, token) {
   const res = await apiClient.get(`/api/posts/search/popular?tag=${tag}`, {
     headers: {

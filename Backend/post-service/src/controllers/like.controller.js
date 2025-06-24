@@ -1,76 +1,131 @@
 const Post = require('../models/Post')
+const Comment = require('../models/Comment')
 
 module.exports = {
     likePost: async (req, res) => {
-        try{
+        try {
             const post_id = req.params.post_id;
-            const { user_id } = req.userId;
+            const user_id = req.userId;
 
-            if(!user_id){
-                return res.status(400).json({ message: 'Authour field is requiered in body'});
+            if (!user_id) {
+            return res.status(400).json({ message: 'Could not get user id from token' });
             }
 
             const post = await Post.findById(post_id).exec();
 
-            if(!post){
-                return res.status(404).json({ message: 'Post not found'});
+            if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
             }
 
-            if(!post.likes.includes(user_id)){
-                post.likes.push(user_id);
-            }else{
-                res.status(400).json({ message: 'User has already liked the post'});
+            if (post.likes.includes(user_id)) {
+            return res.status(400).json({ message: 'User has already liked the post' });
             }
 
-            post.save(post)
-            .then(() => {
-                return res.status(201).json({ message: 'Like added'});
-            })
-            .catch((err) => {
-                return res.status(500).json({ message: 'Unable to like post', details: err.message});
-            })
-        }
-        catch(err){
-            return res.status(500).json({ message: 'Unable to like post', details: err.message});
+            post.likes.push(user_id);
+
+            await post.save();
+
+            return res.status(201).json({ message: 'Like added', success: true });
+        } catch (err) {
+            return res.status(500).json({ message: 'Unable to like post', details: err.message });
         }
     },
+
     unlikePost: async (req, res) => {
         try {
             const post_id = req.params.post_id;
-            const { user_id } = req.userId;
+            const user_id = req.userId;
 
             if (!user_id) {
-                return res.status(400).json({ message: 'User ID is required in body' });
+            return res.status(400).json({ message: 'Could not get user id from token' });
             }
 
-            //Check if user that liked exist
-            const userExist = fetch(`http://localhost:8080/api/user/${user_id}/exists`)
-                .then((response) => response.json());
+            const post = await Post.findById(post_id).exec();
 
-           const post = await Post.findById(post_id).exec();
-
-            if(!post){
-                return res.status(404).json({ message: 'Post not found'});
+            if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
             }
 
-            if(post.likes.includes(user_id)){
-                post.likes.remove(user_id);
-            }else{
-                res.status(400).json({ message: 'User did not liked the post'});
+            const hasLiked = post.likes.includes(user_id);
+
+            if (!hasLiked) {
+            return res.status(400).json({ message: 'User did not like the post' });
             }
 
-            post.save(post)
-            .then(() => {
-                return res.status(201).json({ message: 'Like removed'});
-            })
-            .catch((err) => {
-                return res.status(500).json({ message: 'Unable to unlike post', details: err.message});
-            })
+            // Remove like
+            post.likes = post.likes.filter((id) => id.toString() !== user_id.toString());
 
-            return res.status(200).json({ message: 'Like removed' });
+            await post.save();
+
+            return res.status(200).json({ message: 'Like removed', success: true });
+
         } catch (err) {
             console.error(err);
-            return res.status(500).json({ message: 'Unable to unlike post', details: err.message});
+            return res.status(500).json({ message: 'Unable to unlike post', details: err.message });
         }
     },
+
+
+    likeComment: async (req, res) => {
+        try {
+            const comment_id = req.params.comment_id;
+            const user_id = req.userId;
+
+            if (!user_id) {
+            return res.status(400).json({ message: 'Could not get user id from token' });
+            }
+
+            const comment = await Comment.findById(comment_id).exec();
+
+            if (!comment) {
+            return res.status(404).json({ message: 'Comment not found' });
+            }
+
+            if (comment.likes.includes(user_id)) {
+            return res.status(400).json({ message: 'User has already liked the comment' });
+            }
+
+            comment.likes.push(user_id);
+
+            await comment.save();
+
+            return res.status(201).json({ message: 'Like added', success: true });
+        } catch (err) {
+            return res.status(500).json({ message: 'Unable to like comment', details: err.message });
+        }
+    },
+
+    unlikeComment: async (req, res) => {
+        try {
+            const comment_id = req.params.comment_id;
+            const user_id = req.userId;
+
+            if (!user_id) {
+            return res.status(400).json({ message: 'Could not get user id from token' });
+            }
+
+            const comment = await Comment.findById(comment_id).exec();
+
+            if (!comment) {
+            return res.status(404).json({ message: 'Comment not found' });
+            }
+
+            const hasLiked = comment.likes.includes(user_id);
+
+            if (!hasLiked) {
+            return res.status(400).json({ message: 'User did not like the comment' });
+            }
+
+            // Remove like
+            comment.likes = comment.likes.filter((id) => id.toString() !== user_id.toString());
+
+            await comment.save();
+
+            return res.status(200).json({ message: 'Like removed', success: true });
+
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Unable to unlike comment', details: err.message });
+        }
+    }
 }
