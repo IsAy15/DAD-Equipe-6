@@ -108,4 +108,15 @@ const PostSchema = new mongoose.Schema({
     videoUrls: [String]
 }, { timestamps: true });
 
+PostSchema.virtual('likesCount').get(function () {
+    return this.likes.length;
+});
+
+PostSchema.virtual('commentsCount').get(function () {
+    return this.comments.length;
+});
+
+PostSchema.set('toJSON', { virtuals: true });
+PostSchema.set('toObject', { virtuals: true });
+
 module.exports = mongoose.model('Post', PostSchema);

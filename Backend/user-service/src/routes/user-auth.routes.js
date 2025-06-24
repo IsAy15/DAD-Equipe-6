@@ -10,4 +10,6 @@ router.post('/:userId/refreshTokens/validate', userAuthController.validateRefres
 router.delete('/:userId/refreshTokens', userAuthController.revokeRefreshToken);
 router.get('/check-username', userAuthController.isUsernameTaken);
 
+router.get('/search', verifyJWT, userAuthController.searchUsersByUsername);
+
 module.exports = router;

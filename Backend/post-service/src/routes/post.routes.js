@@ -175,4 +175,10 @@ router.delete(
   postController.deletePost
 );
 
+router.get("/search/recent", verifyJWT, postController.searchRecentPostsByTag);
+router.get("/search/liked", verifyJWT, postController.searchMostLikedPostsByTag);
+router.get("/search/popular", verifyJWT, postController.searchPopularPostsByTag);
+
+
 module.exports = router;
+
