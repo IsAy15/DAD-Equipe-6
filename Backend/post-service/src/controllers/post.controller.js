@@ -146,4 +146,110 @@ module.exports = {
             return res.status(500).json({ message: 'Failed to delete post', details: err.message });
         }
     },
-}
+
+    searchRecentPostsByTag : async (req, res) => {
+    const { tag } = req.query;
+    const limit = parseInt(req.query.limit) || 10; // nombre de posts à afficher
+    const skip = parseInt(req.query.skip) || 0;    // combien en ignorer
+
+    if (!tag) {
+        return res.status(400).json({ message: "Missing tag" });
+    }
+
+    try {
+        const tagRegex = new RegExp(`^${tag}$`, 'i');
+
+        const posts = await Post.find({ tags: tagRegex })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean({ virtuals: true });
+
+        return res.status(200).json(posts);
+    } catch (err) {
+        console.error("Error searching recent posts by tag:", err);
+        return res.status(500).json({ message: "Internal server error" });
+        }
+    },
+
+    searchMostLikedPostsByTag : async (req, res) => {
+        const { tag } = req.query;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = parseInt(req.query.skip) || 0;
+
+        if (!tag) {
+            return res.status(400).json({ message: "Missing tag" });
+        }
+
+        try {
+            const tagRegex = new RegExp(`^${tag}$`, 'i');
+
+            const posts = await Post.aggregate([
+            { $match: { tags: tagRegex } },
+            { $addFields: { likesCount: { $size: "$likes" } } },
+            { $sort: { likesCount: -1, createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit }
+            ]);
+
+            return res.status(200).json(posts);
+        } catch (err) {
+            console.error("Error searching most liked posts by tag:", err);
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    },
+
+    searchPopularPostsByTag : async (req, res) => {
+        const { tag } = req.query;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = parseInt(req.query.skip) || 0;
+
+        if (!tag) {
+            return res.status(400).json({ message: "Missing tag" });
+        }
+
+        try {
+            const tagRegex = new RegExp(`^${tag}$`, 'i');
+            const now = new Date();
+
+            const posts = await Post.aggregate([
+            { $match: { tags: tagRegex } },
+
+            // Ajoute likesCount, commentsCount, age en heures
+            {
+                $addFields: {
+                likesCount: { $size: "$likes" },
+                commentsCount: { $size: "$comments" },
+                ageInHours: {
+                    $divide: [{ $subtract: [now, "$createdAt"] }, 1000 * 60 * 60]
+                }
+                }
+            },
+
+            // Calcule un score basé sur ces critères
+            {
+                $addFields: {
+                score: {
+                    $subtract: [
+                    { $add: [
+                        "$likesCount",
+                        { $multiply: [0.5, "$commentsCount"] }
+                    ] },
+                    { $multiply: [0.3, "$ageInHours"] }
+                    ]
+                }
+                }
+            },
+
+            { $sort: { score: -1 } },
+            { $skip: skip },
+            { $limit: limit }
+            ]);
+
+            return res.status(200).json(posts);
+        } catch (err) {
+            console.error("Error searching popular posts by tag:", err);
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    },
+};
