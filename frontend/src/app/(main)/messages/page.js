@@ -1,11 +1,7 @@
 "use client";
 
 import UserAvatar from "@/components/UserAvatar";
-import {
-  fetchUserProfile,
-  fetchUserMessages,
-  fetchMessageById,
-} from "@/utils/api";
+import { fetchUserProfile, fetchUserMessages } from "@/utils/api";
 import { useAuth } from "@/contexts/authcontext";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -31,7 +27,7 @@ const loadingContent = (
 );
 
 export default function MessagesPage() {
-  const [conversations, setConversations] = useState(null);
+  const [conversations, setConversations] = useState([]);
   const { user, accessToken } = useAuth();
   const t = useTranslations("Messages");
   const [loading, setLoading] = useState(true);
@@ -80,14 +76,6 @@ export default function MessagesPage() {
     loadMessages();
   }, [accessToken, user?.id]);
 
-  if (!conversations || conversations.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-base-content/80">{t("noMessages")}</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen flex flex-col bg-base-100">
       {/* Header */}
@@ -96,6 +84,7 @@ export default function MessagesPage() {
         <button
           className="btn btn-square btn-primary"
           aria-label="Nouveau message"
+          onClick={() => router.push("/messages/new")}
         >
           <span className="icon-[tabler--edit] size-6 text-base-content"></span>
         </button>

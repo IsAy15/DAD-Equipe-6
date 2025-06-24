@@ -48,6 +48,11 @@ export async function fetchUserFollowers(userId) {
   return res.data;
 }
 
+export async function fetchUserFriends(userId) {
+  const res = await apiClient.get(`/api/users/${userId}/friends`);
+  return res.data;
+}
+
 export async function fetchUserPosts(userId, token) {
   const res = await apiClient.get(`/api/posts/${userId}`, {
     headers: {
