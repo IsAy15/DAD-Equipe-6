@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import clsx from "clsx";
 import AppearanceSettings from "./AppearanceSettings";
 import { usePathname } from "next/navigation";
@@ -28,6 +28,11 @@ export default function NavBar() {
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
 
+  // Refs persistantes pour le swipe
+  const startY = useRef(null);
+  const isDragging = useRef(false);
+  const dragStartX = useRef(null);
+
   // Détection mobile (évite le SSR)
   useEffect(() => {
     function checkMobile() {
@@ -46,29 +51,68 @@ export default function NavBar() {
   // Gestion du swipe pour ouvrir/fermer l'aside sur mobile
   useEffect(() => {
     if (!isMobile) return;
+    let dynamicResistance = 100;
+    const resistance = 100;
+    const horizontalThreshold = 2;
     function handleTouchStart(e) {
       setTouchStartX(e.touches[0].clientX);
-      setDragX(0);
+      startY.current = e.touches[0].clientY;
+      setDragX(null);
+      isDragging.current = false;
+      dragStartX.current = null;
+      // Calcule la résistance selon la position de départ (plus à gauche = moins résistant)
+      const minRes = 30;
+      const maxRes = 150;
+      const screenWidth = window.innerWidth;
+      const ratio = Math.min(
+        1,
+        Math.max(0, e.touches[0].clientX / (screenWidth * 0.7))
+      );
+      dynamicResistance = minRes + (maxRes - minRes) * ratio;
     }
     function handleTouchMove(e) {
-      if (touchStartX !== null) {
+      if (touchStartX !== null && startY.current !== null) {
         const currentX = e.touches[0].clientX;
-        let delta = currentX - touchStartX;
-        if (!asideOpen) delta = Math.max(0, Math.min(delta, ASIDE_WIDTH));
-        if (asideOpen) delta = Math.min(0, Math.max(delta, -ASIDE_WIDTH));
-        setDragX(delta);
-        setTouchEndX(currentX);
+        const currentY = e.touches[0].clientY;
+        const deltaX = currentX - touchStartX;
+        const deltaY = currentY - startY.current;
+        if (!asideOpen) {
+          if (!isDragging.current) {
+            if (Math.abs(deltaY) < 10) return;
+            if (Math.abs(deltaX) / Math.abs(deltaY) < horizontalThreshold)
+              return;
+            isDragging.current = true;
+            dragStartX.current = currentX; // On mémorise la position du doigt au début du drag
+          }
+        } else {
+          isDragging.current = true;
+          if (dragStartX.current === null) dragStartX.current = currentX;
+        }
+        if (isDragging.current) {
+          let delta = currentX - dragStartX.current;
+          if (!asideOpen) {
+            delta = Math.max(0, Math.min(delta, ASIDE_WIDTH));
+          }
+          if (asideOpen) {
+            delta = Math.min(0, Math.max(delta, -ASIDE_WIDTH));
+          }
+          setDragX(delta);
+          setTouchEndX(currentX);
+        }
       }
     }
     function handleTouchEnd() {
-      if (touchStartX !== null && touchEndX !== null) {
-        const deltaX = touchEndX - touchStartX;
-        if (!asideOpen && deltaX > 60) setAsideOpen(true);
-        else if (asideOpen && deltaX < -60) setAsideOpen(false);
+      if (touchStartX !== null && touchEndX !== null && isDragging.current) {
+        const deltaX = touchEndX - dragStartX.current;
+        if (!asideOpen && deltaX > dynamicResistance) setAsideOpen(true);
+        else if (asideOpen && deltaX < -100) setAsideOpen(false);
       }
       setTouchStartX(null);
       setTouchEndX(null);
       setDragX(null);
+      startY.current = null;
+      isDragging.current = false;
+      dragStartX.current = null;
     }
     window.addEventListener("touchstart", handleTouchStart);
     window.addEventListener("touchmove", handleTouchMove);
@@ -330,6 +374,7 @@ export default function NavBar() {
           style={{
             opacity: overlayOpacity,
             transition: dragX === null ? "opacity 0.3s" : "none",
+            pointerEvents: overlayOpacity > 0.05 ? "auto" : "none",
           }}
           onPointerUp={handleAsideClose}
           aria-label="Fermer le menu"

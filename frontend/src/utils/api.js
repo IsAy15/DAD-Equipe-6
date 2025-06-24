@@ -292,3 +292,28 @@ export async function sendMessage(receiverId, content, token) {
   );
   return res.data;
 }
+
+export async function getConversations(userId, token) {
+  const res = await apiClient.get(`/messages/conversations/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+}
+
+export async function deleteMessage(messageId, token) {
+  const res = await apiClient.delete(`/messages/${messageId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+}
+
+export async function editMessage(messageId, content, token) {
+  const res = await apiClient.patch(
+    `/messages/${messageId}`,
+    { content: content },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return res.data;
+}

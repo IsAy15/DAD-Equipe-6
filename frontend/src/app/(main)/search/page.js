@@ -5,13 +5,14 @@ import {
   fetchTaggedPosts,
   fetchPosts,
   fetchUsersByUsername,
+  fetchUserProfile,
 } from "@/utils/api";
 import { useAuth } from "@/contexts/authcontext";
 import Post from "@/components/Post";
 import ProfileCard from "@/components/ProfileCard";
 
 export default function SearchPage() {
-  const { accessToken } = useAuth();
+  const { user: myUser, accessToken } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
@@ -79,7 +80,17 @@ export default function SearchPage() {
       } else {
         // Recherche d'utilisateurs
         const usersResult = await fetchUsersByUsername(value, accessToken);
-        setUsers(usersResult);
+        // fetchUserProfile pour chaque utilisateur
+        if (!usersResult || usersResult.length === 0) {
+          setUsers([]);
+          return;
+        }
+        const usersProfiles = await Promise.all(
+          usersResult
+            .filter((user) => user._id !== myUser.id)
+            .map((user) => fetchUserProfile(user._id))
+        );
+        setUsers(usersProfiles);
       }
     } catch (err) {
       console.error("Erreur lors de la recherche :", err);
@@ -102,13 +113,10 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-base-100">
+    <div className="min-h-screen flex flex-col">
       {/* Barre de recherche */}
-      <div className="p-4 bg-white shadow">
-        <form
-          className="input input-lg flex max-w-md mx-auto space-x-4"
-          onSubmit={onSubmit}
-        >
+      <div className="p-4 bg-base-200 shadow">
+        <form className="input input-lg flex space-x-4" onSubmit={onSubmit}>
           {/* Icône loupe */}
           <span className="icon-[tabler--search] text-base-content/80 my-auto size-6 shrink-0"></span>
 
@@ -125,8 +133,19 @@ export default function SearchPage() {
           </label>
 
           <span className="my-auto flex gap-2 text-base-content/60">
-            <kbd className="kbd kbd-sm">⌘</kbd>
-            <kbd className="kbd kbd-sm">K</kbd>
+            {typeof window !== "undefined" &&
+              (() => {
+                const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+                const isTouch =
+                  "ontouchstart" in window || navigator.maxTouchPoints > 0;
+                if (isTouch) return null;
+                return (
+                  <span className="my-auto flex gap-2 text-base-content/60">
+                    <kbd className="kbd kbd-sm">{isMac ? "⌘" : "Ctrl"}</kbd>
+                    <kbd className="kbd kbd-sm">K</kbd>
+                  </span>
+                );
+              })()}
           </span>
         </form>
       </div>
@@ -135,7 +154,7 @@ export default function SearchPage() {
       <main className="flex-1 overflow-auto p-4">
         {query.trim() === "" ? (
           <>
-            <h2 className="font-semibold text-gray-600 mb-2">
+            <h2 className="font-semibold text-base-content/80 mb-2">
               Recent searches
             </h2>
             <div className="flex flex-wrap gap-4">
@@ -181,16 +200,16 @@ export default function SearchPage() {
                       aria-label="Supprimer"
                       tabIndex={-1}
                     >
-                      <span className="text-xs text-gray-400 hover:text-red-500">
+                      <span className="text-xs text-base-content/80 hover:text-red-500">
                         ✕
                       </span>
                     </button>
                   )}
-                  <div className="w-10 h-10 bg-gray-200 rounded-full mb-1 flex items-center justify-center text-lg">
+                  <div className="w-10 h-10 bg-base-200 rounded-full mb-1 flex items-center justify-center text-lg">
                     {item.type === "tag" ? (
-                      <span className="text-blue-500">#</span>
+                      <span className="text-accent">#</span>
                     ) : (
-                      <span className="icon-[tabler--user] text-gray-500" />
+                      <span className="icon-[tabler--user] text-base-content/80" />
                     )}
                   </div>
                   <span className="truncate">
@@ -201,7 +220,7 @@ export default function SearchPage() {
             </div>
           </>
         ) : (
-          <div className="text-gray-700">
+          <div className="text-base-content/80">
             Résultats pour <strong>"{query}"</strong> …
             <ul className="mt-4 space-y-2">
               {loading ? (
@@ -211,7 +230,7 @@ export default function SearchPage() {
               ) : query.startsWith("#") ? (
                 taggedPosts.length > 0 ? (
                   taggedPosts.map((post) => (
-                    <li key={post._id} className="border p-4 rounded-lg">
+                    <li key={post._id} className="card border p-4">
                       <Post post={post} />
                     </li>
                   ))
@@ -220,8 +239,8 @@ export default function SearchPage() {
                 )
               ) : users.length > 0 ? (
                 users.map((user) => (
-                  <li key={user._id} className="border p-4 rounded-lg">
-                    <ProfileCard identifier={user.username} full={true} />
+                  <li key={user.id} className="card border p-4">
+                    <ProfileCard user={user} full={true} />
                   </li>
                 ))
               ) : (
