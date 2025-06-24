@@ -1,154 +1,291 @@
-const Post = require('../models/Post.js');
-const mongoose = require('mongoose');
-const axios = require('axios');
+const Post = require("../models/Post.js");
+const mongoose = require("mongoose");
+const axios = require("axios");
 
 module.exports = {
-    getPostsByUserId: async (req, res) => {
-        // Controller logic to retrieve posts by user id goes here
-        const user_id = req.params.user_id;
-        try {
-        const posts = await Post.find({ author: user_id })
-            .sort({ createdAt: -1 })
-            .lean()
-            .exec();
-
-        if (posts?.length == 0) {
-            return res.status(404).json({ message: "No post found for this user" });
-        }
-
-        if (posts) {
-            return res.status(200).json(posts);
-        }
-
-        return res.status(404).json({ message: "No posts found for this user" });
-        } catch (err) {
-        return res
-            .status(500)
-            .json({ message: "Failed to retrieve posts", details: err.message });
-        }
-    },
-
-    getPostsOfSubscribdedTo: async (req, res) => {
+  getPostsByUserId: async (req, res) => {
+    // Controller logic to retrieve posts by user id goes here
+    const user_id = req.params.user_id;
     try {
-        const user_id = req.userId;
+      const posts = await Post.find({ author: user_id })
+        .sort({ createdAt: -1 })
+        .lean()
+        .exec();
 
-        if (!user_id) {
-        return res.status(400).json({ message: 'User id is required' });
-        }
+      if (posts?.length == 0) {
+        return res.status(404).json({ message: "No post found for this user" });
+      }
 
-            const friends_ids = await fetch(`http://localhost:8080/api/user/${user_id}/following`, {
-                method: 'GET'
-            }).then((response) => response.json());
+      if (posts) {
+        return res.status(200).json(posts);
+      }
 
-            if(!friends_ids){
-                return res.status(500).json({ message: 'Unable to get who the user is following' });
-            }
-
-            if(friends_ids.length == 0){
-                return res.status(500).json({ message: 'The user does not follow anyone' });
-            }
-
-        const feed = await Post.find().where('author').in(friends_ids).lean().exec();
-
-            if(!feed){
-                return res.status(204).json({ message: 'No feed available for user' });
-            }
-
-            return res.status(200).json({ feed : feed });
-
+      return res.status(404).json({ message: "No posts found for this user" });
     } catch (err) {
-        return res.status(500).json({ message: 'Unable to get user feed', details: err.message });
+      return res
+        .status(500)
+        .json({ message: "Failed to retrieve posts", details: err.message });
     }
-    },
+  },
 
-    createPost: async (req, res) => {
+  getPostsOfSubscribdedTo: async (req, res) => {
     try {
-        const user_id = req.params.user_id;
-        const { content, tags, imageUrls, videoUrls } = req.body;
+      const user_id = req.userId;
 
-        // TODO : Check if the author is the same as the logged-in user
-        // TODO : Validate the input data
+      if (!user_id) {
+        return res.status(400).json({ message: "User id is required" });
+      }
 
-        const newPost = new Post({
-            author: user_id,
-            content,
-            tags,
-            imageUrls,
-            videoUrls
-        });
+      const response = await axios.get(
+        `http://gateway:8080/api/users/${user_id}/following`
+      );
+      const friends_ids = response.data.following;
 
-        const savedPost = await newPost.save();
+      if (!friends_ids || friends_ids.length === 0) {
+        return res.status(200).json({ feed: [] });
+      }
 
-        // Appel au notification-service
-        try {
-            await axios.post('http://notification-service:3004/api/notifications/on-post-created', {
-                userId: user_id, // L'utilisateur qui a créé le post
-                postId: savedPost._id
-            });
-        } catch (notifyErr) {
-            console.error('Failed to notify followers:', notifyErr.message);
-            // Ne bloque pas la création du post en cas d'erreur de notif
-        }
+      const feed = await Post.find()
+        .where("author")
+        .in(friends_ids)
+        .lean()
+        .exec();
 
-        return res.status(201).json(savedPost);
+      if (!feed) {
+        return res.status(200).json({ feed: [] });
+      }
 
-        } catch (err) {
-            return res.status(500).json({ message: 'Failed to create post', details: err.message });
-        }
-    },
+      return res.status(200).json({ feed: feed });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: "Unable to get user feed", details: err.message });
+    }
+  },
 
-    updatePost: async (req, res) => {
-        try{
-            const postId = req.userId;
-    
-            if(!postId) {
-                return res.status(400).json({ message: 'Post id is required' });
-            }
-            
-            const { content, tags, imageUrls, videoUrls } = req.body;
-            
-            const updatedPost = await Post.findByIdAndUpdate(
-                new mongoose.Types.ObjectId(postId), 
+  createPost: async (req, res) => {
+    try {
+      const user_id = req.userId;
+      const { content, tags, imageUrls, videoUrls } = req.body;
+
+      // TODO : Check if the author is the same as the logged-in user
+      // TODO : Validate the input data
+
+      const newPost = new Post({
+        author: user_id,
+        content,
+        tags,
+        imageUrls,
+        videoUrls,
+      });
+
+      const savedPost = await newPost.save();
+
+      // Appel au notification-service
+      try {
+        await axios.post(
+          "http://notification-service:3004/api/notifications/on-post-created",
+          {
+            userId: user_id, // L'utilisateur qui a créé le post
+            postId: savedPost._id,
+          }
+        );
+      } catch (notifyErr) {
+        console.error("Failed to notify followers:", notifyErr.message);
+        // Ne bloque pas la création du post en cas d'erreur de notif
+      }
+
+      return res.status(201).json(savedPost);
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: "Failed to create post", details: err.message });
+    }
+  },
+
+  updatePost: async (req, res) => {
+    try {
+      const postId = req.userId;
+
+      if (!postId) {
+        return res.status(400).json({ message: "Post id is required" });
+      }
+
+      const { content, tags, imageUrls, videoUrls } = req.body;
+
+      const updatedPost = await Post.findByIdAndUpdate(
+        new mongoose.Types.ObjectId(postId),
+        {
+          content,
+          tags,
+          imageUrls,
+          videoUrls,
+        },
+        { new: true }
+      )
+        .lean()
+        .exec();
+
+      if (!updatedPost) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+      return res.status(200).json(updatedPost);
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: "Failed to update post", details: err.message });
+    }
+  },
+
+  deletePost: async (req, res) => {
+    try {
+      const postId = req.userId;
+
+      if (!postId) {
+        return res.status(400).json({ message: "Post id is required" });
+      }
+
+      const deletedPost = await Post.findByIdAndDelete(
+        new mongoose.Types.ObjectId(postId)
+      )
+        .lean()
+        .exec();
+
+      if (!deletedPost) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+      return res.status(204).json({ message: "Post deleted successfully" });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: "Failed to delete post", details: err.message });
+    }
+  },
+
+  searchRecentPostsByTag: async (req, res) => {
+    const { tag } = req.query;
+    const limit = parseInt(req.query.limit) || 10; // nombre de posts à afficher
+    const skip = parseInt(req.query.skip) || 0; // combien en ignorer
+
+    if (!tag) {
+      return res.status(400).json({ message: "Missing tag" });
+    }
+
+    try {
+      const tagRegex = new RegExp(`^${tag}$`, "i");
+
+      const posts = await Post.find({ tags: tagRegex })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean({ virtuals: true });
+
+      return res.status(200).json(posts);
+    } catch (err) {
+      console.error("Error searching recent posts by tag:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+  searchMostLikedPostsByTag: async (req, res) => {
+    const { tag } = req.query;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = parseInt(req.query.skip) || 0;
+
+    if (!tag) {
+      return res.status(400).json({ message: "Missing tag" });
+    }
+
+    try {
+      const tagRegex = new RegExp(`^${tag}$`, "i");
+
+      const posts = await Post.aggregate([
+        { $match: { tags: tagRegex } },
+        { $addFields: { likesCount: { $size: "$likes" } } },
+        { $sort: { likesCount: -1, createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit },
+      ]);
+
+      return res.status(200).json(posts);
+    } catch (err) {
+      console.error("Error searching most liked posts by tag:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+  searchPopularPostsByTag: async (req, res) => {
+    const { tag } = req.query;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = parseInt(req.query.skip) || 0;
+
+    if (!tag) {
+      return res.status(400).json({ message: "Missing tag" });
+    }
+
+    try {
+      const tagRegex = new RegExp(`^${tag}$`, "i");
+      const now = new Date();
+
+      const posts = await Post.aggregate([
+        { $match: { tags: tagRegex } },
+
+        // Ajoute likesCount, commentsCount, age en heures
+        {
+          $addFields: {
+            likesCount: { $size: "$likes" },
+            commentsCount: { $size: "$comments" },
+            ageInHours: {
+              $divide: [{ $subtract: [now, "$createdAt"] }, 1000 * 60 * 60],
+            },
+          },
+        },
+
+        // Calcule un score basé sur ces critères
+        {
+          $addFields: {
+            score: {
+              $subtract: [
                 {
-                    content,
-                    tags,
-                    imageUrls,
-                    videoUrls
+                  $add: ["$likesCount", { $multiply: [0.5, "$commentsCount"] }],
                 },
-                { new: true }
-            )
-            .lean()
-            .exec();
+                { $multiply: [0.3, "$ageInHours"] },
+              ],
+            },
+          },
+        },
 
-            if(!updatedPost) {
-                return res.status(404).json({ message: 'Post not found' });
-            }
-            return res.status(200).json(updatedPost);
-        }
-        catch(err) {
-            return res.status(500).json({ message: 'Failed to update post', details: err.message });
-        }
-    },
+        { $sort: { score: -1 } },
+        { $skip: skip },
+        { $limit: limit },
+      ]);
+      const postIds = posts.map((post) => post._id);
+      return res.status(200).json(postIds);
+    } catch (err) {
+      console.error("Error searching popular posts by tag:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  },
 
-    deletePost: async (req, res) => {
-        try{
-            const postId = req.userId;
+  getPostById: async (req, res) => {
+    const postId = req.params.post_id;
 
-            if(!postId) {
-                return res.status(400).json({ message: 'Post id is required' });
-            }
+    if (!postId) {
+      return res.status(400).json({ message: "Post ID is required" });
+    }
 
-            const deletedPost = await Post.findByIdAndDelete( new mongoose.Types.ObjectId(postId))
-            .lean()
-            .exec();
+    try {
+      const post = await Post.findById(postId).lean().exec();
 
-            if(!deletedPost) {
-                return res.status(404).json({ message: 'Post not found' });
-            }
-            return res.status(204).json({ message: 'Post deleted successfully' });
-        }
-        catch(err) {
-            return res.status(500).json({ message: 'Failed to delete post', details: err.message });
-        }
-    },
-}
+      if (!post) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+
+      return res.status(200).json(post);
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: "Failed to retrieve post", details: err.message });
+    }
+  },
+};

@@ -154,7 +154,7 @@ const verifyJWT = require("../middlewares/verifyJWT");
  */
 
 router.get(
-  "/:user_id",
+  "/byuser/:user_id",
   [validateUrlObjectId("user_id"), verifyJWT],
   postController.getPostsByUserId
 );
@@ -173,6 +173,24 @@ router.delete(
   "/:post_id",
   [validateUrlObjectId("post_id"), verifyJWT],
   postController.deletePost
+);
+
+router.get(
+  "/:post_id",
+  validateUrlObjectId("post_id"),
+  postController.getPostById
+);
+
+router.get("/search/recent", verifyJWT, postController.searchRecentPostsByTag);
+router.get(
+  "/search/liked",
+  verifyJWT,
+  postController.searchMostLikedPostsByTag
+);
+router.get(
+  "/search/popular",
+  verifyJWT,
+  postController.searchPopularPostsByTag
 );
 
 module.exports = router;

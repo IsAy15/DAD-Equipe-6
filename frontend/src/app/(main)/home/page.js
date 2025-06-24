@@ -14,7 +14,7 @@ export default function Index() {
     async function loadPosts() {
       setLoadingPosts(true);
       try {
-        const userPosts = await fetchUserFeed(identifier, accessToken);
+        const userPosts = await fetchUserFeed(accessToken);
         setPosts(userPosts || []);
       } catch (err) {
         setPosts([]);

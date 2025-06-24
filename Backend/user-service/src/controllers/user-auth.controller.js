@@ -146,3 +146,27 @@ exports.isUsernameTaken = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.searchUsersByUsername = async (req, res) => {
+  const { query } = req.query;
+
+  if (!query || query.trim() === '') {
+    return res.status(400).json({ message: "Search query is required" });
+  }
+
+  try {
+    const regex = new RegExp(query.trim(), 'i'); 
+
+    console.log("Requête utilisateur :", query);
+    const users = await User.find({ username: { $regex: regex } })
+      .select('username avatar _id') 
+      .limit(20); 
+
+    console.log("Utilisateurs trouvés :", users.length);
+
+    return res.status(200).json(users);
+  } catch (err) {
+    console.error("Error searching users:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};

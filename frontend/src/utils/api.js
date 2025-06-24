@@ -49,7 +49,7 @@ export async function fetchUserFollowers(userId) {
 }
 
 export async function fetchUserPosts(userId, token) {
-  const res = await apiClient.get(`/api/posts/${userId}`, {
+  const res = await apiClient.get(`/api/posts/byuser/${userId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -57,8 +57,8 @@ export async function fetchUserPosts(userId, token) {
   return res.data;
 }
 
-export async function fetchUserFeed(userId, token) {
-  const res = await apiClient.get(`/api/posts/${userId}/feed`, {
+export async function fetchUserFeed(token) {
+  const res = await apiClient.get(`/api/posts/feed`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -104,5 +104,23 @@ export async function postBreeze(text, image, token) {
       },
     }
   );
+  return res.data;
+}
+
+export async function fetchTaggedPosts(tag, token) {
+  const res = await apiClient.get(`/api/posts/search/popular?tag=${tag}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+}
+
+export async function fetchPosts(postId, token) {
+  const res = await apiClient.get(`/api/posts/${postId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return res.data;
 }
