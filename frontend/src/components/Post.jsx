@@ -4,15 +4,17 @@ import LikeButton from "./LikeButton";
 import { likeBreeze, fetchUserProfile } from "@/utils/api";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/authcontext";
+import { useLocale } from "next-intl";
 
 export default function Post({ post }) {
+  const locale = useLocale();
   const [author, setAuthor] = useState(null);
-    const { identifier } = useAuth(); // récupère l'id de l'utilisateur connecté
-  const isLiked = post.likes.includes(identifier)
+  const { user } = useAuth();
+  const isLiked = post.likes.includes(user.id);
 
+  console.log("Post component rendered with post:", post);
 
   useEffect(() => {
-  
     async function loadAuthor() {
       try {
         const authorProfile = await fetchUserProfile(post.author);
@@ -24,8 +26,6 @@ export default function Post({ post }) {
     }
     loadAuthor();
   }, [post.author]);
-
-
 
   return (
     <div className="">
@@ -47,13 +47,13 @@ export default function Post({ post }) {
             : "Utilisateur inconnu"}
         </span>
         <span
-          className="text-gray-500 text-sm tooltip tooltip-toggle"
-          title={new Date(post.createdAt).toLocaleString("fr-FR", {
+          className="text-base-content/50 text-sm tooltip tooltip-toggle"
+          title={new Date(post.createdAt).toLocaleString(locale, {
             dateStyle: "full",
             timeStyle: "short",
           })}
         >
-          {new Date(post.createdAt).toLocaleDateString("fr-FR")}
+          {new Date(post.createdAt).toLocaleDateString(locale)}
         </span>
       </div>
       <p>{post.content}</p>
@@ -69,7 +69,12 @@ export default function Post({ post }) {
           ))}
         </div>
       )}
-                <LikeButton isLiked={isLiked} count={post.likes.length} onLike={likeBreeze} idToLike={post._id}  />
+      <LikeButton
+        isLiked={isLiked}
+        count={post.likes.length}
+        onLike={likeBreeze}
+        idToLike={post._id}
+      />
 
       <hr className="border-t border-base-content/30 mt-4 w-full" />
     </div>

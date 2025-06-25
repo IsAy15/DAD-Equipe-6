@@ -65,8 +65,8 @@ module.exports = {
 
   createPost: async (req, res) => {
     try {
-        const user_id = req.userId;
-        const { content, tags, imageUrls, videoUrls } = req.body;
+      const user_id = req.userId;
+      const { content, tags, mediaUrls } = req.body;
 
       // TODO : Check if the author is the same as the logged-in user
       // TODO : Validate the input data
@@ -75,8 +75,7 @@ module.exports = {
         author: user_id,
         content,
         tags,
-        imageUrls,
-        videoUrls,
+        mediaUrls,
       });
 
       const savedPost = await newPost.save();
@@ -111,15 +110,14 @@ module.exports = {
         return res.status(400).json({ message: "Post id is required" });
       }
 
-      const { content, tags, imageUrls, videoUrls } = req.body;
+      const { content, tags, mediaUrls } = req.body;
 
       const updatedPost = await Post.findByIdAndUpdate(
         new mongoose.Types.ObjectId(postId),
         {
           content,
           tags,
-          imageUrls,
-          videoUrls,
+          mediaUrls,
         },
         { new: true }
       )

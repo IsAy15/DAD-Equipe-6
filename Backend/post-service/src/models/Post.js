@@ -16,12 +16,7 @@ const mongoose = require("mongoose");
  *           type: array
  *           items:
  *             type: string
- *         imageUrls:
- *           type: array
- *           items:
- *             type: string
- *             format: uri
- *         videoUrls:
+ *         mediaUrls:
  *           type: array
  *           items:
  *             type: string
@@ -36,12 +31,7 @@ const mongoose = require("mongoose");
  *           type: array
  *           items:
  *             type: string
- *         imageUrls:
- *           type: array
- *           items:
- *             type: string
- *             format: uri
- *         videoUrls:
+ *         mediaUrls:
  *           type: array
  *           items:
  *             type: string
@@ -77,18 +67,12 @@ const mongoose = require("mongoose");
  *             type: string
  *             format: objectId
  *           example: []
- *         imageUrls:
+ *         mediaUrls:
  *           type: array
  *           items:
  *             type: string
  *             format: uri
  *           example: ["https://example.com/image1.jpg"]
- *         videoUrls:
- *           type: array
- *           items:
- *             type: string
- *             format: uri
- *           example: ["https://example.com/video1.mp4"]
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -109,8 +93,7 @@ const PostSchema = new mongoose.Schema(
     tags: [String],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
-    imageUrls: [String],
-    videoUrls: [String],
+    mediaUrls: [String],
   },
   { timestamps: true }
 );
