@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { addCommentToPost } from '@/utils/api';
 import { useAuth } from "@/contexts/authcontext";
 import { Image, Video, Smile } from 'lucide-react';
+import { useNotyf } from '@/contexts/NotyfContext';
 
 export default function CommentInput({ post_id, onAddComment }) {
   const { accessToken } = useAuth();
+  const notyf = useNotyf();
   const [content, setContent] = useState('');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
@@ -54,7 +56,12 @@ export default function CommentInput({ post_id, onAddComment }) {
               type="button"
               title="Ajouter une image"
               className="hover:text-blue-600 transition"
-              onClick={() => alert('Coming soon')}
+              onClick={() =>
+                notyf.open({
+                  type: "warning",
+                  message: "Fonctionnalité en cours de développement",
+                })
+              }
             >
               <Image size={20} />
             </button>
@@ -62,7 +69,12 @@ export default function CommentInput({ post_id, onAddComment }) {
               type="button"
               title="Ajouter une vidéo"
               className="hover:text-green-600 transition"
-              onClick={() => alert('Coming soon')}
+              onClick={() =>
+                notyf.open({
+                  type: "warning",
+                  message: "Fonctionnalité en cours de développement",
+                })
+              }
             >
               <Video size={20} />
             </button>
@@ -70,7 +82,12 @@ export default function CommentInput({ post_id, onAddComment }) {
               type="button"
               title="Ajouter un emoji"
               className="hover:text-yellow-500 transition"
-              onClick={() => alert('Coming soon')}
+              onClick={() =>
+                notyf.open({
+                  type: "warning",
+                  message: "Fonctionnalité en cours de développement",
+                })
+              }
             >
               <Smile size={20} />
             </button>
