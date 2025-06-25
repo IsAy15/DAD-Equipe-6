@@ -15,14 +15,12 @@ export default function Comment({
   onDeleteComment,
   onAddReply,
 }) {
-  const { identifier, accessToken } = useAuth();
+  const { user, accessToken } = useAuth();
   const [username, setUsername] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [usernameLoading, setUsernameLoading] = useState(true);
 
-  const [avatarUrl, setAvatarUrl] = useState(null);
   const [avatarLoading, setAvatarLoading] = useState(true);
-  const [avatarFallback, setAvatarFallback] = useState(null);
   
   const isEditing = editingCommentId === comment._id;
   const [editedContent, setEditedContent] = useState(comment.content);
@@ -98,17 +96,17 @@ export default function Comment({
   const handleLike = async () => {
     try {
       setError(null)
-      const alreadyLiked = likes.includes(identifier);
+      const alreadyLiked = likes.includes(user.id);
 
       if (alreadyLiked) {
         const result = await unlikeComment(comment._id, accessToken);
         if (result.success) {
-          setLikes((prev) => prev.filter((id) => id !== identifier));
+          setLikes((prev) => prev.filter((id) => id !== user.id));
         }
       } else {
         const result = await likeComment(comment._id, accessToken);
         if (result.success) {
-          setLikes((prev) => [...prev, identifier]);
+          setLikes((prev) => [...prev, user.id]);
         }
       }
     } catch (error) {
@@ -184,7 +182,7 @@ export default function Comment({
   return (
     <>
   <div className="relative flex flex-col gap-2 p-2">
-    {comment.author === identifier && !isEditing && (
+    {comment.author === user.id && !isEditing && (
       <>
         <button
           onClick={() => setEditingCommentId(comment._id)}
@@ -302,10 +300,10 @@ export default function Comment({
             >
               <div
                 className={`p-1 rounded-full ${
-                  likes.includes(identifier) ? "text-red-600" : "bg-transparent text-base-content"
+                  likes.includes(user.id) ? "text-red-600" : "bg-transparent text-base-content"
                 }`}
               >
-                <Heart size={14} fill={likes.includes(identifier) ? "currentColor" : "none"} />
+                <Heart size={14} fill={likes.includes(user.id) ? "currentColor" : "none"} />
               </div>
               {likes.length}
             </button>

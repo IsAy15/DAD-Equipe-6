@@ -1,5 +1,4 @@
 import Post from "@/components/Post";
-import CommentsExpander from "@/components/comment/CommentsExpander"
 
 export default function Feed({ posts, loadingPosts }) {
   return (

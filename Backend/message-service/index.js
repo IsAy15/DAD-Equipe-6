@@ -6,7 +6,8 @@ require('dotenv').config();
 
 const app = express();
 const cors = require("cors");
-app.use(cors());
+const corsOptions = require('./config/corsOptions');
+app.use(cors(corsOptions));
 const port = 3002;
 app.use(express.json());
 app.use('/messages', messageRoutes);

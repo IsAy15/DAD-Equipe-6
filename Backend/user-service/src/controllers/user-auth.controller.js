@@ -71,6 +71,8 @@ exports.storeRefreshToken = async (req, res) => {
   const { userId } = req.params;
   const { refreshToken } = req.body;
 
+    console.log(userId);
+
   if (!refreshToken) {
     return res.status(400).json({ message: "Missing refresh token" });
   }

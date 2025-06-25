@@ -1,7 +1,8 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
-import { registerUser, loginUser, fetchUserProfile } from "@/utils/api";
+import { registerUser, loginUser, fetchUserProfile, refreshToken } from "@/utils/api";
 import Cookies from "js-cookie";
+import { bindAuthContext, bindLogout } from '@/utils/api';
 
 const AuthContext = createContext();
 
@@ -9,6 +10,11 @@ export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
   const [identifier, setIdentifier] = useState(null);
   const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    bindAuthContext(setAccessTokenFromApi);
+    bindLogout(logout);
+  }, []);
 
   useEffect(() => {
     // Vérifie si un token est stocké dans les cookies
@@ -37,6 +43,15 @@ export const AuthProvider = ({ children }) => {
     };
     fetchUser();
   }, [identifier]);
+
+  const setAccessTokenFromApi = (newAccessToken) => {
+    setAccessToken(newAccessToken);
+    Cookies.set("accessToken", newAccessToken, {
+          secure: true,
+          sameSite: "strict",
+          expires: 7,
+        });
+  }
 
   // — Inscription
   const register = async (email, username, password) => {

@@ -67,6 +67,7 @@ services:
     environment:
       - USER_SERVICE_URL=http://user-service:3001
       - ACCESS_JWT_KEY=dazhbdajbdjadakd
+      - REFRESH_TOKEN_SECRET=djendiebdeuibdeuidiue
     restart: unless-stopped
     ports:
       - "3000:3000"
