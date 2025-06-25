@@ -269,19 +269,13 @@ module.exports = {
 
   getPostById: async (req, res) => {
     const postId = req.params.post_id;
-    const userID = req.userId;
+
     if (!postId) {
       return res.status(400).json({ message: "Post ID is required" });
     }
 
     try {
       const post = await Post.findById(postId).lean().exec();
-
-      if(userID){
-        post.isLiked = post.likes.includes(userID);
-      }else{
-        post.isLiked = false;
-      }
 
       if (!post) {
         return res.status(404).json({ message: "Post not found" });

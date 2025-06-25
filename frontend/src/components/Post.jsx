@@ -3,12 +3,17 @@ import UserAvatar from "./UserAvatar";
 import LikeButton from "./LikeButton";
 import { likeBreeze, fetchUserProfile } from "@/utils/api";
 import React, { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/authcontext";
 
 export default function Post({ post }) {
   const [author, setAuthor] = useState(null);
+    const { identifier } = useAuth(); // récupère l'id de l'utilisateur connecté
+  const isLiked = post.likes.includes(identifier)
 
+
+  console.log(isLiked, "isliked");
   useEffect(() => {
-    console.log(post);
+  
     async function loadAuthor() {
       try {
         const authorProfile = await fetchUserProfile(post.author);
@@ -50,7 +55,7 @@ export default function Post({ post }) {
           })}
         >
           {new Date(post.createdAt).toLocaleDateString("fr-FR")}
-          <LikeButton active={post.isLiked} count={post.likesCount} onLike={likeBreeze} idToLike={post._id}  />
+          <LikeButton isLiked={isLiked} count={post.likesCount} onLike={likeBreeze} idToLike={post._id}  />
         </span>
       </div>
       <p>{post.content}</p>

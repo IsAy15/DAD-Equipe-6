@@ -2,6 +2,7 @@ const router = require("express").Router();
 const postController = require("../controllers/post.controller");
 const { validateUrlObjectId } = require("../middlewares/validateIds");
 const verifyJWT = require("../middlewares/verifyJWT");
+const addIsLikedMiddleware = require("../middlewares/addIsLikedMiddleware");
 
 // Routes for /api/posts
 
@@ -155,11 +156,11 @@ const verifyJWT = require("../middlewares/verifyJWT");
 
 router.get(
   "/byuser/:user_id",
-  [validateUrlObjectId("user_id"), verifyJWT],
+  [addIsLikedMiddleware, validateUrlObjectId("user_id"), verifyJWT],
   postController.getPostsByUserId
 );
 
-router.get("/feed", verifyJWT, postController.getPostsOfSubscribdedTo);
+router.get("/feed", [ verifyJWT,addIsLikedMiddleware], postController.getPostsOfSubscribdedTo);
 
 router.post("/", verifyJWT, postController.createPost);
 
@@ -177,19 +178,19 @@ router.delete(
 
 router.get(
   "/:post_id",
-  validateUrlObjectId("post_id"),
+  [validateUrlObjectId("post_id"),addIsLikedMiddleware],
   postController.getPostById
 );
 
-router.get("/search/recent", verifyJWT, postController.searchRecentPostsByTag);
+router.get("/search/recent", [verifyJWT,addIsLikedMiddleware], postController.searchRecentPostsByTag);
 router.get(
   "/search/liked",
-  verifyJWT,
+  [verifyJWT,addIsLikedMiddleware],
   postController.searchMostLikedPostsByTag
 );
 router.get(
   "/search/popular",
-  verifyJWT,
+  [verifyJWT,addIsLikedMiddleware],
   postController.searchPopularPostsByTag
 );
 
