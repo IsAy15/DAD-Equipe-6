@@ -9,9 +9,11 @@
     "registerTitle": "注册",
     "loginDescription": "登录以访问您的账户",
     "registerDescription": "创建账户以开始使用",
+    "identifier": "用户名或邮箱",
+    "identifierPlaceholder": "请输入用户名或邮箱",
     "username": "用户名",
     "usernamePlaceholder": "请输入用户名",
-    "usernameError": "用户名无效/已被占用",
+    "usernameError": "用户名无效或已被占用",
     "email": "邮箱",
     "emailPlaceholder": "请输入邮箱",
     "emailError": "邮箱地址无效",
@@ -46,10 +48,46 @@
     "title": "Breezy",
     "home": "首页",
     "profile": "个人资料",
+    "search": "搜索",
+    "breeze": "Breeze",
+    "notifications": "通知",
+    "messages": "消息",
     "settings": "设置",
     "theme": "主题",
     "language": "语言",
-    "css_components": "CSS组件",
-    "js_components": "JS组件"
+    "logout": "登出"
+  },
+  "AppearanceSettings": {
+    "theme": "主题",
+    "lightTheme": "浅色主题",
+    "darkTheme": "深色主题",
+    "blackTheme": "黑色主题",
+    "systemTheme": "系统主题",
+    "language": "语言"
+  },
+  "Feed": {
+    "loading": "正在加载动态...",
+    "noPosts": "未找到帖子"
+  },
+  "profileCard": {
+    "userNotFound": "未找到用户"
+  },
+  "Comment": {
+    "cancel": "取消",
+    "send": "发送",
+    "save": "保存",
+    "replyTo": "回复"
+  },
+  "CommentInput": {
+    "placeholder": "写评论...",
+    "addImage": "添加图片",
+    "addVideo": "添加视频",
+    "featureInDevelopment": "该功能正在开发中",
+    "addEmoji": "添加表情"
+  },
+  "CommmentsExpanded": {
+    "errorFetchComments": "获取评论时出错",
+    "noComments": "未找到评论",
+    "showMore": "显示更多"
   }
 }

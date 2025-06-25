@@ -9,6 +9,11 @@
     "loginTitle": "Anmelden",
     "registerDescription": "Erstellen Sie ein Konto, um zu starten",
     "loginDescription": "Melden Sie sich an, um auf Ihr Konto zuzugreifen",
+    "identifier": "Benutzername oder E-Mail",
+    "identifierPlaceholder": "Geben Sie Ihren Benutzernamen oder Ihre E-Mail ein",
+    "username": "Benutzername",
+    "usernamePlaceholder": "Geben Sie Ihren Benutzernamen ein",
+    "usernameError": "Ungültiger oder bereits vergebener Benutzername",
     "email": "E-Mail",
     "emailPlaceholder": "Geben Sie Ihre E-Mail ein",
     "emailError": "Ungültige E-Mail-Adresse",
@@ -32,16 +37,16 @@
     },
     "passwordConfirmation": "Passwort bestätigen",
     "passwordsDoNotMatch": "Passwörter stimmen nicht überein",
+    "acceptTermsText": "Ich akzeptiere die",
+    "acceptTermsLink": "Datenschutzrichtlinie",
     "rememberMe": "Angemeldet bleiben",
     "forgotPassword": "Passwort vergessen?",
     "loginButton": "Anmelden",
-    "loginLoading": "Anmeldung läuft...",
+    "loginLoading": "Anmeldung läuft…",
     "registerButton": "Registrieren",
     "noAccount": "Sie haben noch kein Konto?",
     "alreadyHaveAccount": "Sie haben bereits ein Konto?",
     "createAccount": "Konto erstellen",
-    "acceptTermsText": "Ich akzeptiere die",
-    "acceptTermsLink": "Datenschutzrichtlinie",
     "or": "oder",
     "loginWithGoogle": "Mit Google anmelden",
     "registerwithGoogle": "Mit Google registrieren"
@@ -50,10 +55,46 @@
     "title": "Breezy",
     "home": "Startseite",
     "profile": "Profil",
+    "search": "Suche",
+    "breeze": "Breeze",
+    "notifications": "Benachrichtigungen",
+    "messages": "Nachrichten",
     "settings": "Einstellungen",
     "theme": "Thema",
     "language": "Sprache",
-    "css_components": "CSS-Komponenten",
-    "js_components": "JS-Komponenten"
+    "logout": "Abmelden"
+  },
+  "AppearanceSettings": {
+    "theme": "Thema",
+    "lightTheme": "Helles Thema",
+    "darkTheme": "Dunkles Thema",
+    "blackTheme": "Schwarzes Thema",
+    "systemTheme": "System-Standard",
+    "language": "Sprache"
+  },
+  "Feed": {
+    "loading": "Feed wird geladen...",
+    "noPosts": "Keine Beiträge gefunden"
+  },
+  "profileCard": {
+    "userNotFound": "Benutzer nicht gefunden"
+  },
+  "Comment": {
+    "cancel": "Abbrechen",
+    "send": "Senden",
+    "save": "Speichern",
+    "replyTo": "Antworten auf"
+  },
+  "CommentInput": {
+    "placeholder": "Schreibe einen Kommentar...",
+    "addImage": "Bild hinzufügen",
+    "addVideo": "Video hinzufügen",
+    "featureInDevelopment": "Diese Funktion ist in Entwicklung",
+    "addEmoji": "Emoji hinzufügen"
+  },
+  "CommmentsExpanded": {
+    "errorFetchComments": "Fehler beim Laden der Kommentare",
+    "noComments": "Keine Kommentare gefunden",
+    "showMore": "Mehr anzeigen"
   }
 }

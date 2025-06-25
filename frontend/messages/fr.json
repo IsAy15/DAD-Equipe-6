@@ -91,8 +91,7 @@
       "following": "Abonné",
       "unfollow": "Se désabonner",
       "friends": "Amis"
-    },
-    "unfollowConfirm": "Se désabonner de votre ami ?"
+    }
   },
   "EditProfile": {
     "title": "Modifier le profil",
@@ -117,5 +116,30 @@
     "typeMessage": "Tapez votre message ici...",
     "send": "Envoyer",
     "loading": "Chargement des messages..."
+  },
+  "Feed": {
+    "loading": "Chargement du fil d'actualité...",
+    "noPosts": "Aucun post trouvé"
+  },
+  "profileCard": {
+    "userNotFound": "Utilisateur non trouvé"
+  },
+  "Comment": {
+    "cancel": "Annuler",
+    "send": "Envoyer",
+    "save": "Enregistrer",
+    "replyTo": "Répondre à"
+  },
+  "CommentInput": {
+    "placeholder": "Écrivez un commentaire...",
+    "addImage": "Ajouter une image",
+    "addVideo": "Ajouter une vidéo",
+    "featureInDevelopment": "Cette fonctionnalité est en cours de développement",
+    "addEmoji": "Ajouter un emoji"
+  },
+  "CommmentsExpanded": {
+    "errorFetchComments": "Erreur lors de la récupération des commentaires",
+    "noComments": "Aucun commentaire trouvé",
+    "showMore": "Afficher plus"
   }
 }
