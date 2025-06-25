@@ -5,7 +5,7 @@ import { getUserLocale, setUserLocale } from "../services/locale";
 import { getUserTheme, setUserTheme } from "../services/theme";
 
 export default function AppearanceSettings() {
-  const t = useTranslations("Navbar");
+  const t = useTranslations("AppearanceSettings");
   const [theme, setTheme] = useState(null);
   const [language, setLanguage] = useState(null);
 
@@ -30,7 +30,7 @@ export default function AppearanceSettings() {
   };
 
   return (
-    <div className="p-4 flex justify-end flex-wrap gap-2">
+    <>
       <div className="dropdown relative">
         <button
           id="dropdown-default"
@@ -55,7 +55,18 @@ export default function AppearanceSettings() {
               type="radio"
               name="theme-dropdown"
               className="theme-controller btn btn-text w-full justify-start"
-              aria-label="Default"
+              aria-label={t("systemTheme")}
+              value=""
+              checked={theme === null || theme === ""}
+              onChange={handleThemeChange}
+            />
+          </li>
+          <li>
+            <input
+              type="radio"
+              name="theme-dropdown"
+              className="theme-controller btn btn-text w-full justify-start"
+              aria-label={t("lightTheme")}
               value="light"
               checked={theme === "light"}
               onChange={handleThemeChange}
@@ -66,7 +77,7 @@ export default function AppearanceSettings() {
               type="radio"
               name="theme-dropdown"
               className="theme-controller btn btn-text w-full justify-start"
-              aria-label="Dark"
+              aria-label={t("darkTheme")}
               value="dark"
               checked={theme === "dark"}
               onChange={handleThemeChange}
@@ -77,7 +88,7 @@ export default function AppearanceSettings() {
               type="radio"
               name="theme-dropdown"
               className="theme-controller btn btn-text w-full justify-start"
-              aria-label="Black"
+              aria-label={t("blackTheme")}
               value="black"
               checked={theme === "black"}
               onChange={handleThemeChange}
@@ -192,8 +203,19 @@ export default function AppearanceSettings() {
               onChange={handleLanguageChange}
             />
           </li>
+          <li>
+            <input
+              type="radio"
+              name="language-dropdown"
+              className="language-controller btn btn-text w-full justify-start"
+              aria-label="中文"
+              value="zh"
+              checked={language === "zh"}
+              onChange={handleLanguageChange}
+            />
+          </li>
         </ul>
       </div>
-    </div>
+    </>
   );
 }

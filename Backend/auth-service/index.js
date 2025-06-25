@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const mongoose = require("mongoose");
+const cookieParser = require('cookie-parser');
 require("dotenv").config();
 const swaggerDocs = require("./utils/swagger");
 const { logger } = require("./src/middlewares/logger");
@@ -10,6 +11,7 @@ const { logger } = require("./src/middlewares/logger");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logger);
+app.use(cookieParser());
 
 // Allow all origins by default
 const cors = require("cors");

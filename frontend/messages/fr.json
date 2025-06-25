@@ -4,10 +4,13 @@
     "description": "Ceci est la page d'accueil"
   },
   "Auth": {
+    "title": "Connexion",
     "loginTitle": "Connexion",
     "registerTitle": "Inscription",
     "loginDescription": "Connectez-vous pour accéder à votre compte",
     "registerDescription": "Créez un compte pour commencer",
+    "identifier": "Nom d'utilisateur ou email",
+    "identifierPlaceholder": "Entrez votre nom d'utilisateur ou email",
     "username": "Nom d'utilisateur",
     "usernamePlaceholder": "Entrez votre nom d'utilisateur",
     "usernameError": "Nom d'utilisateur invalide/déjà pris",
@@ -25,10 +28,11 @@
       "Ultra fort"
     ],
     "passwordRequirements": "Votre mot de passe doit contenir :",
+    "passwordRecommendations": "Recommandations pour un mot de passe fort :",
     "passwordRequirementsList": {
-      "min-length": "Au moins 8 caractères",
-      "lowercase": "Au moins une lettre majuscule",
-      "uppercase": "Au moins une lettre minuscule",
+      "min-length": "Au moins 6 caractères",
+      "lowercase": "Au moins une lettre minuscule",
+      "uppercase": "Au moins une lettre majuscule",
       "numbers": "Au moins un chiffre",
       "special-characters": "Au moins un caractère spécial"
     },
@@ -52,10 +56,66 @@
     "title": "Breezy",
     "home": "Accueil",
     "profile": "Profil",
-    "settings": "Paramètres",
+    "search": "Rechercher",
+    "breeze": "Souffler",
+    "notifications": "Notifications",
+    "messages": "Messages",
     "theme": "Thème",
     "language": "Langue",
-    "css_components": "Composants CSS",
-    "js_components": "Composants JS"
+    "logout": "Se déconnecter"
+  },
+  "AppearanceSettings": {
+    "theme": "Thème",
+    "lightTheme": "Thème clair",
+    "darkTheme": "Thème sombre",
+    "blackTheme": "Thème noir",
+    "systemTheme": "Thème système",
+    "language": "Langue"
+  },
+  "Profile": {
+    "title": "Profil",
+    "userNotFound": "Utilisateur non trouvé",
+    "editProfile": "Modifier le profil",
+    "changePassword": "Changer le mot de passe",
+    "profilePicture": "Photo de profil",
+    "username": "Nom d'utilisateur",
+    "email": "Email",
+    "bio": "Bio",
+    "joined": "Inscrit depuis",
+    "follower": "abonné",
+    "followers": "abonnés",
+    "following": "abonnement",
+    "followings": "abonnements",
+    "status": {
+      "follow": "Suivre",
+      "following": "Abonné",
+      "unfollow": "Se désabonner",
+      "friends": "Amis"
+    },
+    "unfollowConfirm": "Se désabonner de votre ami ?"
+  },
+  "EditProfile": {
+    "title": "Modifier le profil",
+    "username": "Nom d'utilisateur",
+    "usernamePlaceholder": "Entrez votre nom d'utilisateur",
+    "usernameError": "Nom d'utilisateur invalide/déjà pris",
+    "email": "Email",
+    "emailPlaceholder": "Entrez votre email",
+    "emailError": "Adresse email invalide",
+    "bio": "Bio",
+    "bioPlaceholder": "Parlez de vous en quelques mots",
+    "profilePicture": "Photo de profil",
+    "saveChanges": "Enregistrer",
+    "cancel": "Annuler"
+  },
+  "Messages": {
+    "title": "Messages",
+    "noMessages": "Aucun message trouvé",
+    "newMessage": "Nouveau message",
+    "searchPlaceholder": "Rechercher des messages ou des utilisateurs",
+    "sendMessage": "Envoyer un message",
+    "typeMessage": "Tapez votre message ici...",
+    "send": "Envoyer",
+    "loading": "Chargement des messages..."
   }
 }

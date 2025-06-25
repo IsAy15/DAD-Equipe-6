@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 /**
  * @swagger
@@ -16,12 +16,7 @@ const mongoose = require('mongoose');
  *           type: array
  *           items:
  *             type: string
- *         imageUrls:
- *           type: array
- *           items:
- *             type: string
- *             format: uri
- *         videoUrls:
+ *         mediaUrls:
  *           type: array
  *           items:
  *             type: string
@@ -36,12 +31,7 @@ const mongoose = require('mongoose');
  *           type: array
  *           items:
  *             type: string
- *         imageUrls:
- *           type: array
- *           items:
- *             type: string
- *             format: uri
- *         videoUrls:
+ *         mediaUrls:
  *           type: array
  *           items:
  *             type: string
@@ -77,18 +67,12 @@ const mongoose = require('mongoose');
  *             type: string
  *             format: objectId
  *           example: []
- *         imageUrls:
+ *         mediaUrls:
  *           type: array
  *           items:
  *             type: string
  *             format: uri
  *           example: ["https://example.com/image1.jpg"]
- *         videoUrls:
- *           type: array
- *           items:
- *             type: string
- *             format: uri
- *           example: ["https://example.com/video1.mp4"]
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -98,14 +82,31 @@ const mongoose = require('mongoose');
  *           format: date-time
  *           example: "2023-01-02T15:30:00Z"
  */
-const PostSchema = new mongoose.Schema({
-    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+const PostSchema = new mongoose.Schema(
+  {
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     content: { type: String, maxlength: 280, required: true },
     tags: [String],
-    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
-    imageUrls: [String],
-    videoUrls: [String]
-}, { timestamps: true });
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+    mediaUrls: [String],
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Post', PostSchema);
+PostSchema.virtual("likesCount").get(function () {
+  return this.likes.length;
+});
+
+PostSchema.virtual("commentsCount").get(function () {
+  return this.comments.length;
+});
+
+PostSchema.set("toJSON", { virtuals: true });
+PostSchema.set("toObject", { virtuals: true });
+
+module.exports = mongoose.model("Post", PostSchema);

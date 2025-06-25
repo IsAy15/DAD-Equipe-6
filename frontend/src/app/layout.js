@@ -1,7 +1,7 @@
 import "./globals.css";
+import "notyf/notyf.min.css";
 
 import FlyonuiScript from "../components/FlyonuiScript";
-import DefaultTheme from "../components/DefaultTheme";
 
 import { NextIntlClientProvider } from "next-intl";
 
@@ -9,6 +9,8 @@ import { getUserLocale } from "../services/locale";
 import { getUserTheme } from "../services/theme";
 
 import { AuthProvider } from "../contexts/authcontext";
+
+import { NotyfProvider } from "../contexts/NotyfContext";
 
 export default async function RootLayout({ children }) {
   /* ------------------------------------------------------------------ */
@@ -30,11 +32,10 @@ export default async function RootLayout({ children }) {
         {/* Provider d’authentification : tout le site a accès à useAuth */}
         <AuthProvider>
           <body>
-            <DefaultTheme /> {/* applique le thème Tailwind/DaisyUI */}
-            {children} {/* pages rendues ici */}
-            <script src="../../node_modules/flyonui/flyonui.js"></script>
+            <NotyfProvider>
+              {children} {/* pages rendues ici */}
+            </NotyfProvider>
           </body>
-
           {/* Scripts éventuels de ta lib Flyonui */}
           <FlyonuiScript />
         </AuthProvider>

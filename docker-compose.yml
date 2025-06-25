@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   nginx:
     image: nginx:latest
@@ -23,6 +21,41 @@ services:
       - "27017:27017"
     volumes:
       - mongo-user-data:/data/db
+    networks:
+      - app-network
+
+  mongo-message:
+    image: mongo
+    container_name: mongo-message
+    restart: unless-stopped
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo-message-data:/data/db
+    networks:
+      - app-network
+
+  mongo-notification:
+    image: mongo
+    container_name: mongo-notification
+    restart: unless-stopped
+    ports:
+      - "27020:27017"
+    volumes:
+      - mongo-notification-data:/data/db
+    networks:
+      - app-network
+
+  notification-service:
+    build: ./Backend/notification-service
+    container_name: notification-service
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    depends_on:
+      - mongo-notification
+    environment:
+      - MONGO_URI=mongodb://mongo-notification:27017/notification-db
     networks:
       - app-network
 
@@ -81,6 +114,21 @@ services:
     volumes:
       - ./Backend/user-service/logs:/home/logs/user-service
 
+  message-service:
+    build: ./Backend/message-service
+    container_name: message-service
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mongo-message
+    environment:
+      - MONGO_URI=mongodb://mongo-message:27017/messages-db
+    networks:
+      - app-network
+    volumes:
+      - ./Backend/message-service/logs:/home/logs/message-service
+
   frontend:
     build: ./frontend
     container_name: frontend
@@ -93,6 +141,8 @@ services:
 volumes:
   mongo-user-data:
   mongo-post-data:
+  mongo-message-data:
+  mongo-notification-data:
 
 networks:
   app-network:

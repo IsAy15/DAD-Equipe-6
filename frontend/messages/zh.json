@@ -1,0 +1,55 @@
+{
+  "Index": {
+    "title": "欢迎",
+    "description": "这是主页"
+  },
+  "Auth": {
+    "title": "登录",
+    "loginTitle": "登录",
+    "registerTitle": "注册",
+    "loginDescription": "登录以访问您的账户",
+    "registerDescription": "创建账户以开始使用",
+    "username": "用户名",
+    "usernamePlaceholder": "请输入用户名",
+    "usernameError": "用户名无效/已被占用",
+    "email": "邮箱",
+    "emailPlaceholder": "请输入邮箱",
+    "emailError": "邮箱地址无效",
+    "password": "密码",
+    "passwordLevel": "密码强度等级：",
+    "passwordLevels": ["空", "弱", "中", "强", "非常强", "极强"],
+    "passwordRequirements": "您的密码必须包含：",
+    "passwordRequirementsList": {
+      "min-length": "至少8个字符",
+      "lowercase": "至少一个小写字母",
+      "uppercase": "至少一个大写字母",
+      "numbers": "至少一个数字",
+      "special-characters": "至少一个特殊字符"
+    },
+    "passwordConfirmation": "确认密码",
+    "passwordsDoNotMatch": "两次输入的密码不一致",
+    "acceptTermsText": "我接受",
+    "acceptTermsLink": "隐私政策",
+    "rememberMe": "记住我",
+    "forgotPassword": "忘记密码？",
+    "loginButton": "登录",
+    "loginLoading": "正在登录...",
+    "registerButton": "注册",
+    "noAccount": "还没有账户？",
+    "alreadyHaveAccount": "已有账户？",
+    "createAccount": "创建账户",
+    "or": "或",
+    "loginWithGoogle": "使用谷歌登录",
+    "registerwithGoogle": "使用谷歌注册"
+  },
+  "Navbar": {
+    "title": "Breezy",
+    "home": "首页",
+    "profile": "个人资料",
+    "settings": "设置",
+    "theme": "主题",
+    "language": "语言",
+    "css_components": "CSS组件",
+    "js_components": "JS组件"
+  }
+}

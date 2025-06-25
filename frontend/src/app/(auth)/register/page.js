@@ -2,10 +2,49 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import AdvanceForms from "@/components/AdvanceForms";
+import { useAuth } from "@/contexts/authcontext";
+import { useNotyf } from "@/contexts/NotyfContext";
+import axios from "axios";
+import Cookies from "js-cookie";
+
+const apiClient = axios.create({
+  baseURL: "http://localhost:8080",
+  timeout: 5000,
+  withCredentials: true, // important pour les cookies
+});
+
+// Intercepteur de réponse
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    // Si 401 et pas déjà tenté
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+      try {
+        const userId = Cookies.get("userId");
+        const { data } = await apiClient.post("/refresh-token", { userId });
+        Cookies.set("accessToken", data.accessToken); // ou stocke-le dans le state/context
+        originalRequest.headers["Authorization"] = `Bearer ${data.accessToken}`;
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        // Redirige vers login ou logout
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default function RegisterForm() {
   const t = useTranslations("Auth");
+
+  const { register } = useAuth();
+
+  const notyf = useNotyf();
 
   const [username, setUsername] = useState("");
   const [usernameValid, setUsernameValid] = useState(true);
@@ -14,6 +53,25 @@ export default function RegisterForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordsMatch, setPasswordsMatch] = useState(true);
+  const [passwordsRequirements, setPasswordsRequirements] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
+    try {
+      await register(email, username, password);
+      router.push(searchParams.get("from") || "/home");
+    } catch (error) {
+      setError(error.message || "auth failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Vérification nom d'utilisateur en temps réel
   const handleUsernameChange = (e) => {
@@ -39,6 +97,22 @@ export default function RegisterForm() {
     setPasswordsMatch(
       value === confirmPassword || confirmPassword.length === 0
     );
+
+    // Check if the min-length rule element has the class 'strong-password-active:text-success'
+    const minLengthEl = document.querySelector(
+      '[data-pw-strength-rule="min-length"]'
+    );
+    const lowercaseEl = document.querySelector(
+      '[data-pw-strength-rule="lowercase"]'
+    );
+    if (
+      minLengthEl &&
+      minLengthEl.classList.contains("active") &&
+      lowercaseEl &&
+      lowercaseEl.classList.contains("active")
+    ) {
+      setPasswordsRequirements(true);
+    }
   };
 
   const handleConfirmPasswordChange = (e) => {
@@ -47,17 +121,21 @@ export default function RegisterForm() {
     setPasswordsMatch(password === value || value.length === 0);
   };
 
+  const handleTermsChange = (e) => {
+    setTermsAccepted(e.target.checked);
+  };
+
   return (
     <div className="bg-base-100 flex h-auto min-h-screen items-center justify-center overflow-x-hidden py-10">
       <div className="relative flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="bg-base-100 shadow-base-300/20 z-1 w-full space-y-6 rounded-xl p-6 shadow-md sm:min-w-md lg:p-8">
           <div className="flex items-center gap-3">
-            <img
+            {/* <img
               src="https://cdn.flyonui.com/fy-assets//logo/logo.png"
               className="size-8"
               alt="brand-logo"
-            />
-            <h2 className="text-base-content text-xl font-bold">FlyonUI</h2>
+            /> */}
+            <h2 className="text-base-content text-xl font-bold">Breezy</h2>
           </div>
           <div>
             <h3 className="text-base-content mb-1.5 text-2xl font-semibold">
@@ -66,10 +144,7 @@ export default function RegisterForm() {
             <p className="text-base-content/80">{t("registerDescription")}</p>
           </div>
           <div className="space-y-4">
-            <form
-              className="mb-4 space-y-4"
-              onSubmit={(e) => e.preventDefault()}
-            >
+            <form className="mb-4 space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="label-text" htmlFor="userName">
                   {t("username")}*
@@ -106,13 +181,13 @@ export default function RegisterForm() {
                   <span className="text-error text-sm">{t("emailError")}</span>
                 )}
               </div>
-              <div className="max-w-sm">
+              <div>
                 <div className="flex mb-2">
                   <div className="flex-1">
                     <input
                       type="password"
                       id="password-hints"
-                      className="input"
+                      className="input w-full"
                       placeholder={t("password")}
                       value={password}
                       onChange={handlePasswordChange}
@@ -171,6 +246,9 @@ export default function RegisterForm() {
                       ></span>
                       {t.raw("passwordRequirementsList")["lowercase"]}
                     </li>
+                    <h6 className="my-2 text-base font-semibold text-base-content">
+                      {t("passwordRecommendations")}
+                    </h6>
                     <li
                       data-pw-strength-rule="uppercase"
                       className="strong-password-active:text-success flex items-center gap-x-2"
@@ -242,6 +320,8 @@ export default function RegisterForm() {
                   type="checkbox"
                   className="checkbox checkbox-primary"
                   id="policyagreement"
+                  checked={termsAccepted}
+                  onChange={handleTermsChange}
                 />
                 <label
                   className="label-text text-base-content/80 p-0 text-base"
@@ -249,15 +329,36 @@ export default function RegisterForm() {
                 >
                   {t("acceptTermsText")}{" "}
                   <a
-                    href="#"
+                    href="/register/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="link link-animated link-primary font-normal"
                   >
                     {t("acceptTermsLink")}
                   </a>
                 </label>
               </div>
-              <button className="btn btn-lg btn-primary btn-gradient btn-block">
-                {t("registerButton")}
+              <button
+                type="submit"
+                disabled={
+                  !(
+                    usernameValid &&
+                    username != "" &&
+                    emailValid &&
+                    email != "" &&
+                    confirmPassword != "" &&
+                    passwordsMatch &&
+                    passwordsRequirements &&
+                    termsAccepted
+                  ) || loading
+                }
+                className="btn btn-lg btn-primary btn-gradient btn-block"
+              >
+                {loading ? (
+                  <span className="loading loading-dots"></span>
+                ) : (
+                  t("registerButton")
+                )}
               </button>
             </form>
             <div className="divider">{t("alreadyHaveAccount")}</div>
@@ -270,7 +371,15 @@ export default function RegisterForm() {
               </a>
             </p>
             <div className="divider">{t("or")}</div>
-            <button className="btn btn-text btn-block">
+            <button
+              className="btn btn-text btn-block"
+              onClick={() =>
+                notyf.open({
+                  type: "warning",
+                  message: "Fonctionnalité en cours de développement",
+                })
+              }
+            >
               <img
                 src="https://cdn.flyonui.com/fy-assets/blocks/marketing-ui/brand-logo/google-icon.png"
                 alt="google icon"
@@ -283,4 +392,13 @@ export default function RegisterForm() {
       </div>
     </div>
   );
+}
+
+export async function refreshAccessToken(userId) {
+  const response = await apiClient.post(
+    "/refresh-token",
+    { userId },
+    { withCredentials: true }
+  );
+  return response.data.accessToken;
 }

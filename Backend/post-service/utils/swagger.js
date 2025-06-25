@@ -1,20 +1,58 @@
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
+const { SchemaTypes } = require('mongoose');
 const version = require('../package.json').version;
 
 const swaggeroptOptions = { 
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'Post Service API',
-            version,
-            description: 'API documentation for the Post Service',
-            server: "http://localhost:3003",
-        },
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Post Service API',
+      version,
+      description: 'API documentation for the Post Service',
     },
-    apis: ['./src/routes/*.js', './src/models/*.js'],
+    servers: [
+      {
+        url: "http://localhost:3003",
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+      responses: {
+        UnauthorizedError: {
+          description: 'Access token is missing or invalid',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  error: {
+                    type: 'string',
+                    example: 'Access token is missing or invalid',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+  },
+  apis: ['./src/routes/*.js', './src/models/*.js'],
 };
+
 
 const swaggerSpec = swaggerJsDoc(swaggeroptOptions);
 
