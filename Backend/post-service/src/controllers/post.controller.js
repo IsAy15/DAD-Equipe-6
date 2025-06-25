@@ -52,10 +52,10 @@ module.exports = {
         .exec();
 
       if (!feed) {
-        return res.status(200).json({ feed: [] });
+        return res.status(200).json([]);
       }
 
-      return res.status(200).json({ feed: feed });
+      return res.status(200).json(feed);
     } catch (err) {
       return res
         .status(500)
@@ -65,8 +65,8 @@ module.exports = {
 
   createPost: async (req, res) => {
     try {
-      const user_id = req.userId;
-      const { content, tags, imageUrls, videoUrls } = req.body;
+        const user_id = req.userId;
+        const { content, tags, imageUrls, videoUrls } = req.body;
 
       // TODO : Check if the author is the same as the logged-in user
       // TODO : Validate the input data

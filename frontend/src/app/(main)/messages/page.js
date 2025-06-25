@@ -1,86 +1,146 @@
 "use client";
 
-import { useState } from "react";
+import UserAvatar from "@/components/UserAvatar";
+import { fetchUserProfile, fetchUserMessages } from "@/utils/api";
+import { useAuth } from "@/contexts/authcontext";
+import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import React from "react";
 
-const mockConversations = [
-  {
-    id: 1,
-    user: "Alice Dupont",
-    lastMessage: "Salut, tu as vu le dernier article ?",
-    time: "1h",
-    unread: true,
-  },
-  {
-    id: 2,
-    user: "Bob Martin",
-    lastMessage: "Merci pour le feedback 🙂",
-    time: "3h",
-    unread: false,
-  },
-  {
-    id: 3,
-    user: "Charlie",
-    lastMessage: "On se retrouve demain à 10h ?",
-    time: "1j",
-    unread: true,
-  },
-  {
-    id: 4,
-    user: "Dev Team",
-    lastMessage: "Déploiement terminé 🚀",
-    time: "2j",
-    unread: false,
-  },
-];
+const loadingContent = (
+  <li
+    className={`p-4 flex items-center bg-base-100 hover:bg-primary/50 active:bg-primary/80 focus:bg-primary/50 touch-active:bg-primary/50`}
+    onTouchStart={(e) => e.currentTarget.classList.add("bg-primary/50")}
+    onTouchEnd={(e) => e.currentTarget.classList.remove("bg-primary/50")}
+    onTouchCancel={(e) => e.currentTarget.classList.remove("bg-primary/50")}
+  >
+    <div className="skeleton skeleton-animated h-12 w-12 shrink-0 rounded-full"></div>
+    <div className="ml-4 flex-1">
+      <div className="skeleton skeleton-animated h-3 w-16"></div>
+      <div className="mt-2 skeleton skeleton-animated h-3 w-16"></div>
+    </div>
+    <div className="text-xs text-base-500 ml-4 self-start">
+      <div className="skeleton skeleton-animated h-3 w-16"></div>
+    </div>
+  </li>
+);
 
 export default function MessagesPage() {
-  const [conversations] = useState(mockConversations);
+  const [conversations, setConversations] = useState([]);
+  const { user, accessToken } = useAuth();
+  const t = useTranslations("Messages");
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user || !user.id) {
+      setLoading(false);
+      return;
+    }
+    async function loadMessages() {
+      try {
+        const apiResult = await fetchUserMessages(accessToken);
+        const conversationsArray = Array.isArray(apiResult)
+          ? apiResult
+          : apiResult.conversations || [];
+        const formattedConversations = await Promise.all(
+          conversationsArray.map(async (conv) => {
+            const userProfile = await fetchUserProfile(conv.user);
+            const lastMessageObj = conv.lastMessage || {};
+            let lastMessageText = lastMessageObj.content || "";
+            if (lastMessageObj.sender === user.id) {
+              lastMessageText = `Vous: ${lastMessageObj.content || ""}`;
+            }
+            return {
+              id: conv.user,
+              user: userProfile,
+              username: userProfile.username,
+              lastMessage: lastMessageText,
+              time: lastMessageObj.createdAt
+                ? new Date(lastMessageObj.createdAt).toLocaleString()
+                : "",
+              unread: lastMessageObj.isRead === false,
+            };
+          })
+        );
+        setConversations(formattedConversations);
+      } catch (error) {
+        console.error("Failed to fetch messages:", error);
+      } finally {
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
+      }
+    }
+    loadMessages();
+  }, [accessToken, user?.id]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-base-100">
+    <div className="flex flex-col bg-base-100">
       {/* Header */}
-      <div className="p-4 bg-white shadow flex items-center">
+      <div className="p-4 bg-base-100 shadow flex items-center">
         <h1 className="text-xl font-bold flex-1">Messages</h1>
-        <button aria-label="Nouveau message">
-          <span className="icon-[tabler--edit] size-6 text-gray-500"></span>
+        <button
+          className="btn btn-square btn-primary"
+          aria-label="Nouveau message"
+          onClick={() => router.push("/messages/new")}
+        >
+          <span className="icon-[tabler--edit] size-6 text-base-content"></span>
         </button>
       </div>
 
       {/* Liste des conversations */}
       <main className="flex-1 overflow-auto">
-        <ul className="divide-y divide-gray-200">
-          {conversations.map((conv) => (
-            <li
-              key={conv.id}
-              className={`p-4 flex items-center bg-white hover:bg-gray-50 ${
-                conv.unread ? "font-semibold" : "font-normal"
-              }`}
-            >
-              <div className="w-12 h-12 bg-gray-200 rounded-full shrink-0" />
-              <div className="ml-4 flex-1">
-                <p className="text-sm">{conv.user}</p>
-                <p className="mt-1 text-sm text-gray-600 truncate">
-                  {conv.lastMessage}
-                </p>
-              </div>
-              <div className="text-xs text-gray-500 ml-4 self-start">
-                {conv.time}
-              </div>
-              {conv.unread && (
-                <span className="ml-2 w-2 h-2 bg-blue-500 rounded-full" />
-              )}
-            </li>
-          ))}
+        <ul className="divide-y divide-base-content/30">
+          {loading &&
+            Array.from({ length: 3 }).map((_, i) => (
+              <React.Fragment key={i}>{loadingContent}</React.Fragment>
+            ))}
+          {!loading && conversations.length === 0 && (
+            <li className="p-4 text-base-content/80">{t("noMessages")}</li>
+          )}
+          {!loading &&
+            conversations.map((conv) => (
+              <li
+                key={conv.id}
+                className={`p-4 flex items-center bg-base-100 hover:bg-primary/50 active:bg-primary/80 focus:bg-primary/50 touch-active:bg-primary/50 ${
+                  conv.unread ? "font-semibold" : "font-normal"
+                }`}
+                onClick={() => router.push(`/messages/${conv.id}`)}
+                tabIndex={0}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    router.push(`/messages/${conv.id}`);
+                  }
+                }}
+                onTouchStart={(e) =>
+                  e.currentTarget.classList.add("bg-primary/50")
+                }
+                onTouchEnd={(e) =>
+                  e.currentTarget.classList.remove("bg-primary/50")
+                }
+                onTouchCancel={(e) =>
+                  e.currentTarget.classList.remove("bg-primary/50")
+                }
+              >
+                <UserAvatar user={conv.user} link={false} size="gs" />
+                <div className="ml-4 flex-1">
+                  <p className="text-sm">{conv.username}</p>
+                  <p className="mt-1 text-sm text-base-600 truncate">
+                    {conv.lastMessage}
+                  </p>
+                </div>
+                <div className="text-xs text-base-500 ml-4 self-start">
+                  {conv.time}
+                </div>
+                {conv.unread && (
+                  <span className="ml-2 w-2 h-2 bg-accent rounded-full" />
+                )}
+              </li>
+            ))}
         </ul>
       </main>
-
-      {/* Navigation basse */}
-      <nav className="h-14 bg-white border-t flex justify-around items-center">
-        <button className="icon-[tabler--home] size-6 text-gray-400"></button>
-        <button className="icon-[tabler--search] size-6 text-gray-400"></button>
-        <button className="icon-[tabler--bell] size-6 text-gray-400"></button>
-        <button className="icon-[tabler--message] size-6 text-blue-500"></button>
-      </nav>
     </div>
   );
 }

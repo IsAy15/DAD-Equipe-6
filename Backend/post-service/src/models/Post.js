@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 /**
  * @swagger
@@ -98,26 +98,32 @@ const mongoose = require('mongoose');
  *           format: date-time
  *           example: "2023-01-02T15:30:00Z"
  */
-const PostSchema = new mongoose.Schema({
-    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+const PostSchema = new mongoose.Schema(
+  {
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     content: { type: String, maxlength: 280, required: true },
     tags: [String],
-    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
     imageUrls: [String],
-    videoUrls: [String]
-}, { timestamps: true });
+    videoUrls: [String],
+  },
+  { timestamps: true }
+);
 
-PostSchema.virtual('likesCount').get(function () {
-    return this.likes.length;
+PostSchema.virtual("likesCount").get(function () {
+  return this.likes.length;
 });
 
-
-PostSchema.virtual('commentsCount').get(function () {
-    return this.comments.length;
+PostSchema.virtual("commentsCount").get(function () {
+  return this.comments.length;
 });
 
-PostSchema.set('toJSON', { virtuals: true });
-PostSchema.set('toObject', { virtuals: true });
+PostSchema.set("toJSON", { virtuals: true });
+PostSchema.set("toObject", { virtuals: true });
 
-module.exports = mongoose.model('Post', PostSchema);
+module.exports = mongoose.model("Post", PostSchema);

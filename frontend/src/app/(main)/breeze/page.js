@@ -11,20 +11,7 @@ export default function CreateBreathPage() {
   const [text, setText] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
-  const { identifier, accessToken } = useAuth();
-  const [userProfile, setUserProfile] = useState(null);
-
-  useEffect(() => {
-    async function loadProfile() {
-      try {
-        const profile = await fetchUserProfile(identifier);
-        setUserProfile(profile);
-      } catch (error) {
-        console.error("Failed to fetch user profile:", error);
-      }
-    }
-    loadProfile();
-  }, [identifier]);
+  const { user, accessToken } = useAuth();
 
   // Annuler et revenir en arrière
   const handleCancel = () => router.back();
@@ -78,7 +65,7 @@ export default function CreateBreathPage() {
       <main className="p-4">
         <div className="flex items-start space-x-3">
           {/* Avatar */}
-          <UserAvatar user={userProfile} link={false} size="sm" />
+          <UserAvatar user={user} link={false} size="sm" />
 
           {/* Champ texte */}
           <textarea

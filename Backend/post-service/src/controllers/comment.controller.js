@@ -12,7 +12,7 @@ module.exports = {
                 return res.status(400).json({ message: 'Post ID is required' });
             }
 
-            const postComments = await Comment.find({ post: post_id }).sort({ createdAt: -1 }).lean().exec();
+            const postComments = await Comment.find({ post: post_id, parentComment: null }).sort({ createdAt: 1 }).lean().exec();
 
             if(postComments?.length === 0) {
                 return res.status(404).json({ message: 'No comments found for this post' });
@@ -30,7 +30,7 @@ module.exports = {
     try {
         const post_id = req.params.post_id;
         const author = req.userId;
-        const { content, parentComment } = req.body;
+        const { content } = req.body;
 
         if (!post_id || !author || !content) {
             return res.status(400).json({ message: 'Post ID, author, and content are required' });
@@ -45,7 +45,8 @@ module.exports = {
             author,
             post: post_id,
             content,
-            parentComment
+            replyTo: null,
+            isReply: false
         });
 
         const savedComment = await newComment.save();
@@ -128,16 +129,15 @@ module.exports = {
     getCommentReplies: async (req, res) => {
         try{
             const comment_id = req.params.comment_id;
-            const user_id = req.userId;
 
              if (!comment_id) {
                 return res.status(400).json({ message: 'Comment_id is required' });
             }
 
-            const comments = await Comment.find({ parentComment: comment_id}).lean().exec();
+            const comments = await Comment.find({ replyTo: comment_id}).lean().exec();
 
             if(comments?.length == 0){
-                return res.status(404).json('No replies found for this comment');
+                return res.status(200).json([]);
             }
 
             return res.status(200).json(comments);
@@ -148,10 +148,32 @@ module.exports = {
         }
     },
 
+    getCommentRepliesCount: async (req, res) => {
+        try{
+            const comment_id = req.params.comment_id;
+
+             if (!comment_id) {
+                return res.status(400).json({ message: 'Comment_id is required' });
+            }
+
+            const comments = await Comment.find({ replyTo: comment_id}).lean().exec();
+
+            if(comments?.length == 0){
+                return res.status(200).json({ repliesCount: 0});
+            }
+
+            return res.status(200).json({ repliesCount: comments.length});
+
+        }catch{
+            console.error('Error getting comment replies count', error);
+            return res.status(500).json({message : 'Internal server error', error: error.message})
+        }
+    },
+
     addReplyToComment: async (req, res) => {
     try {
         const { post_id, comment_id } = req.params;
-        const { content } = req.body;
+        const { content, replyUsername } = req.body;
         const author = req.userId;
 
         if (!content || !author) {
@@ -171,7 +193,9 @@ module.exports = {
             content,
             author,
             post: post_id,
-            parentComment: comment_id,
+            replyTo: comment_id,
+            replyUsername: replyUsername,
+            isReply: true,
         });
 
         await newReply.save();
@@ -231,7 +255,7 @@ module.exports = {
             const user_id = req.userId;
             const parentComment = await Comment.findById(comment_id).exec();
 
-            if(!parentComment.parentComment){
+            if(!parentComment.replyTo){
                 return res.status(500).json({ message: 'Internal server error', error: 'error' });
             }
 

@@ -1,12 +1,14 @@
-const axios = require('axios'); 
-const Message = require('../models/message.model');
+const axios = require("axios");
+const Message = require("../models/message.model");
 
 exports.sendMessage = async (req, res) => {
   const sender = req.userId;
   const { receiver, content } = req.body;
 
   if (!receiver || !content) {
-    return res.status(400).json({ message: 'Receiver and content are required' });
+    return res
+      .status(400)
+      .json({ message: "Receiver and content are required" });
   }
 
   try {
@@ -14,17 +16,17 @@ exports.sendMessage = async (req, res) => {
     await message.save();
 
     // Appel au service de notification
-    await axios.post('http://notification-service:3004/api/notifications', {
+    await axios.post("http://notification-service:3004/api/notifications", {
       userId: receiver,
-      type: 'message',
+      type: "message",
       content: `You received a new message.`,
-      link: `/messages`
+      link: `/messages`,
     });
 
-    res.status(201).json({ message: 'Message sent', messageId: message._id });
+    res.status(201).json({ message: "Message sent", messageId: message._id });
   } catch (err) {
-    console.error('Error sending message:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error sending message:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -32,51 +34,37 @@ exports.getInbox = async (req, res) => {
   const userId = req.userId;
 
   try {
-    const messages = await Message.find({
-      receiver: userId,
-      isDeleted: false
-    }).sort({ createdAt: -1 }).select('_id sender');
+    // Récupérer tous les messages où l'utilisateur est soit l'expéditeur soit le destinataire
+    const allMessages = await Message.find({
+      $or: [
+        { receiver: userId, isDeleted: false },
+        { sender: userId, isDeleted: false },
+      ],
+    })
+      .sort({ createdAt: -1 })
+      .select("_id sender receiver content createdAt isRead");
 
-    if (!messages || messages.length === 0) {
-      return res.status(404).json({ message: 'No messages found in inbox.' });
-    }
-    
-    // Group messages by expeditor
+    // Grouper par l'autre utilisateur (l'interlocuteur) et ne garder que le dernier message
     const grouped = {};
-    messages.forEach(msg => {
-      const sender = msg.sender;
-      if (!grouped[sender]) {
-        grouped[sender] = [];
+    allMessages.forEach((msg) => {
+      const interlocutor = msg.sender == userId ? msg.receiver : msg.sender;
+      if (!grouped[interlocutor]) {
+        grouped[interlocutor] = msg; // On garde le premier (le plus récent)
       }
-      grouped[sender].push(msg._id);
     });
 
-    // Transform the object to an array
-    const inbox = Object.entries(grouped).map(([sender, messageIds]) => ({
-      sender,
-      messages: messageIds
-    }));
+    // Transformer en liste d'objets { user, lastMessage }
+    const conversations = Object.entries(grouped).map(
+      ([user, lastMessage]) => ({
+        user,
+        lastMessage,
+      })
+    );
 
-    return res.status(200).json({ inbox });
+    return res.status(200).json(conversations);
   } catch (err) {
-    console.error('Error fetching inbox:', err);
-    return res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
-exports.getSentMessages = async (req, res) => {
-  const userId = req.userId;
-
-  try {
-    const messages = await Message.find({
-      sender: userId,
-      isDeleted: false
-    }).sort({ createdAt: -1 });
-
-    return res.status(200).json({ sent: messages });
-  } catch (err) {
-    console.error('Error fetching sent messages:', err);
-    return res.status(500).json({ message: 'Internal server error' });
+    console.error("Error fetching conversations:", err);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -88,21 +76,23 @@ exports.deleteMessage = async (req, res) => {
     const message = await Message.findById(messageId);
 
     if (!message) {
-      return res.status(404).json({ message: 'Message not found' });
+      return res.status(404).json({ message: "Message not found" });
     }
 
     // Vérifie si l'utilisateur est l'expéditeur ou le destinataire
     if (message.sender !== userId && message.receiver !== userId) {
-      return res.status(403).json({ message: 'Not authorized to delete this message' });
+      return res
+        .status(403)
+        .json({ message: "Not authorized to delete this message" });
     }
 
     // Suppression physique
     await message.deleteOne();
 
-    return res.status(200).json({ message: 'Message deleted successfully' });
+    return res.status(200).json({ message: "Message deleted successfully" });
   } catch (err) {
-    console.error('Error deleting message:', err);
-    return res.status(500).json({ message: 'Internal server error' });
+    console.error("Error deleting message:", err);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -111,32 +101,38 @@ exports.editMessage = async (req, res) => {
   const messageId = req.params.id;
   const { content } = req.body;
 
-  if (!content || content.trim() === '') {
-    return res.status(400).json({ message: 'Content is required' });
+  if (!content || content.trim() === "") {
+    return res.status(400).json({ message: "Content is required" });
   }
 
   try {
     const message = await Message.findById(messageId);
 
     if (!message) {
-      return res.status(404).json({ message: 'Message not found' });
+      return res.status(404).json({ message: "Message not found" });
     }
 
     // Règle 1 : seul l'expéditeur peut modifier
     if (message.sender !== userId) {
-      return res.status(403).json({ message: 'You are not allowed to edit this message' });
+      return res
+        .status(403)
+        .json({ message: "You are not allowed to edit this message" });
     }
 
     // Règle 2 : pas plus de 15 minutes
     const now = new Date();
     const minutesSinceCreated = (now - message.createdAt) / 60000;
     if (minutesSinceCreated > 15) {
-      return res.status(400).json({ message: 'Message can no longer be edited (15 min limit)' });
+      return res
+        .status(400)
+        .json({ message: "Message can no longer be edited (15 min limit)" });
     }
 
     // Règle 3 : pas plus de 3 modifications
     if (message.editedCount >= 3) {
-      return res.status(400).json({ message: 'Message edit limit reached (3 times)' });
+      return res
+        .status(400)
+        .json({ message: "Message edit limit reached (3 times)" });
     }
 
     // Appliquer la modification
@@ -146,9 +142,58 @@ exports.editMessage = async (req, res) => {
 
     await message.save();
 
-    return res.status(200).json({ message: 'Message updated successfully' });
+    return res.status(200).json({ message: "Message updated successfully" });
   } catch (err) {
-    console.error('Error editing message:', err);
-    return res.status(500).json({ message: 'Internal server error' });
+    console.error("Error editing message:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getMessageById = async (req, res) => {
+  const userId = req.userId;
+  const messageId = req.params.id;
+
+  try {
+    const message = await Message.findById(messageId);
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+    // Vérifie si l'utilisateur est l'expéditeur ou le destinataire
+    if (message.sender !== userId && message.receiver !== userId) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to view this message" });
+    }
+    // Marquer le message comme lu si c'est le destinataire
+    if (message.receiver === userId && !message.isRead) {
+      message.isRead = true;
+      await message.save();
+    }
+    // Retourner directement l'objet message (toObject pour enlever les méthodes Mongoose)
+    return res.status(200).json(message.toObject());
+  } catch (err) {
+    console.error("Error fetching message by ID:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getConversations = async (req, res) => {
+  const userId = req.userId;
+  const otherUserId = req.params.userId;
+
+  try {
+    // Vérifie si l'utilisateur est l'expéditeur ou le destinataire
+    const messages = await Message.find({
+      $or: [
+        { sender: userId, receiver: otherUserId },
+        { sender: otherUserId, receiver: userId },
+      ],
+      isDeleted: false,
+    }).sort({ createdAt: -1 }); // Par défaut, tous les champs sont sélectionnés
+
+    return res.status(200).json(messages);
+  } catch (err) {
+    console.error("Error fetching messages by user:", err);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -5,7 +5,7 @@ import { fetchUserFeed } from "@/utils/api";
 import { useEffect, useState } from "react";
 
 export default function Index() {
-  const { identifier, accessToken } = useAuth();
+  const { accessToken } = useAuth();
 
   const [posts, setPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
@@ -22,10 +22,10 @@ export default function Index() {
       setLoadingPosts(false);
     }
     loadPosts();
-  }, [identifier, accessToken]);
+  }, [accessToken]);
 
   return (
-    <main style={{ minHeight: "1000vh" }}>
+    <main className="p-6">
       <Feed posts={posts} loadingPosts={loadingPosts} />
     </main>
   );

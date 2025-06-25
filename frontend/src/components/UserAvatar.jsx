@@ -6,6 +6,7 @@ export default function UserAvatar({ user, size = "md", link = true }) {
   const sizes = {
     xs: "h-8 w-8",
     sm: "h-10 w-10",
+    gs: "h-12 w-12",
     md: "h-16 w-16",
     lg: "h-24 w-24",
     xl: "h-32 w-32",

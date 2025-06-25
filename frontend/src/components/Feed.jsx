@@ -1,4 +1,5 @@
 import Post from "@/components/Post";
+import CommentsExpander from "@/components/comment/CommentsExpander"
 
 export default function Feed({ posts, loadingPosts }) {
   return (
@@ -8,8 +9,11 @@ export default function Feed({ posts, loadingPosts }) {
       ) : posts && posts.length > 0 ? (
         posts.map((post) => <Post key={post._id} post={post} />)
       ) : (
-        <p className="text-center text-gray-500">Aucun post pour le moment.</p>
+        <div>
+          <p className="text-center text-gray-500">Aucun post pour le moment.</p>
+        </div>
       )}
+      
     </div>
   );
 }

@@ -4,6 +4,40 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useAuth } from "@/contexts/authcontext";
 import { useNotyf } from "@/contexts/NotyfContext";
+import axios from "axios";
+import Cookies from "js-cookie";
+
+const apiClient = axios.create({
+  baseURL: "http://localhost:8080",
+  timeout: 5000,
+  withCredentials: true, // important pour les cookies
+});
+
+// Intercepteur de réponse
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    // Si 401 et pas déjà tenté
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+      try {
+        const userId = Cookies.get("userId");
+        const { data } = await apiClient.post("/refresh-token", { userId });
+        Cookies.set("accessToken", data.accessToken); // ou stocke-le dans le state/context
+        originalRequest.headers["Authorization"] = `Bearer ${data.accessToken}`;
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        // Redirige vers login ou logout
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default function RegisterForm() {
   const t = useTranslations("Auth");
@@ -295,7 +329,9 @@ export default function RegisterForm() {
                 >
                   {t("acceptTermsText")}{" "}
                   <a
-                    href="#"
+                    href="/register/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="link link-animated link-primary font-normal"
                   >
                     {t("acceptTermsLink")}
@@ -356,4 +392,13 @@ export default function RegisterForm() {
       </div>
     </div>
   );
+}
+
+export async function refreshAccessToken(userId) {
+  const response = await apiClient.post(
+    "/refresh-token",
+    { userId },
+    { withCredentials: true }
+  );
+  return response.data.accessToken;
 }

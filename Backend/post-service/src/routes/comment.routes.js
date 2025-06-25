@@ -335,36 +335,48 @@ router.get('/',
     commentController.getPostComments);
 
 router.post('/',
-    [validateBodyObjectId('author'),
-    validateUrlObjectId('post_id'),
+    [validateUrlObjectId('post_id'),
     verifyJWT],
     commentController.addCommentToPost);
 
 router.put('/:comment_id',
     [validateUrlObjectId('post_id'),
+    validateUrlObjectId('comment_id'),
     verifyJWT],
     commentController.updateCommentFromPost);
 
 router.delete('/:comment_id',
     [validateUrlObjectId('post_id'),
+    validateUrlObjectId('comment_id'),
     verifyJWT], 
     commentController.deleteCommentFromPost);
 
 
 router.get('/:comment_id/replies',
-    verifyJWT,
+    [validateUrlObjectId('comment_id'),
+    verifyJWT],
     commentController.getCommentReplies);
 
+router.get('/:comment_id/repliesCount',
+    [validateUrlObjectId('comment_id'),
+    verifyJWT],
+    commentController.getCommentRepliesCount);
+
 router.post('/:comment_id/replies',
-    verifyJWT,
+    [validateUrlObjectId('comment_id'),
+    verifyJWT],
     commentController.addReplyToComment);
 
 router.put('/:comment_id/replies/:reply_id',
-    verifyJWT,
+    [validateUrlObjectId('comment_id'),
+    validateUrlObjectId('reply_id'),
+    verifyJWT],
     commentController.updateReplyFromComment);
 
 router.delete('/:comment_id/replies/:reply_id',
-    verifyJWT,
+    [validateUrlObjectId('comment_id'),
+    validateUrlObjectId('reply_id'),
+    verifyJWT],
     commentController.deleteReplyFromComment);
 
 module.exports = router;
