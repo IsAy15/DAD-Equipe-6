@@ -11,7 +11,6 @@ export default function Post({ post }) {
   const isLiked = post.likes.includes(identifier)
 
 
-  console.log(isLiked, "isliked");
   useEffect(() => {
   
     async function loadAuthor() {
@@ -55,7 +54,6 @@ export default function Post({ post }) {
           })}
         >
           {new Date(post.createdAt).toLocaleDateString("fr-FR")}
-          <LikeButton isLiked={isLiked} count={post.likesCount} onLike={likeBreeze} idToLike={post._id}  />
         </span>
       </div>
       <p>{post.content}</p>
@@ -71,6 +69,8 @@ export default function Post({ post }) {
           ))}
         </div>
       )}
+                <LikeButton isLiked={isLiked} count={post.likes.length} onLike={likeBreeze} idToLike={post._id}  />
+
       <hr className="border-t border-base-content/30 mt-4 w-full" />
     </div>
   );
