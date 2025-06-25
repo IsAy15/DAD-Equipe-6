@@ -6,12 +6,14 @@ const { randomBytes } = require("crypto");
 
 const generateRefreshToken = () => randomBytes(64).toString("hex");
 
-
 exports.refreshToken = async (req, res) => {
-  const { refreshToken: oldRefreshToken, userId } = req.body;
+  const { userId } = req.body;
+  const oldRefreshToken = req.cookies.refreshToken;
 
   if (!oldRefreshToken || !userId) {
-    return res.status(400).json({ message: "Refresh token and user ID required" });
+    return res
+      .status(400)
+      .json({ message: "Refresh token and user ID required" });
   }
 
   try {
@@ -24,39 +26,35 @@ exports.refreshToken = async (req, res) => {
     );
 
     // 2. Génère un nouveau accessToken
-    const newAccessToken = jwt.sign(
-      { userId },
-      process.env.ACCESS_JWT_KEY,
-      { expiresIn: "10m" }
-    );
+    const newAccessToken = jwt.sign({ userId }, process.env.ACCESS_JWT_KEY, {
+      expiresIn: "10m",
+    });
 
     // 3. Génère un nouveau refreshToken (rotation)
     const newRefreshToken = generateRefreshToken();
 
     // 4. Remplace dans la base (remplace l'ancien)
-    await axios.post(
-      `${userServiceURL}/api/users/${userId}/refreshTokens`,
-      { refreshToken: newRefreshToken }
-    );
+    await axios.post(`${userServiceURL}/api/users/${userId}/refreshTokens`, {
+      refreshToken: newRefreshToken,
+    });
 
     // 5. Met à jour le cookie
-    res.cookie('refreshToken', newRefreshToken, {
+    res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: false, // true en prod HTTPS
-      sameSite: 'Strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 jours
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
     });
 
     // 6. Réponse au client
     return res.status(200).json({ accessToken: newAccessToken });
-
   } catch (err) {
     console.error("Refresh token error:", err.message);
-    return res.status(403).json({ message: "Invalid or expired refresh token" });
+    return res
+      .status(403)
+      .json({ message: "Invalid or expired refresh token" });
   }
 };
-
-
 
 exports.register = async (req, res) => {
   try {
@@ -85,7 +83,7 @@ exports.register = async (req, res) => {
         username: user.username,
       },
       process.env.ACCESS_JWT_KEY,
-      { expiresIn: "10m" } // Token court (10 min)
+      { expiresIn: "10s" } // Token court (10 s)
     );
 
     const refreshToken = generateRefreshToken();
@@ -96,11 +94,11 @@ exports.register = async (req, res) => {
       { refreshToken }
     );
 
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: false,
-      sameSite: 'Strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // durée de vie 7 jours
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // durée de vie 7 jours
     });
 
     return res.status(201).json({
@@ -108,7 +106,6 @@ exports.register = async (req, res) => {
       accessToken,
       userId: user.userId,
     });
-
   } catch (err) {
     if (err.response) {
       console.error(
@@ -126,7 +123,6 @@ exports.register = async (req, res) => {
   }
 };
 
-
 // LOGIN : demande les données à user-service
 exports.login = async (req, res) => {
   try {
@@ -134,7 +130,9 @@ exports.login = async (req, res) => {
     console.log("Login request body:", req.body);
 
     if (!identifier || !password) {
-      return res.status(400).json({ message: "Missing identifier or password" });
+      return res
+        .status(400)
+        .json({ message: "Missing identifier or password" });
     }
 
     const userServiceURL = process.env.USER_SERVICE_URL;
@@ -147,7 +145,9 @@ exports.login = async (req, res) => {
 
     const isPasswordValid = bcrypt.compareSync(password, user.hashedPassword);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid email/username or password" });
+      return res
+        .status(401)
+        .json({ message: "Invalid email/username or password" });
     }
 
     // Création du accessToken court (10 min)
@@ -160,16 +160,15 @@ exports.login = async (req, res) => {
     const refreshToken = generateRefreshToken();
 
     // Stocker le refreshToken côté user-service
-    await axios.post(
-      `${userServiceURL}/api/users/${user.id}/refreshTokens`,
-      { refreshToken }
-    );
+    await axios.post(`${userServiceURL}/api/users/${user.id}/refreshTokens`, {
+      refreshToken,
+    });
 
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: false,
-      sameSite: 'Strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // durée de vie 7 jours
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // durée de vie 7 jours
     });
 
     return res.status(200).json({
@@ -177,16 +176,16 @@ exports.login = async (req, res) => {
       accessToken,
       userId: user.id,
     });
-
   } catch (err) {
     if (err.response && err.response.status === 404) {
-      return res.status(401).json({ message: "Invalid email/username or password" });
+      return res
+        .status(401)
+        .json({ message: "Invalid email/username or password" });
     }
     console.error("Login error:", err.message);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 // AUTHENTICATE : vérifie le token JWT
 exports.verifyToken = (req, res) => {
@@ -206,7 +205,6 @@ exports.verifyToken = (req, res) => {
   }
 };
 
-
 exports.logout = async (req, res) => {
   const { userId } = req.body;
 
@@ -221,14 +219,13 @@ exports.logout = async (req, res) => {
     await axios.delete(`${userServiceURL}/api/users/${userId}/refreshTokens`);
 
     // Suppression du cookie côté client
-    res.clearCookie('refreshToken', {
+    res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: false, // ou true si HTTPS
-      sameSite: 'Strict'
+      sameSite: "Strict",
     });
 
     return res.status(200).json({ message: "Successfully logged out" });
-
   } catch (err) {
     console.error("Logout error:", err.message);
     return res.status(500).json({ message: "Logout failed" });
