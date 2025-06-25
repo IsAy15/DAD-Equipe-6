@@ -154,27 +154,30 @@ export default function UserPage({ params }) {
       break;
     case status === "friends":
       actionButton = (
-        <div class="tooltip [--placement:bottom] [--trigger:focus] tooltip-toggle">
-          <button className="btn btn-primary btn-outline px-6 py-2 font-semibold">
+        <div className="tooltip [--placement:bottom] [--trigger:focus] tooltip-toggle">
+          <button
+            className="btn btn-primary btn-outline px-6 py-2 font-semibold"
+            onClick={() => handleActionButtonClick()}
+          >
             {t.raw("status")["friends"]}
           </button>
-          <div
-            class="tooltip-content tooltip-shown:opacity-100 tooltip-shown:visible"
+          {/* <div
+            className="tooltip-content tooltip-shown:opacity-100 tooltip-shown:visible"
             role="popover"
           >
-            <div class="tooltip-body bg-base-200 max-w-xs rounded-lg p-4 text-start flex flex-col items-center">
-              <span class="text-base-content text-lg font-medium">
+            <div className="tooltip-body bg-base-200 max-w-xs rounded-lg p-4 text-start flex flex-col items-center">
+              <span className="text-base-content text-lg font-medium">
                 {t("unfollowConfirm")}
               </span>
               <button
                 className="btn btn-error btn-outline mt-2"
-                onClick={handleActionButtonClick}
+                onClick={() => handleActionButtonClick()}
               >
                 <span className="icon-[tabler--user-off] mr-2" />
                 {t.raw("status")["unfollow"]}
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
       );
       break;
