@@ -336,3 +336,43 @@ export async function editMessage(messageId, content, token) {
   );
   return res.data;
 }
+
+export async function fetchNotifications(token) {
+  const res = await apiClient.get("/api/notifications", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+}
+
+export async function getNotificationCount(token) {
+  const res = await apiClient.get("/api/notifications/count", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+}
+
+export async function readAndUpdateNotification(notificationId, token) {
+  const res = await apiClient.patch(
+    `/api/notifications/${notificationId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+}
+
+export async function readAndDeleteNotification(notificationId, token) {
+  const res = await apiClient.delete(`/api/notifications/${notificationId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+}
