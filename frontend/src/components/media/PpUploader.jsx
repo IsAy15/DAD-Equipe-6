@@ -13,12 +13,13 @@ export default function ImageUploader() {
 
     setUploading(true);
 
-    const res = await fetch("/api/upload", {
+    const res = await fetch("/api/upload_pp", {
       method: "POST",
       body: formData,
     });
 
     const data = await res.json();
+    console.log(data);
     setUrl(data.url);
     setUploading(false);
   };

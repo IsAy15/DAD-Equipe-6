@@ -8,9 +8,9 @@ export const config = {
 };
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: "dfmfacomp",
+  api_key: "119457589759245",
+  api_secret: "3QNYjaQNmwie4w4c0SAHpXpg8Hw",
 });
 
 export default async function handler(req, res) {
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       folder: "next_uploads",
       format: "webp", // conversion automatique en WebP
       transformation: [
-        { width: 1024, crop: "limit" }, // limite la largeur à 1024px sans couper
+        { width: 1024, height: 1024, crop: "fill", gravity: "auto" }, // carré 1024x1024, crop centré
       ],
     });
 

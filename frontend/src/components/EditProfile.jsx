@@ -1,6 +1,23 @@
 import { useTranslations } from "next-intl";
+import { updateUserProfile } from "../utils/api";
+import { useAuth } from "@/contexts/authcontext";
+
 export default function EditProfile() {
+  const { user, token } = useAuth();
   const t = useTranslations("EditProfile");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const bio = formData.get("bio");
+    const avatar = formData.get("avatar");
+
+    try {
+      await updateUserProfile(user.id, bio, avatar, token);
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      // Handle error (e.g., show an error message)
+    }
+  };
   return (
     <div
       id="slide-up-animated-modal"
@@ -22,12 +39,12 @@ export default function EditProfile() {
             </button>
           </div>
           <div className="modal-body">
-            <form className="flex flex-col gap-4">
+            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">{t("profilePicture")}</span>
                 </label>
-                <input type="file" accept="image/*" className="input" />
+                <PpUploader />
               </div>
               <div className="form-control">
                 <label className="label">
@@ -36,7 +53,9 @@ export default function EditProfile() {
                 <input
                   type="text"
                   className="input input-bordered"
-                  placeholder={t("usernamePlaceholder")}
+                  name="username"
+                  disabled="true"
+                  defaultValue={user.username}
                 />
               </div>
               <div className="form-control">
@@ -46,6 +65,7 @@ export default function EditProfile() {
                 <textarea
                   className="textarea textarea-bordered"
                   placeholder={t("bioPlaceholder")}
+                  name="bio"
                 ></textarea>
               </div>
             </form>
@@ -58,7 +78,7 @@ export default function EditProfile() {
             >
               {t("cancel")}
             </button>
-            <button type="button" className="btn btn-primary">
+            <button type="submit" className="btn btn-primary">
               {t("saveChanges")}
             </button>
           </div>
