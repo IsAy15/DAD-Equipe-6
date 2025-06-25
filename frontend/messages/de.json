@@ -96,5 +96,9 @@
     "errorFetchComments": "Fehler beim Laden der Kommentare",
     "noComments": "Keine Kommentare gefunden",
     "showMore": "Mehr anzeigen"
+  },
+  "homepage": {
+    "forYou": "Für dich",
+    "follow": "Gefolgt"
   }
 }

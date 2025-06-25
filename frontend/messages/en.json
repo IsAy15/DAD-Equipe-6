@@ -97,5 +97,9 @@
     "errorFetchComments": "Error fetching comments",
     "noComments": "No comments found",
     "showMore": "Show more"
+  },
+  "homepage": {
+    "forYou": "For you",
+    "follow": "Following"
   }
 }

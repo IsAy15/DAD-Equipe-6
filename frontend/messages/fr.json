@@ -141,5 +141,9 @@
     "errorFetchComments": "Erreur lors de la récupération des commentaires",
     "noComments": "Aucun commentaire trouvé",
     "showMore": "Afficher plus"
+  },
+  "homepage": {
+    "forYou": "Pour vous",
+    "follow": "Suivis"
   }
 }

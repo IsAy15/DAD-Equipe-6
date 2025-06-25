@@ -89,5 +89,9 @@
     "errorFetchComments": "获取评论时出错",
     "noComments": "未找到评论",
     "showMore": "显示更多"
+  },
+  "homepage": {
+    "forYou": "为你推荐",
+    "follow": "关注"
   }
 }

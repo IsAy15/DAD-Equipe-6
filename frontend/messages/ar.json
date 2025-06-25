@@ -96,5 +96,9 @@
     "errorFetchComments": "حدث خطأ أثناء جلب التعليقات",
     "noComments": "لم يتم العثور على تعليقات",
     "showMore": "عرض المزيد"
+  },
+  "homepage": {
+    "forYou": "لك",
+    "follow": "المتابَعون"
   }
 }
