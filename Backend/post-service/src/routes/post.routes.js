@@ -159,7 +159,7 @@ router.get(
   postController.getPostsByUserId
 );
 
-router.get("/feed", verifyJWT, postController.getPostsOfSubscribdedTo);
+router.get("/feed", [ verifyJWT], postController.getPostsOfSubscribdedTo);
 
 router.post("/", verifyJWT, postController.createPost);
 
@@ -177,19 +177,19 @@ router.delete(
 
 router.get(
   "/:post_id",
-  validateUrlObjectId("post_id"),
+  [validateUrlObjectId("post_id")],
   postController.getPostById
 );
 
-router.get("/search/recent", verifyJWT, postController.searchRecentPostsByTag);
+router.get("/search/recent", [verifyJWT], postController.searchRecentPostsByTag);
 router.get(
   "/search/liked",
-  verifyJWT,
+  [verifyJWT],
   postController.searchMostLikedPostsByTag
 );
 router.get(
   "/search/popular",
-  verifyJWT,
+  [verifyJWT],
   postController.searchPopularPostsByTag
 );
 

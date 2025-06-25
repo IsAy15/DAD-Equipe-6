@@ -21,7 +21,7 @@ const loadingContent = (
 );
 
 export default function NewMessagePage() {
-  const { user } = useAuth();
+  const { user, accessToken } = useAuth();
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,7 +35,7 @@ export default function NewMessagePage() {
     const fetchFriends = async () => {
       try {
         setLoading(true);
-        const friendsListRaw = await fetchUserFriends(user.id); // return a list of friend IDs, example : ["685a5a9a4a1c089930a76c34"]
+        const friendsListRaw = await fetchUserFriends(user.id, accessToken);
         if (!friendsListRaw || friendsListRaw.length === 0) {
           setFriends([]);
           return;

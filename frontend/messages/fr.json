@@ -91,7 +91,8 @@
       "following": "Abonné",
       "unfollow": "Se désabonner",
       "friends": "Amis"
-    }
+    },
+    "unfollowConfirm": "Se désabonner de votre ami ?"
   },
   "EditProfile": {
     "title": "Modifier le profil",
