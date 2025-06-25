@@ -48,8 +48,12 @@ export async function fetchUserFollowers(userId) {
   return res.data;
 }
 
-export async function fetchUserFriends(userId) {
-  const res = await apiClient.get(`/api/users/${userId}/friends`);
+export async function fetchUserFriends(userId, token) {
+  const res = await apiClient.get(`/api/users/${userId}/friends`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return res.data;
 }
 
@@ -113,14 +117,12 @@ export async function postBreeze(text, image, token) {
 }
 
 export async function likeBreeze(setLiked, postID, token) {
-
   const res = await apiClient.post(
-    setLiked?
-    "/api/posts/likes/posts/"+postID+"/like":
-     "/api/posts/likes/posts/"+postID+"/unlike",
-      {},
+    setLiked
+      ? "/api/posts/likes/posts/" + postID + "/like"
+      : "/api/posts/likes/posts/" + postID + "/unlike",
+    {},
     {
-     
       headers: {
         Authorization: `Bearer ${token}`,
       },

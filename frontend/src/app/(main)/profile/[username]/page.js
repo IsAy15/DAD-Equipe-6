@@ -7,6 +7,7 @@ import {
   fetchUserProfile,
   fetchUserFollowing,
   fetchUserFollowers,
+  fetchUserFriends,
   fetchUserPosts,
   followUser,
   unfollowUser,
@@ -63,6 +64,7 @@ export default function UserPage({ params }) {
     async function loadStatus() {
       try {
         const followings = await fetchUserFollowing(user.id);
+        const friends = await fetchUserFriends(user.id, accessToken);
         // Correction de l'extraction de la liste des followings
         let list = [];
         if (Array.isArray(followings)) {
@@ -72,7 +74,9 @@ export default function UserPage({ params }) {
         } else if (Array.isArray(followings?.data)) {
           list = followings.data;
         }
-        if (list.some((user) => user._id === userProfile.id)) {
+        if (friends.some((friend) => friend === userProfile.id)) {
+          setStatus("friends");
+        } else if (list.some((user) => user._id === userProfile.id)) {
           setStatus("following");
         } else {
           setStatus("not-following");
@@ -97,11 +101,10 @@ export default function UserPage({ params }) {
       } catch (err) {
         console.error("Error following user:", err);
       }
-    } else if (status === "following") {
+    } else if (status === "following" || status === "friends") {
       try {
         await unfollowUser(userProfile.id, accessToken);
         setStatus("not-following");
-        // Refresh profile to update counts
         const updatedProfile = await fetchUserProfile(username);
         setUserProfile(updatedProfile);
       } catch (err) {
@@ -151,9 +154,28 @@ export default function UserPage({ params }) {
       break;
     case status === "friends":
       actionButton = (
-        <button className="btn btn-primary btn-outline px-6 py-2 font-semibold">
-          {t.raw("status")["friends"]}
-        </button>
+        <div class="tooltip [--placement:bottom] [--trigger:focus] tooltip-toggle">
+          <button className="btn btn-primary btn-outline px-6 py-2 font-semibold">
+            {t.raw("status")["friends"]}
+          </button>
+          <div
+            class="tooltip-content tooltip-shown:opacity-100 tooltip-shown:visible"
+            role="popover"
+          >
+            <div class="tooltip-body bg-base-200 max-w-xs rounded-lg p-4 text-start flex flex-col items-center">
+              <span class="text-base-content text-lg font-medium">
+                {t("unfollowConfirm")}
+              </span>
+              <button
+                className="btn btn-error btn-outline mt-2"
+                onClick={handleActionButtonClick}
+              >
+                <span className="icon-[tabler--user-off] mr-2" />
+                {t.raw("status")["unfollow"]}
+              </button>
+            </div>
+          </div>
+        </div>
       );
       break;
     default:
