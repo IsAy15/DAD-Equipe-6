@@ -6,9 +6,7 @@ exports.refreshToken = async (req, res) => {
   const oldRefreshToken = req.cookies.refreshToken;
 
   if (!oldRefreshToken) {
-    return res
-      .status(400)
-      .json({ message: "Refresh token is required" });
+    return res.status(400).json({ message: "Refresh token is required" });
   }
 
   try {
@@ -16,36 +14,37 @@ exports.refreshToken = async (req, res) => {
 
     const decoded = jwt.verify(
       oldRefreshToken,
-      process.env.REFRESH_TOKEN_SECRET,
-    )
+      process.env.REFRESH_TOKEN_SECRET
+    );
 
-    const username = decoded.userInfo.username
+    const username = decoded.userInfo.username;
     const userId = decoded.userInfo.userId;
 
     // 1. Vérifie l'ancien refreshToken
     const userExists = await axios.get(
-      `${userServiceURL}/api/users/check-username?username=${username}`);
+      `${userServiceURL}/api/users/check-username?username=${username}`
+    );
 
-    if(userExists == false){
-      return res.status(401).json({ message: 'Unauthorized'})
+    if (userExists == false) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
     // 2. Génère un nouveau accessToken
     const newAccessToken = jwt.sign({ userId }, process.env.ACCESS_JWT_KEY, {
-      expiresIn: "10s",
+      expiresIn: "15m",
     });
 
     // 3. Génère un nouveau refreshToken (rotation)
     const newRefreshToken = jwt.sign(
       {
-        "userInfo": {
-          "userId": userId,
-          "username": username
-        }
+        userInfo: {
+          userId: userId,
+          username: username,
+        },
       },
       process.env.REFRESH_TOKEN_SECRET,
-      {expiresIn: '1d'}
-    )
+      { expiresIn: "1d" }
+    );
 
     // 4. Remplace dans la base (remplace l'ancien)
     await axios.post(`${userServiceURL}/api/users/${userId}/refreshTokens`, {
@@ -102,14 +101,14 @@ exports.register = async (req, res) => {
 
     const refreshToken = jwt.sign(
       {
-        "userInfo": {
-          "userId": user.userId,
-          "username": user.username
-        }
+        userInfo: {
+          userId: user.userId,
+          username: user.username,
+        },
       },
       process.env.REFRESH_TOKEN_SECRET,
-      {expiresIn: '1d'}
-    )
+      { expiresIn: "1d" }
+    );
 
     // Stocker le refreshToken côté user-service
     await axios.post(
@@ -182,14 +181,14 @@ exports.login = async (req, res) => {
 
     const refreshToken = jwt.sign(
       {
-        "userInfo": {
-          "userId": user.id,
-          "username": user.username
-        }
+        userInfo: {
+          userId: user.id,
+          username: user.username,
+        },
       },
       process.env.REFRESH_TOKEN_SECRET,
-      {expiresIn: '1d'}
-    )
+      { expiresIn: "1d" }
+    );
 
     // Stocker le refreshToken côté user-service
     await axios.post(`${userServiceURL}/api/users/${user.id}/refreshTokens`, {
@@ -223,11 +222,10 @@ exports.login = async (req, res) => {
 exports.verifyToken = (req, res) => {
   const authHeader = req.headers["authorization"];
 
-  
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ message: "No token provided" });
   }
-  
+
   const token = authHeader.slice(7); // Enlève "Bearer "
   console.log(token);
 

@@ -1,5 +1,7 @@
 import axios from "axios";
+import avatar from "flyonui/components/avatar";
 import Cookies from "js-cookie";
+import { use } from "react";
 
 let setAccessTokenFromApi = null;
 export const bindAuthContext = (setAccessToken) => {
@@ -11,53 +13,60 @@ export const bindLogout = (logout) => {
   logoutAPI = logout;
 };
 
-
 const config = {
- headers: {
-    'Content-Type': 'application/json',
-   },
-  withCredentials: true
-}; 
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+};
 
 const apiClient = axios.create({
   baseURL: "http://localhost:8080",
   timeout: 5000,
 });
 
-apiClient.interceptors.request.use(request => {
-  const accessToken = Cookies.get('accessToken');
-  if (accessToken) {
-    request.headers['Authorization'] = `Bearer ${accessToken}`;
+apiClient.interceptors.request.use(
+  (request) => {
+    const accessToken = Cookies.get("accessToken");
+    if (accessToken) {
+      request.headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+    return request;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return request;
-}, error => {
-  return Promise.reject(error);
-});
+);
 
 apiClient.interceptors.response.use(
-  response => response, // Directly return successful responses.
-  async error => {
+  (response) => response, // Directly return successful responses.
+  async (error) => {
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true; // Mark the request as retried to avoid infinite loops.
       try {
         // Make a request to your auth server to refresh the token.
-        const response = await apiClient.post('/auth/refresh-token', {}, config)
+        const response = await apiClient.post(
+          "/auth/refresh-token",
+          {},
+          config
+        );
         const { accessToken: newAccessToken } = response.data;
 
-        if(newAccessToken){
-          setAccessTokenFromApi(newAccessToken)
+        if (newAccessToken) {
+          setAccessTokenFromApi(newAccessToken);
         }
 
         // Update the authorization header with the new access token.
-        apiClient.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+        apiClient.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${newAccessToken}`;
         return apiClient(originalRequest); // Retry the original request with the new access token.
-      
       } catch (refreshError) {
         // Handle refresh token errors by clearing stored tokens and redirecting to the login page.
-        console.error('Token refresh failed:', refreshError);
+        console.error("Token refresh failed:", refreshError);
         logoutAPI();
-        window.location.href = '/';
+        window.location.href = "/";
         return Promise.reject(refreshError);
       }
     }
@@ -71,13 +80,15 @@ apiClient.interceptors.response.use(
 
 // Inscription
 export async function registerUser(email, username, password) {
-  const { data } = await apiClient.post("/register", {
-    email,
-    username,
-    password,
-  },
-  config
-);
+  const { data } = await apiClient.post(
+    "/register",
+    {
+      email,
+      username,
+      password,
+    },
+    config
+  );
   return data; // { msg, accessToken }
 }
 
@@ -137,7 +148,7 @@ export async function fetchUserFeed(token) {
 export async function followUser(targetUserId, token) {
   const res = await apiClient.post(
     `api/friend-requests/follow/${targetUserId}`,
-    {},
+    {}
   );
   return res.data;
 }
@@ -145,17 +156,14 @@ export async function followUser(targetUserId, token) {
 export async function unfollowUser(targetUserId, token) {
   const res = await apiClient.post(
     `api/friend-requests/unfollow/${targetUserId}`,
-    {},
+    {}
   );
   return res.data;
 }
 export async function postBreeze(text, image, token) {
-  const res = await apiClient.post(
-    "/api/posts/",
-    {
-      content: text,
-    },
-  );
+  const res = await apiClient.post("/api/posts/", {
+    content: text,
+  });
   return res.data;
 }
 
@@ -205,12 +213,9 @@ export async function fetchPostComments(postId, token) {
 }
 
 export async function addCommentToPost(postId, comment_content, token) {
-  const res = await apiClient.post(
-    `/api/posts/${postId}/comments`,
-    {
-      content: comment_content,
-    }
-  );
+  const res = await apiClient.post(`/api/posts/${postId}/comments`, {
+    content: comment_content,
+  });
   return res;
 }
 
@@ -233,13 +238,15 @@ export async function deleteComment(postId, commentId, token) {
 
 export async function getCommentReplies(postId, commentId, token) {
   const res = await apiClient.get(
-    `/api/posts/${postId}/comments/${commentId}/replies`);
+    `/api/posts/${postId}/comments/${commentId}/replies`
+  );
   return res.data;
 }
 
 export async function getCommentRepliesCount(postId, commentId, token) {
   const res = await apiClient.get(
-    `/api/posts/${postId}/comments/${commentId}/repliesCount`);
+    `/api/posts/${postId}/comments/${commentId}/repliesCount`
+  );
   return res;
 }
 
@@ -277,13 +284,10 @@ export async function unlikeComment(commentId, token) {
 }
 
 export async function sendMessage(receiverId, content, token) {
-  const res = await apiClient.post(
-    "/messages/send",
-    {
-      receiver: receiverId,
-      content: content,
-    }
-  );
+  const res = await apiClient.post("/messages/send", {
+    receiver: receiverId,
+    content: content,
+  });
   return res.data;
 }
 
@@ -298,9 +302,24 @@ export async function deleteMessage(messageId, token) {
 }
 
 export async function editMessage(messageId, content, token) {
+  const res = await apiClient.patch(`/messages/${messageId}`, {
+    content: content,
+  });
+  return res.data;
+}
+
+export async function updateUserProfile(bio, avatar, token) {
   const res = await apiClient.patch(
-    `/messages/${messageId}`,
-    { content: content }
+    `/api/users/`,
+    {
+      bio,
+      avatar,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
   );
   return res.data;
 }
