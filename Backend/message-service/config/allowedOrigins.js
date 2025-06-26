@@ -1,7 +1,7 @@
 const allowedOrigins = [
     'http://localhost:3005',
     'http://localhost',
-    'http://13.37.42.31/',
+    'http://15.188.65.97',
     'http://notification-service:3004',
     'http://post-service:3003',
     'http://message-service:3002',
