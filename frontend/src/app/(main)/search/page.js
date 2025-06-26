@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import {
   fetchTaggedPosts,
-  fetchPosts,
+  fetchPost,
   fetchUsersByUsername,
   fetchUserProfile,
 } from "@/utils/api";
@@ -74,7 +74,7 @@ export default function SearchPage() {
           return;
         }
         const postsList = await Promise.all(
-          postsListRaw.map((postId) => fetchPosts(postId, accessToken))
+          postsListRaw.map((postId) => fetchPost(postId, accessToken))
         );
         setTaggedPosts(postsList);
       } else {

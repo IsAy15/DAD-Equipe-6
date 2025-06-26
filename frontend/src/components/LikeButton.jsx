@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/authcontext";
 
-export default function LikeButton({ isLiked, count, onLike, idToLike }) {
+export default function LikeButton({
+  isLiked,
+  count,
+  onLike,
+  idToLike,
+  onClick,
+}) {
   const [liked, setLiked] = useState(isLiked ?? false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -9,7 +15,8 @@ export default function LikeButton({ isLiked, count, onLike, idToLike }) {
 
   const { identifier, accessToken } = useAuth();
 
-  const handleLike = async () => {
+  const handleLike = async (e) => {
+    if (onClick) onClick(e);
     if (loading) {
       return;
     }

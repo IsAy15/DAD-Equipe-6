@@ -35,7 +35,7 @@ export default function CommentExpander({ postId }) {
     async function FetchPostComments() {
       try {
         setError(null);
-        if (!postId) {
+        if (postId) {
           const comments = await fetchPostComments(postId, accessToken);
           setComments(comments);
         }

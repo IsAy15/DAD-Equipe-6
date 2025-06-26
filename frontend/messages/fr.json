@@ -128,7 +128,8 @@
     "cancel": "Annuler",
     "send": "Envoyer",
     "save": "Enregistrer",
-    "replyTo": "Répondre à"
+    "replyTo": "Répondre à",
+    "reply": "Répondre"
   },
   "CommentInput": {
     "placeholder": "Écrivez un commentaire...",
@@ -137,7 +138,7 @@
     "featureInDevelopment": "Cette fonctionnalité est en cours de développement",
     "addEmoji": "Ajouter un emoji"
   },
-  "CommmentsExpanded": {
+  "CommentExpander": {
     "errorFetchComments": "Erreur lors de la récupération des commentaires",
     "noComments": "Aucun commentaire trouvé",
     "showMore": "Afficher plus"
