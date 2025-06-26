@@ -93,5 +93,15 @@
   "homepage": {
     "forYou": "为你推荐",
     "follow": "关注"
+  },
+  "searchPage": {
+    "searchLabel": "搜索用户、帖子或标签",
+    "searchPlaceholder": "搜索...",
+    "recentSearch": "最近搜索"
+  },
+  "notificationspage": {
+    "title": "通知",
+    "all": "全部",
+    "mentions": "提及"
   }
 }

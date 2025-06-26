@@ -146,5 +146,15 @@
   "homepage": {
     "forYou": "Pour vous",
     "follow": "Suivis"
+  },
+  "searchPage": {
+    "searchLabel": "Rechercher des utilisateurs, des posts ou des hashtags",
+    "searchPlaceholder": "Rechercher...",
+    "recentSearch": "Recherches récentes"
+  },
+  "notificationspage": {
+    "title": "Notifications",
+    "all": "Toutes",
+    "mentions": "Mentions"
   }
 }
