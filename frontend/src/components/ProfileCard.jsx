@@ -9,8 +9,10 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import UserAvatar from "./UserAvatar";
+import { useTranslations } from "next-intl";
 
 export default function ProfileCard({ user, full = false }) {
+  const t = useTranslations("profileCard");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("not-following");
@@ -117,7 +119,7 @@ export default function ProfileCard({ user, full = false }) {
       ) : error ? (
         <div className="text-red-500">{error}</div>
       ) : !userProfile ? (
-        <div className="text-red-500">Utilisateur introuvable</div>
+        <div className="text-red-500"> {t("userNotFound")} </div>
       ) : (
         <div className="flex items-center gap-4">
           <UserAvatar user={userProfile} size="md" />

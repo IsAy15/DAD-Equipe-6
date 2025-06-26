@@ -9,7 +9,8 @@ const cors = require("cors");
 const app = express();
 const port = 3003;
 
-app.use(cors());
+const corsOptions = require('./config/corsOptions');
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(logger);
 swaggerDocs(app, port);

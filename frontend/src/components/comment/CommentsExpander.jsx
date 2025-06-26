@@ -3,14 +3,15 @@ import Comment from "./Comment";
 import { useAuth } from "@/contexts/authcontext";
 import { fetchPostComments, updateComment, deleteComment } from "@/utils/api";
 import CommentInput from "@/components/comment/CommentInput";
+import { useTranslations } from "next-intl";
 
 export default function CommentExpander({ postId }) {
+  const t = useTranslations("CommentExpander");
   const { accessToken } = useAuth();
   const [comments, setComments] = useState(null);
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(5);
   const [error, setError] = useState(null);
-  
 
   // État global du commentaire en édition
   const [editingCommentId, setEditingCommentId] = useState(null);
@@ -33,13 +34,13 @@ export default function CommentExpander({ postId }) {
   useEffect(() => {
     async function FetchPostComments() {
       try {
-        setError(null)
+        setError(null);
         if (!postId) {
           const comments = await fetchPostComments(postId, accessToken);
           setComments(comments);
         }
       } catch (error) {
-        setError('Impossible de charger les commentaires.');
+        setError(t("errorFetchComments"));
       } finally {
         setLoading(false);
       }
@@ -50,15 +51,17 @@ export default function CommentExpander({ postId }) {
 
   const handleAddReply = (comment_id, reply) => {
     setComments((prevComments) =>
-      prevComments.map(comment => {
-        if (comment._id === comment_id) {
-          return {
-            ...comment,
-            repliesCount: (comment.repliesCount || 0) + 1
-          };
-        }
-        return comment;
-      }).concat(reply) 
+      prevComments
+        .map((comment) => {
+          if (comment._id === comment_id) {
+            return {
+              ...comment,
+              repliesCount: (comment.repliesCount || 0) + 1,
+            };
+          }
+          return comment;
+        })
+        .concat(reply)
     );
   };
 
@@ -96,13 +99,11 @@ export default function CommentExpander({ postId }) {
 
   if (loading) return loadingContent;
 
-  if(error){
+  if (error) {
     return (
       <div>
         <CommentInput post_id={postId} onAddComment={handleAddComment} />
-        <div className="text-error text-sm mt-1 ml-4">
-         {error}
-        </div>  
+        <div className="text-error text-sm mt-1 ml-4">{error}</div>
       </div>
     );
   }
@@ -112,8 +113,8 @@ export default function CommentExpander({ postId }) {
       <div>
         <CommentInput post_id={postId} onAddComment={handleAddComment} />
         <div className="p-4 text-sm text-primary italic">
-          Aucun commentaire pour ce post
-        </div>  
+          {t("noComments")}{" "}
+        </div>
       </div>
     );
   }
@@ -144,7 +145,7 @@ export default function CommentExpander({ postId }) {
             onClick={handleShowMore}
             className="text-sm text-accent hover:underline"
           >
-            Afficher plus de commentaires
+            {t("showMore")}
           </button>
         </div>
       )}

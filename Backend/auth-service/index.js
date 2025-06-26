@@ -13,9 +13,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(logger);
 app.use(cookieParser());
 
-// Allow all origins by default
 const cors = require("cors");
-app.use(cors());
+const corsOptions = require('./config/corsOptions');
+app.use(cors(corsOptions));
 
 require("./src/routes/auth.routes")(app);
 

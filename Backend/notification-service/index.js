@@ -6,7 +6,8 @@ const notificationRoutes = require("./src/routes/notification.routes");
 
 const app = express();
 const cors = require("cors");
-app.use(cors());
+const corsOptions = require('./config/corsOptions');
+app.use(cors(corsOptions));
 const port = 3004;
 
 app.use(express.json());

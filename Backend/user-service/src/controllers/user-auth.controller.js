@@ -48,13 +48,11 @@ exports.createUser = async (req, res) => {
     });
     await newUser.save();
 
-    return res
-      .status(201)
-      .json({
-        username: newUser.username,
-        userId: newUser._id,
-        message: "User created successfully",
-      });
+    return res.status(201).json({
+      username: newUser.username,
+      userId: newUser._id,
+      message: "User created successfully",
+    });
   } catch (err) {
     if (err.code === 11000) {
       const field = Object.keys(err.keyValue)[0];
@@ -66,10 +64,11 @@ exports.createUser = async (req, res) => {
   }
 };
 
-
 exports.storeRefreshToken = async (req, res) => {
   const { userId } = req.params;
   const { refreshToken } = req.body;
+
+  console.log(userId);
 
   if (!refreshToken) {
     return res.status(400).json({ message: "Missing refresh token" });
@@ -83,13 +82,11 @@ exports.storeRefreshToken = async (req, res) => {
     await user.save();
 
     return res.status(200).json({ message: "Refresh token stored" });
-
   } catch (err) {
     console.error("Failed to store refresh token:", err);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 exports.validateRefreshToken = async (req, res) => {
   const { userId } = req.params;
@@ -106,7 +103,6 @@ exports.validateRefreshToken = async (req, res) => {
     }
 
     return res.status(200).json({ message: "Refresh token is valid" });
-
   } catch (err) {
     console.error("Failed to validate refresh token:", err);
     return res.status(500).json({ message: "Internal server error" });
@@ -124,7 +120,6 @@ exports.revokeRefreshToken = async (req, res) => {
     await user.save();
 
     return res.status(200).json({ message: "Refresh token revoked" });
-
   } catch (err) {
     console.error("Failed to revoke refresh token:", err);
     return res.status(500).json({ message: "Internal server error" });
@@ -150,23 +145,53 @@ exports.isUsernameTaken = async (req, res) => {
 exports.searchUsersByUsername = async (req, res) => {
   const { query } = req.query;
 
-  if (!query || query.trim() === '') {
+  if (!query || query.trim() === "") {
     return res.status(400).json({ message: "Search query is required" });
   }
 
   try {
-    const regex = new RegExp(query.trim(), 'i'); 
+    const regex = new RegExp(query.trim(), "i");
 
     console.log("Requête utilisateur :", query);
     const users = await User.find({ username: { $regex: regex } })
-      .select('username avatar _id') 
-      .limit(20); 
+      .select("username avatar _id")
+      .limit(20);
 
     console.log("Utilisateurs trouvés :", users.length);
 
     return res.status(200).json(users);
   } catch (err) {
     console.error("Error searching users:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.updateUserProfile = async (req, res) => {
+  const userId = req.userId;
+  const { bio, avatar } = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { bio, avatar },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user: {
+        id: user._id,
+        username: user.username,
+        bio: user.bio,
+        avatar: user.avatar,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating profile:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
