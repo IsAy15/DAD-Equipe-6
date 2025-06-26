@@ -34,6 +34,8 @@ jobs:
         BRANCH="deployement"
         REPO_DIR="$HOME/breezy-api"
 
+        set -e  # stoppe le script si une commande échoue
+
         if [ -d "$REPO_DIR/.git" ]; then
           cd "$REPO_DIR"
           git pull origin "$BRANCH"
@@ -43,8 +45,6 @@ jobs:
         fi
 
         cd "$REPO_DIR"
-        set -e  # stoppe le script si une commande échoue
-
         cd "$REPO_DIR" || exit 1
 
         echo "Arrêt des anciens conteneurs..."
