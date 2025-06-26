@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import UserAvatar from "@/components/UserAvatar";
 import { sendMessage, getConversations, fetchUserProfile } from "@/utils/api";
 import { useAuth } from "@/contexts/authcontext";
+import socket from "@/utils/socket";
 
 export default function ConversationPage() {
   const { userId: conversationId } = useParams();
@@ -15,6 +16,41 @@ export default function ConversationPage() {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const bottomRef = useRef(null);
+
+  // On connecte le socket avec l'userId de la conversation
+  useEffect(() => {
+    if (!user?.id) return;
+
+    socket.connect();
+    socket.emit("join", user.id);
+
+    socket.on("newMessage", (message) => {
+      const isForThisChat =
+        (message.sender === user.id && message.receiver === conversationId) ||
+        (message.sender === conversationId && message.receiver === user.id);
+
+      if (isForThisChat) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: message._id,
+            sender: message.sender,
+            senderProfile:
+              message.sender === user.id
+                ? user
+                : { username: "?", id: message.sender },
+            content: message.content,
+            timestamp: new Date(message.createdAt),
+          },
+        ]);
+      }
+    });
+
+    return () => {
+      socket.off("newMessage");
+      socket.disconnect();
+    };
+  }, [user?.id, conversationId]);
 
   useEffect(() => {
     const navbars = document.querySelectorAll(".navbar");
@@ -102,24 +138,11 @@ export default function ConversationPage() {
   async function handleSend() {
     const text = newMessage.trim();
     if (!text) return;
+
     try {
-      // on récupère { message, messageId }
-      const { messageId } = await sendMessage(
-        conversationId,
-        text,
-        accessToken
-      );
-      // on ajoute la bulle optimiste
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: messageId,
-          sender: user.id,
-          content: text,
-          timestamp: new Date(),
-        },
-      ]);
+      await sendMessage(conversationId, text, accessToken);
       setNewMessage("");
+      // ⛔ Ne pas faire de setMessages ici !
     } catch (err) {
       console.error("Envoi échoué :", err);
     }

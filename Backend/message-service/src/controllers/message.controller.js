@@ -23,6 +23,13 @@ exports.sendMessage = async (req, res) => {
       link: `/messages`,
     });
 
+    // Récupération de l'instance de Socket.IO
+    const io = req.app.get("io");
+
+    // Émettre uniquement aux deux participants
+    io.to(sender.toString()).emit("newMessage", message);
+    io.to(receiver.toString()).emit("newMessage", message);
+
     res.status(201).json({ message: "Message sent", messageId: message._id });
   } catch (err) {
     console.error("Error sending message:", err);
