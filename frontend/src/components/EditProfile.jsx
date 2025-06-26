@@ -1,18 +1,44 @@
 import { useTranslations } from "next-intl";
 import { updateUserProfile } from "../utils/api";
 import { useAuth } from "@/contexts/authcontext";
+import { useState } from "react";
 
 export default function EditProfile() {
   const { user, token } = useAuth();
   const t = useTranslations("EditProfile");
+  const [uploading, setUploading] = useState(false);
+  const [bio, setBio] = useState(user.bio || "");
+  const [avatar, setAvatar] = useState(user.avatar || "");
+  const handleAvatar = async (e) => {
+    const image = e.target.files[0];
+
+    const formData = new FormData();
+    formData.append("file", image);
+
+    setUploading(true);
+
+    const res = await fetch("/api/upload_pp", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    console.log(data);
+    setAvatar(data.url);
+    setUploading(false);
+  };
   const handleSubmit = async (e) => {
+    console.log("Submitting form");
     e.preventDefault();
-    const formData = new FormData(e.target);
-    const bio = formData.get("bio");
-    const avatar = formData.get("avatar");
+    if (!bio && !avatar) {
+      console.log("No changes to save");
+      return;
+    }
 
     try {
-      await updateUserProfile(user.id, bio, avatar, token);
+      await updateUserProfile(bio, avatar, token);
+      // refresh page
+      window.location.reload();
     } catch (error) {
       console.error("Failed to update profile:", error);
       // Handle error (e.g., show an error message)
@@ -44,7 +70,22 @@ export default function EditProfile() {
                 <label className="label">
                   <span className="label-text">{t("profilePicture")}</span>
                 </label>
-                <PpUploader />
+                <div className="p-4">
+                  {avatar && (
+                    <div className="mt-4">
+                      <img src={avatar} alt="uploaded" className="w-48" />
+                    </div>
+                  )}
+                  {uploading && (
+                    <div className="loading loading-spinner loading-lg"></div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="input"
+                    onChange={handleAvatar}
+                  />
+                </div>
               </div>
               <div className="form-control">
                 <label className="label">
@@ -54,7 +95,7 @@ export default function EditProfile() {
                   type="text"
                   className="input input-bordered"
                   name="username"
-                  disabled="true"
+                  disabled={true}
                   defaultValue={user.username}
                 />
               </div>
@@ -66,6 +107,8 @@ export default function EditProfile() {
                   className="textarea textarea-bordered"
                   placeholder={t("bioPlaceholder")}
                   name="bio"
+                  onChange={(e) => setBio(e.target.value)}
+                  value={bio}
                 ></textarea>
               </div>
             </form>
@@ -78,7 +121,11 @@ export default function EditProfile() {
             >
               {t("cancel")}
             </button>
-            <button type="submit" className="btn btn-primary">
+            <button
+              className="btn btn-primary"
+              onClick={handleSubmit}
+              disabled={uploading}
+            >
               {t("saveChanges")}
             </button>
           </div>

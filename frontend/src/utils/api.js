@@ -308,9 +308,9 @@ export async function editMessage(messageId, content, token) {
   return res.data;
 }
 
-export async function updateUserProfile(userId, bio, avatar, token) {
+export async function updateUserProfile(bio, avatar, token) {
   const res = await apiClient.patch(
-    `/api/users/${userId}`,
+    `/api/users/`,
     {
       bio,
       avatar,
