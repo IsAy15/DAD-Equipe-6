@@ -35,7 +35,7 @@ export default function CommentExpander({ postId }) {
       try {
         setError(null)
         if (!postId) {
-          const comments = await fetchPostComments(postId, accessToken);
+          const comments = await fetchPostComments('685998752925fb31103216de', accessToken);
           setComments(comments);
         }
       } catch (error) {
@@ -72,7 +72,7 @@ export default function CommentExpander({ postId }) {
     setComments((prev) =>
       prev.map((c) => (c._id === commentId ? { ...c, content: newContent } : c))
     );
-    await updateComment(postId, commentId, newContent, accessToken);
+    await updateComment('685998752925fb31103216de', commentId, newContent, accessToken);
     setEditingCommentId(null);
   };
 
@@ -80,7 +80,7 @@ export default function CommentExpander({ postId }) {
   const handleDeleteComment = async (commentId) => {
     // Optionnel : confirmation ici ou dans le composant Comment
     try {
-      await deleteComment(postId, commentId, accessToken);
+      await deleteComment('685998752925fb31103216de', commentId, accessToken);
       setComments((prev) => prev.filter((c) => c._id !== commentId));
       if (editingCommentId === commentId) {
         setEditingCommentId(null);
@@ -99,7 +99,7 @@ export default function CommentExpander({ postId }) {
   if(error){
     return (
       <div>
-        <CommentInput post_id={postId} onAddComment={handleAddComment} />
+        <CommentInput post_id='685998752925fb31103216de' onAddComment={handleAddComment} />
         <div className="text-error text-sm mt-1 ml-4">
          {error}
         </div>  
@@ -110,7 +110,7 @@ export default function CommentExpander({ postId }) {
   if (!comments || comments.length === 0) {
     return (
       <div>
-        <CommentInput post_id={postId} onAddComment={handleAddComment} />
+        <CommentInput post_id='685998752925fb31103216de' onAddComment={handleAddComment} />
         <div className="p-4 text-sm text-primary italic">
           Aucun commentaire pour ce post
         </div>  
@@ -123,11 +123,11 @@ export default function CommentExpander({ postId }) {
 
   return (
     <div className="mt-4">
-      <CommentInput post_id={postId} onAddComment={handleAddComment} />
+      <CommentInput post_id='685998752925fb31103216de' onAddComment={handleAddComment} />
       <div className="flex flex-col p-2">
         {visibleComments.map((comment) => (
           <Comment
-            postId={postId}
+            postId='685998752925fb31103216de'
             key={comment._id}
             comment={comment}
             editingCommentId={editingCommentId}

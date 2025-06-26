@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/authcontext";
 import UserAvatar from "../UserAvatar";
 import { fetchUserProfile, getCommentRepliesCount, addReplyToComment, likeComment, unlikeComment } from "@/utils/api"
 import Link from "next/link";
+import { useLocale } from "next-intl";
 
 export default function Comment({
   postId,
@@ -15,6 +16,8 @@ export default function Comment({
   onDeleteComment,
   onAddReply,
 }) {
+
+  const locale = useLocale();
   const { user, accessToken } = useAuth();
   const [username, setUsername] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
@@ -26,6 +29,7 @@ export default function Comment({
   const [editedContent, setEditedContent] = useState(comment.content);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   
   const [repliesCount, setRepliesCount] = useState(null);
   const [showReplyBox, setShowReplyBox] = useState(false);
@@ -193,7 +197,7 @@ export default function Comment({
           <Pencil size={16} />
         </button>
         <button
-          onClick={handleDelete}
+          onClick={() => setShowDeleteModal(true)}
           className="absolute top-2 right-2 text-base-content hover:text-error"
           aria-label="Delete comment"
           disabled={deleting}
@@ -222,7 +226,10 @@ export default function Comment({
             <div>
               {username}
               <span className="text-xs text-base-content font-normal">
-                · {new Date(comment.createdAt).toDateString()}
+                · {new Date(comment.createdAt).toLocaleString(locale, {
+                    dateStyle: "full",
+                    timeStyle: "short",
+                  })}
               </span>
             </div>
             {comment.isReply && (
@@ -342,6 +349,43 @@ export default function Comment({
               >
                 Annuler
               </button>
+            </div>
+          </div>
+        )}
+        
+        {showDeleteModal && (
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+            <div className="bg-base-100 p-4 rounded-lg shadow-lg max-w-sm w-full">
+              <h2 className="text-primary text-lg font-semibold mb-2">Confirmer la suppression</h2>
+              <p className="text-base-content text-sm mb-4">Voulez-vous vraiment supprimer ce commentaire ?</p>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="px-3 py-1 text-sm text-base-content hover:text-accent"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={async () => {
+                    setDeleting(true);
+                    setError(null);
+                    try {
+                      await onDeleteComment(comment._id);
+                      setShowDeleteModal(false);
+                      if (editingCommentId === comment._id) {
+                        setEditingCommentId(null);
+                      }
+                    } catch (error) {
+                      setError("Impossible de supprimer le commentaire.");
+                    } finally {
+                      setDeleting(false);
+                    }
+                  }}
+                  className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                  Supprimer
+                </button>
+              </div>
             </div>
           </div>
         )}
