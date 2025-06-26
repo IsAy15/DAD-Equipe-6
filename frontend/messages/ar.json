@@ -100,5 +100,15 @@
   "homepage": {
     "forYou": "لك",
     "follow": "المتابَعون"
+  },
+  "searchPage": {
+    "searchLabel": "ابحث عن مستخدمين أو منشورات أو وسوم",
+    "searchPlaceholder": "بحث...",
+    "recentSearch": "عمليات البحث الأخيرة"
+  },
+  "notificationspage": {
+    "title": "الإشعارات",
+    "all": "الكل",
+    "mentions": "الإشارات"
   }
 }

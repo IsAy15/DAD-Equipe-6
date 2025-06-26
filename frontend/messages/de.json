@@ -100,5 +100,15 @@
   "homepage": {
     "forYou": "Für dich",
     "follow": "Gefolgt"
+  },
+  "searchPage": {
+    "searchLabel": "Suche nach Nutzern, Beiträgen oder Hashtags",
+    "searchPlaceholder": "Suchen...",
+    "recentSearch": "Letzte Suchen"
+  },
+  "notificationspage": {
+    "title": "Benachrichtigungen",
+    "all": "Alle",
+    "mentions": "Erwähnungen"
   }
 }

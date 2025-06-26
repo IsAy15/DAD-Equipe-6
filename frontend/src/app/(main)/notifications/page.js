@@ -13,7 +13,7 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all"); // 'all' ou 'mentions'
-  const t = useTranslations("Notifications");
+  const t = useTranslations("notificationspage");
   const locale = useLocale();
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export default function NotificationsPage() {
         >
           <span className="icon-[tabler--arrow-left] size-6" />
         </button>
-        <h1 className="text-lg font-semibold">Notifications</h1>
+        <h1 className="text-lg font-semibold"> </h1>
       </header>
 
       {/* Filtres */}
@@ -79,7 +79,7 @@ export default function NotificationsPage() {
                 : "text-gray-600 hover:bg-gray-50"
             }`}
           >
-            Tous
+            {t("all")}
           </button>
           <button
             onClick={() => setFilter("mentions")}
@@ -89,7 +89,7 @@ export default function NotificationsPage() {
                 : "text-gray-600 hover:bg-gray-50"
             }`}
           >
-            Mentions
+            {t("mentions")}
           </button>
         </div>
       </div>
