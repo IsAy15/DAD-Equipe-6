@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { addCommentToPost } from '@/utils/api';
+import React, { useState } from "react";
+import { addCommentToPost } from "@/utils/api";
 import { useAuth } from "@/contexts/authcontext";
-import { Image, Video, Smile } from 'lucide-react';
-import { useNotyf } from '@/contexts/NotyfContext';
-
+import { Image, Video, Smile } from "lucide-react";
+import { useNotyf } from "@/contexts/NotyfContext";
+import { useTranslations } from "next-intl";
 export default function CommentInput({ post_id, onAddComment }) {
+  const t = useTranslations("CommentInput");
   const { accessToken } = useAuth();
   const notyf = useNotyf();
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
 
@@ -24,7 +25,7 @@ export default function CommentInput({ post_id, onAddComment }) {
       if (response.status === 201 || response.status === 200) {
         const newComment = response.data;
         onAddComment?.(newComment);
-        setContent('');
+        setContent("");
       } else {
         setError("Échec de l'ajout du commentaire.");
       }
@@ -41,7 +42,7 @@ export default function CommentInput({ post_id, onAddComment }) {
       <div className="border border-neutral rounded-lg p-2 m-4 flex flex-col gap-2 focus-within:ring-2 focus-within:ring-primary transition">
         {/* Zone de texte */}
         <textarea
-          placeholder="Poster votre réponse"
+          placeholder={t("placeholder")}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           disabled={sending}
@@ -54,12 +55,12 @@ export default function CommentInput({ post_id, onAddComment }) {
           <div className="flex gap-4 text-gray-500">
             <button
               type="button"
-              title="Ajouter une image"
+              title={t("addImage")}
               className="hover:text-blue-600 transition"
               onClick={() =>
                 notyf.open({
                   type: "warning",
-                  message: "Fonctionnalité en cours de développement",
+                  message: t("featureInDevelopment"),
                 })
               }
             >
@@ -67,12 +68,12 @@ export default function CommentInput({ post_id, onAddComment }) {
             </button>
             <button
               type="button"
-              title="Ajouter une vidéo"
+              title={t("addVideo")}
               className="hover:text-green-600 transition"
               onClick={() =>
                 notyf.open({
                   type: "warning",
-                  message: "Fonctionnalité en cours de développement",
+                  message: t("featureInDevelopment"),
                 })
               }
             >
@@ -80,12 +81,12 @@ export default function CommentInput({ post_id, onAddComment }) {
             </button>
             <button
               type="button"
-              title="Ajouter un emoji"
+              title={t("addEmoji")}
               className="hover:text-yellow-500 transition"
               onClick={() =>
                 notyf.open({
                   type: "warning",
-                  message: "Fonctionnalité en cours de développement",
+                  message: t("featureInDevelopment"),
                 })
               }
             >
@@ -98,7 +99,7 @@ export default function CommentInput({ post_id, onAddComment }) {
             disabled={!content.trim() || sending}
             className="px-4 py-2 rounded-full bg-primary text-base-content font-semibold text-sm hover:bg-primary-focus transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {sending ? '...' : 'Répondre'}
+            {sending ? "..." : "Répondre"}
           </button>
         </div>
       </div>
