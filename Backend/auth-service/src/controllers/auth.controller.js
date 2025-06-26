@@ -2,36 +2,50 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
 
-const { randomBytes } = require("crypto");
-
-const generateRefreshToken = () => randomBytes(64).toString("hex");
-
 exports.refreshToken = async (req, res) => {
-  const { userId } = req.body;
   const oldRefreshToken = req.cookies.refreshToken;
 
-  if (!oldRefreshToken || !userId) {
+  if (!oldRefreshToken) {
     return res
       .status(400)
-      .json({ message: "Refresh token and user ID required" });
+      .json({ message: "Refresh token is required" });
   }
 
   try {
     const userServiceURL = process.env.USER_SERVICE_URL;
 
+    const decoded = jwt.verify(
+      oldRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+    )
+
+    const username = decoded.userInfo.username
+    const userId = decoded.userInfo.userId;
+
     // 1. Vérifie l'ancien refreshToken
-    await axios.post(
-      `${userServiceURL}/api/users/${userId}/refreshTokens/validate`,
-      { refreshToken: oldRefreshToken }
-    );
+    const userExists = await axios.get(
+      `${userServiceURL}/api/users/check-username?username=${username}`);
+
+    if(userExists == false){
+      return res.status(401).json({ message: 'Unauthorized'})
+    }
 
     // 2. Génère un nouveau accessToken
     const newAccessToken = jwt.sign({ userId }, process.env.ACCESS_JWT_KEY, {
-      expiresIn: "10m",
+      expiresIn: "10s",
     });
 
     // 3. Génère un nouveau refreshToken (rotation)
-    const newRefreshToken = generateRefreshToken();
+    const newRefreshToken = jwt.sign(
+      {
+        "userInfo": {
+          "userId": userId,
+          "username": username
+        }
+      },
+      process.env.REFRESH_TOKEN_SECRET,
+      {expiresIn: '1d'}
+    )
 
     // 4. Remplace dans la base (remplace l'ancien)
     await axios.post(`${userServiceURL}/api/users/${userId}/refreshTokens`, {
@@ -86,7 +100,16 @@ exports.register = async (req, res) => {
       { expiresIn: "10s" } // Token court (10 s)
     );
 
-    const refreshToken = generateRefreshToken();
+    const refreshToken = jwt.sign(
+      {
+        "userInfo": {
+          "userId": user.userId,
+          "username": user.username
+        }
+      },
+      process.env.REFRESH_TOKEN_SECRET,
+      {expiresIn: '1d'}
+    )
 
     // Stocker le refreshToken côté user-service
     await axios.post(
@@ -101,7 +124,7 @@ exports.register = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // durée de vie 7 jours
     });
 
-    return res.status(201).json({
+    res.status(201).json({
       msg: "New User created!",
       accessToken,
       userId: user.userId,
@@ -154,10 +177,19 @@ exports.login = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user.id, username: user.username },
       process.env.ACCESS_JWT_KEY,
-      { expiresIn: "10m" }
+      { expiresIn: "10s" }
     );
 
-    const refreshToken = generateRefreshToken();
+    const refreshToken = jwt.sign(
+      {
+        "userInfo": {
+          "userId": user.id,
+          "username": user.username
+        }
+      },
+      process.env.REFRESH_TOKEN_SECRET,
+      {expiresIn: '1d'}
+    )
 
     // Stocker le refreshToken côté user-service
     await axios.post(`${userServiceURL}/api/users/${user.id}/refreshTokens`, {
@@ -171,7 +203,7 @@ exports.login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // durée de vie 7 jours
     });
 
-    return res.status(200).json({
+    res.status(200).json({
       message: "You are now connected!",
       accessToken,
       userId: user.id,
@@ -183,7 +215,7 @@ exports.login = async (req, res) => {
         .json({ message: "Invalid email/username or password" });
     }
     console.error("Login error:", err.message);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", err });
   }
 };
 
@@ -191,11 +223,13 @@ exports.login = async (req, res) => {
 exports.verifyToken = (req, res) => {
   const authHeader = req.headers["authorization"];
 
+  
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ message: "No token provided" });
   }
-
+  
   const token = authHeader.slice(7); // Enlève "Bearer "
+  console.log(token);
 
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_JWT_KEY);
