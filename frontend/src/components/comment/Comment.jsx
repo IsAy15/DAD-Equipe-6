@@ -225,13 +225,12 @@ export default function Comment({
 
         <div className="flex items-center gap-3">
           {/* Avatar */}
-          <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-gray-200 text-gray-600 font-bold text-sm shrink-0">
-            {avatarLoading ? (
-              <div className="w-6 h-6 rounded-full bg-base-content animate-pulse" />
-            ) : (
-              <UserAvatar user={userProfile} />
-            )}
-          </div>
+
+          {avatarLoading ? (
+            <div className="w-10 h-10 rounded-full bg-base-content animate-pulse" />
+          ) : (
+            <UserAvatar user={userProfile} size="sm" />
+          )}
 
           {/* Username + date */}
           <div className="text-sm font-semibold flex items-center gap-1">
@@ -242,10 +241,11 @@ export default function Comment({
                 <div>
                   {username}
                   <span className="text-xs text-base-content font-normal">
-                    · {new Date(comment.createdAt).toLocaleString(locale, {
-                    dateStyle: "full",
-                    timeStyle: "short",
-                  })}
+                    ·{" "}
+                    {new Date(comment.createdAt).toLocaleString(locale, {
+                      dateStyle: "full",
+                      timeStyle: "short",
+                    })}
                   </span>
                 </div>
                 {comment.isReply && (
@@ -375,43 +375,47 @@ export default function Comment({
                 </div>
               </div>
             )}
-        
-        {showDeleteModal && (
-          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-            <div className="bg-base-100 p-4 rounded-lg shadow-lg max-w-sm w-full">
-              <h2 className="text-primary text-lg font-semibold mb-2">Confirmer la suppression</h2>
-              <p className="text-base-content text-sm mb-4">Voulez-vous vraiment supprimer ce commentaire ?</p>
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  className="px-3 py-1 text-sm text-base-content hover:text-accent"
-                >
-                  Annuler
-                </button>
-                <button
-                  onClick={async () => {
-                    setDeleting(true);
-                    setError(null);
-                    try {
-                      await onDeleteComment(comment._id);
-                      setShowDeleteModal(false);
-                      if (editingCommentId === comment._id) {
-                        setEditingCommentId(null);
-                      }
-                    } catch (error) {
-                      setError("Impossible de supprimer le commentaire.");
-                    } finally {
-                      setDeleting(false);
-                    }
-                  }}
-                  className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
-                >
-                  Supprimer
-                </button>
+
+            {showDeleteModal && (
+              <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+                <div className="bg-base-100 p-4 rounded-lg shadow-lg max-w-sm w-full">
+                  <h2 className="text-primary text-lg font-semibold mb-2">
+                    Confirmer la suppression
+                  </h2>
+                  <p className="text-base-content text-sm mb-4">
+                    Voulez-vous vraiment supprimer ce commentaire ?
+                  </p>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => setShowDeleteModal(false)}
+                      className="px-3 py-1 text-sm text-base-content hover:text-accent"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      onClick={async () => {
+                        setDeleting(true);
+                        setError(null);
+                        try {
+                          await onDeleteComment(comment._id);
+                          setShowDeleteModal(false);
+                          if (editingCommentId === comment._id) {
+                            setEditingCommentId(null);
+                          }
+                        } catch (error) {
+                          setError("Impossible de supprimer le commentaire.");
+                        } finally {
+                          setDeleting(false);
+                        }
+                      }}
+                      className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                    >
+                      Supprimer
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            )}
 
             {error && (
               <div className="text-error text-xs mb-1 px-1">{error}</div>

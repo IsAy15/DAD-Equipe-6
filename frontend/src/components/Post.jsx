@@ -5,14 +5,14 @@ import { likeBreeze, fetchUserProfile } from "@/utils/api";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/authcontext";
 import { useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 
-export default function Post({ post }) {
+export default function Post({ post, link = true }) {
   const locale = useLocale();
   const [author, setAuthor] = useState(null);
   const { user } = useAuth();
   const isLiked = post.likes.includes(user.id);
-
-  console.log("Post component rendered with post:", post);
+  const router = useRouter();
 
   useEffect(() => {
     async function loadAuthor() {
@@ -28,7 +28,13 @@ export default function Post({ post }) {
   }, [post.author]);
 
   return (
-    <div className="">
+    <div
+      onClick={() => {
+        if (link) {
+          router.push(`/post/${post._id}`);
+        }
+      }}
+    >
       <div className="flex items-center gap-3 mb-2">
         <div className="tooltip tooltip-toggle" aria-label="Popover Button">
           <UserAvatar size="xs" user={author} />
@@ -74,6 +80,7 @@ export default function Post({ post }) {
         count={post.likes.length}
         onLike={likeBreeze}
         idToLike={post._id}
+        onClick={(e) => e.stopPropagation()}
       />
 
       <hr className="border-t border-base-content/30 mt-4 w-full" />

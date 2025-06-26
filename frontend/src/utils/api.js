@@ -187,7 +187,7 @@ export async function fetchTaggedPosts(tag, token) {
   return res.data;
 }
 
-export async function fetchPosts(postId, token) {
+export async function fetchPost(postId, token) {
   const res = await apiClient.get(`/api/posts/${postId}`);
   return res.data;
 }

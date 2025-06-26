@@ -39,7 +39,7 @@ export default function CommentInput({ post_id, onAddComment }) {
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="border border-neutral rounded-lg p-2 m-4 flex flex-col gap-2 focus-within:ring-2 focus-within:ring-primary transition">
+      <div className="border border-neutral rounded-lg p-2 flex flex-col gap-2 focus-within:ring-2 focus-within:ring-primary transition">
         {/* Zone de texte */}
         <textarea
           placeholder={t("placeholder")}

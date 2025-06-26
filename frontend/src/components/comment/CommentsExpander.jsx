@@ -37,9 +37,11 @@ export default function CommentExpander({ postId }) {
         setError(null);
         if (!postId) {
           const comments = await fetchPostComments(postId, accessToken);
+          console.log("Commentaires récupérés :", comments);
           setComments(comments);
         }
       } catch (error) {
+        console.log("Erreur lors de la récupération des commentaires", error);
         setError(t("errorFetchComments"));
       } finally {
         setLoading(false);
