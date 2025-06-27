@@ -24,21 +24,25 @@ export default function ConversationPage() {
     socket.connect();
     socket.emit("join", user.id);
 
-    socket.on("newMessage", (message) => {
+    socket.on("newMessage", async (message) => {
       const isForThisChat =
         (message.sender === user.id && message.receiver === conversationId) ||
         (message.sender === conversationId && message.receiver === user.id);
 
       if (isForThisChat) {
+        // Fetch sender profile if not me
+        let senderProfile;
+        if (message.sender === user.id) {
+          senderProfile = user;
+        } else {
+          senderProfile = await fetchUserProfile(message.sender);
+        }
         setMessages((prev) => [
           ...prev,
           {
             id: message._id,
             sender: message.sender,
-            senderProfile:
-              message.sender === user.id
-                ? user
-                : { username: "?", id: message.sender },
+            senderProfile: senderProfile,
             content: message.content,
             timestamp: new Date(message.createdAt),
           },

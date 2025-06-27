@@ -23,15 +23,12 @@ export default function EditProfile() {
     });
 
     const data = await res.json();
-    console.log(data);
     setAvatar(data.url);
     setUploading(false);
   };
   const handleSubmit = async (e) => {
-    console.log("Submitting form");
     e.preventDefault();
     if (!bio && !avatar) {
-      console.log("No changes to save");
       return;
     }
 

@@ -103,7 +103,6 @@ export const loginUser = async (identifier, password) => {
       },
       config
     );
-    console.log(response);
     return response.data;
   } catch (error) {
     //console.error("Erreur lors de la connexion :", error);
