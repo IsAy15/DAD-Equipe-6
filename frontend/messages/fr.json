@@ -171,5 +171,9 @@
     "description": "Sélectionnez un utilisateur pour commencer une nouvelle conversation",
     "noFriends": "Aucun ami trouvé",
     "error": "Erreur lors du chargement des amis"
+  },
+   "createbreathpage": {
+    "Cancel": "Annuler",
+    "Breath": "Souffle"
   }
 }

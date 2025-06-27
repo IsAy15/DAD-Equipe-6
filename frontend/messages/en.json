@@ -173,5 +173,9 @@
     "description": "Select a user to start a new conversation",
     "noFriends": "No friends found",
     "error": "Error loading friends"
+  },
+  "createbreathpage": {
+    "Cancel": "Cancel",
+    "Breath": "Breath"
   }
 }

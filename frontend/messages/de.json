@@ -170,5 +170,8 @@
     "description": "Wähle einen Nutzer, um eine neue Unterhaltung zu starten",
     "noFriends": "Keine Freunde gefunden",
     "error": "Fehler beim Laden der Freunde"
-  }
+  },
+  "createbreathpage": {
+  "Cancel": "Abbrechen",
+  "Breath": "Atemzug"}
 }
