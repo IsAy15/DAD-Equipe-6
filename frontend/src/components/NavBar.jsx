@@ -236,7 +236,7 @@ export default function NavBar() {
                 showOnMobile={false}
               />
               <MenuItem
-                label="Favoris"
+                label={t("bookmarks")}
                 href="#"
                 icon="bookmark"
                 iconFillable={true}
