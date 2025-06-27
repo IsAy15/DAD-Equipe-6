@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   fetchTaggedPosts,
   fetchPost,
@@ -12,10 +13,12 @@ import Post from "@/components/Post";
 import ProfileCard from "@/components/ProfileCard";
 
 export default function SearchPage() {
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("q") || "";
   const { user: myUser, accessToken } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [recentSearches, setRecentSearches] = useState([]);
   const [taggedPosts, setTaggedPosts] = useState([]);
   const [users, setUsers] = useState([]);
@@ -44,6 +47,17 @@ export default function SearchPage() {
       setRecentSearches(filtered);
     }
   }, []);
+
+  // Déclenche la recherche automatiquement si initialQuery est présent
+  useEffect(() => {
+    if (initialQuery) {
+      // Simule un event pour onChange
+      onChange({ target: { value: initialQuery } });
+    } else {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQuery]);
 
   const onChange = async (e) => {
     const value = e.target.value;
