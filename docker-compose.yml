@@ -14,7 +14,7 @@ services:
       - post-service
 
   mongo-user:
-    image: mongo
+    image: arm64v8/mongo:4.4.18
     container_name: mongo-user
     restart: unless-stopped
     ports:
@@ -25,7 +25,7 @@ services:
       - app-network
 
   mongo-message:
-    image: mongo
+    image: arm64v8/mongo:4.4.18
     container_name: mongo-message
     restart: unless-stopped
     ports:
@@ -36,7 +36,7 @@ services:
       - app-network
 
   mongo-notification:
-    image: mongo
+    image: arm64v8/mongo:4.4.18
     container_name: mongo-notification
     restart: unless-stopped
     ports:
