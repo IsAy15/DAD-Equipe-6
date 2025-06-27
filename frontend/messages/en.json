@@ -9,6 +9,8 @@
     "loginTitle": "Login",
     "registerDescription": "Create an account to get started",
     "loginDescription": "Log in to access your account",
+    "identifier": "Username or email",
+    "identifierPlaceholder": "Enter your username or email",
     "username": "Username",
     "usernamePlaceholder": "Enter your username",
     "usernameError": "Invalid/Already taken username",
@@ -111,5 +113,50 @@
     "title": "title",
     "all": "All",
     "mentions": "Mentions"
+  },
+  "Profile": {
+    "title": "Profile",
+    "userNotFound": "User not found",
+    "editProfile": "Edit profile",
+    "changePassword": "Change password",
+    "profilePicture": "Profile picture",
+    "username": "Username",
+    "email": "Email",
+    "bio": "Bio",
+    "joined": "Joined",
+    "follower": "follower",
+    "followers": "followers",
+    "following": "following",
+    "followings": "followings",
+    "status": {
+      "follow": "Follow",
+      "following": "Following",
+      "unfollow": "Unfollow",
+      "friends": "Friends"
+    }
+  },
+  "EditProfile": {
+    "title": "Edit profile",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "usernameError": "Invalid/Already taken username",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "emailError": "Invalid email address",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell us about yourself in a few words",
+    "profilePicture": "Profile picture",
+    "saveChanges": "Save",
+    "cancel": "Cancel"
+  },
+  "Messages": {
+    "title": "Messages",
+    "noMessages": "No messages found",
+    "newMessage": "New message",
+    "searchPlaceholder": "Search messages or users",
+    "sendMessage": "Send message",
+    "typeMessage": "Type your message here...",
+    "send": "Send",
+    "loading": "Loading messages..."
   }
 }

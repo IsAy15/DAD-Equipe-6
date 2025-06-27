@@ -103,5 +103,50 @@
     "title": "通知",
     "all": "全部",
     "mentions": "提及"
+  },
+  "Profile": {
+    "title": "个人资料",
+    "userNotFound": "未找到用户",
+    "editProfile": "编辑个人资料",
+    "changePassword": "更改密码",
+    "profilePicture": "头像",
+    "username": "用户名",
+    "email": "邮箱",
+    "bio": "简介",
+    "joined": "注册于",
+    "follower": "粉丝",
+    "followers": "粉丝",
+    "following": "关注",
+    "followings": "关注的人",
+    "status": {
+      "follow": "关注",
+      "following": "已关注",
+      "unfollow": "取消关注",
+      "friends": "好友"
+    }
+  },
+  "EditProfile": {
+    "title": "编辑个人资料",
+    "username": "用户名",
+    "usernamePlaceholder": "请输入用户名",
+    "usernameError": "用户名无效或已被占用",
+    "email": "邮箱",
+    "emailPlaceholder": "请输入邮箱",
+    "emailError": "邮箱地址无效",
+    "bio": "简介",
+    "bioPlaceholder": "用几句话介绍一下你自己",
+    "profilePicture": "头像",
+    "saveChanges": "保存",
+    "cancel": "取消"
+  },
+  "Messages": {
+    "title": "消息",
+    "noMessages": "未找到消息",
+    "newMessage": "新消息",
+    "searchPlaceholder": "搜索消息或用户",
+    "sendMessage": "发送消息",
+    "typeMessage": "在此输入你的消息...",
+    "send": "发送",
+    "loading": "正在加载消息..."
   }
 }
