@@ -137,12 +137,12 @@ export default function SearchPage() {
             id="searchInput"
             type="search"
             className="grow outline-none text-base-content placeholder:text-base-content/40"
-            placeholder="Search"
+            placeholder={t("searchPlaceholder")}
             value={query}
             onChange={onChange}
           />
           <label className="sr-only" htmlFor="searchInput">
-            Search
+            {t("searchLabel")}
           </label>
 
           <span className="my-auto flex gap-2 text-base-content/60">
@@ -168,7 +168,7 @@ export default function SearchPage() {
         {query.trim() === "" ? (
           <>
             <h2 className="font-semibold text-base-content/80 mb-2">
-              Recent searches
+              {t("recentSearch")}
             </h2>
             <div className="flex flex-wrap gap-4">
               {recentSearches.map((item, idx) => (
@@ -234,7 +234,7 @@ export default function SearchPage() {
           </>
         ) : (
           <div className="text-base-content/80">
-            Résultats pour <strong>"{query}"</strong> …
+            {t("resultfor")} <strong>"{query}"</strong> …
             <ul className="mt-4 space-y-2">
               {loading ? (
                 <li className="animate-pulse">Loading...</li>
@@ -257,7 +257,7 @@ export default function SearchPage() {
                   </li>
                 ))
               ) : (
-                <li>No users found</li>
+                <li> {t("noResults")}</li>
               )}
             </ul>
           </div>

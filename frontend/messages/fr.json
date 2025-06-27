@@ -62,7 +62,8 @@
     "messages": "Messages",
     "theme": "Thème",
     "language": "Langue",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "bookmarks": "Favoris"
   },
   "AppearanceSettings": {
     "theme": "Thème",
@@ -122,7 +123,9 @@
     "noPosts": "Aucun post trouvé"
   },
   "profileCard": {
-    "userNotFound": "Utilisateur non trouvé"
+    "userNotFound": "Utilisateur non trouvé",
+    "following": "Abonnements",
+    "followers": "Abonnés"
   },
   "Comment": {
     "cancel": "Annuler",
@@ -150,11 +153,23 @@
   "searchPage": {
     "searchLabel": "Rechercher des utilisateurs, des posts ou des hashtags",
     "searchPlaceholder": "Rechercher...",
-    "recentSearch": "Recherches récentes"
+    "recentSearch": "Recherches récentes",
+    "resultfor": "Résultats pour",
+    "noResults": "Aucun résultat trouvé"
   },
   "notificationspage": {
     "title": "Notifications",
-    "noNotifications": "Aucune notification",
-    "seeMore": "Voir plus"
+    "all": "Toutes",
+    "mentions": "Mentions"
+  },
+  "Conversation": {
+    "title": "Conversation",
+    "messagePlaceholder": "Tapez un message..."
+  },
+  "NewMessagePage": {
+    "title": "Nouvelle conversation",
+    "description": "Sélectionnez un utilisateur pour commencer une nouvelle conversation",
+    "noFriends": "Aucun ami trouvé",
+    "error": "Erreur lors du chargement des amis"
   }
 }

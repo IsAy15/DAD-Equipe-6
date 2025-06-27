@@ -55,7 +55,8 @@
     "settings": "设置",
     "theme": "主题",
     "language": "语言",
-    "logout": "登出"
+    "logout": "登出",
+    "bookmarks": "收藏"
   },
   "AppearanceSettings": {
     "theme": "主题",
@@ -70,7 +71,9 @@
     "noPosts": "未找到帖子"
   },
   "profileCard": {
-    "userNotFound": "未找到用户"
+    "userNotFound": "未找到用户",
+    "following": "关注",
+    "followers": "粉丝"
   },
   "Comment": {
     "cancel": "取消",
@@ -97,7 +100,9 @@
   "searchPage": {
     "searchLabel": "搜索用户、帖子或标签",
     "searchPlaceholder": "搜索...",
-    "recentSearch": "最近搜索"
+    "recentSearch": "最近搜索",
+    "resultfor": "结果：",
+    "noResults": "未找到结果"
   },
   "notificationspage": {
     "title": "通知",
@@ -148,5 +153,15 @@
     "typeMessage": "在此输入你的消息...",
     "send": "发送",
     "loading": "正在加载消息..."
+  },
+  "Conversation": {
+    "title": "会话",
+    "messagePlaceholder": "输入消息..."
+  },
+  "NewMessagePage": {
+    "title": "新会话",
+    "description": "选择一个用户开始新的会话",
+    "noFriends": "未找到好友",
+    "error": "加载好友时出错"
   }
 }

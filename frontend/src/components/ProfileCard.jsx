@@ -139,13 +139,13 @@ export default function ProfileCard({ user, full = false }) {
               <span className="text-base-content font-semibold">
                 {userProfile?.followingCount}
               </span>{" "}
-              abonnements
+              {t("following")}
             </div>
             <div className="h-4 w-28 text-base-content/80">
               <span className="text-base-content font-semibold">
                 {userProfile?.followersCount}
               </span>{" "}
-              abonnés
+              {t("followers")}
             </div>
           </div>
           {/* Bouton suivre/désabonner à droite */}
