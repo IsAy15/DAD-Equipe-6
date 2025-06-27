@@ -362,3 +362,13 @@ export async function readAndDeleteNotification(notificationId, token) {
   });
   return res.data;
 }
+
+export async function markConversationAsRead(userId, token) {
+  return apiClient.post(
+    `/messages/conversations/${userId}/read`,
+    {},
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+}

@@ -204,3 +204,17 @@ exports.getConversations = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.markConversationAsRead = async (req, res) => {
+  const userId = req.userId;
+  const otherUserId = req.params.userId;
+  try {
+    await Message.updateMany(
+      { sender: otherUserId, receiver: userId, isRead: false },
+      { $set: { isRead: true } }
+    );
+    res.status(200).json({ message: "Conversation marked as read" });
+  } catch (err) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

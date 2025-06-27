@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/authcontext";
-import { fetchNotifications } from "@/utils/api";
+import { fetchNotifications, readAndDeleteNotification } from "@/utils/api";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 
@@ -28,6 +28,20 @@ export default function NotificationsPage() {
     }
     load();
   }, [accessToken]);
+
+  const handleNotificationClick = async (notification) => {
+    try {
+      await readAndDeleteNotification(notification._id, accessToken);
+      if (notification.link) {
+        router.push(notification.link);
+      }
+    } catch (err) {
+      console.error("Erreur lors de la suppression de la notification :", err);
+      if (notification.link) {
+        router.push(notification.link);
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -70,7 +84,11 @@ export default function NotificationsPage() {
             <p className="text-center text-gray-600">{t("noNotifications")}</p>
           ) : (
             notifications.map((n) => (
-              <li key={n._id} className="p-3 card mb-2 bg-base-100">
+              <li
+                key={n._id}
+                className={`p-3 card mb-2 bg-base-100 cursor-pointer transition hover:bg-primary/10`}
+                onClick={() => handleNotificationClick(n)}
+              >
                 <div className="flex items-center justify-between ">
                   <div>
                     <p className="font-semibold">{n.action}</p>
@@ -80,11 +98,6 @@ export default function NotificationsPage() {
                     {getRelativeTime(n.createdAt)}
                   </span>
                 </div>
-                {n.link && (
-                  <Link href={n.link} className="text-accent mt-2 block">
-                    {t("seeMore")}
-                  </Link>
-                )}
               </li>
             ))
           )}

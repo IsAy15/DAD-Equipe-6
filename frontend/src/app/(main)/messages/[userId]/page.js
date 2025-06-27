@@ -3,7 +3,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import UserAvatar from "@/components/UserAvatar";
-import { sendMessage, getConversations, fetchUserProfile } from "@/utils/api";
+import {
+  sendMessage,
+  getConversations,
+  fetchUserProfile,
+  markConversationAsRead,
+} from "@/utils/api";
 import { useAuth } from "@/contexts/authcontext";
 import socket from "@/utils/socket";
 
@@ -146,11 +151,16 @@ export default function ConversationPage() {
     try {
       await sendMessage(conversationId, text, accessToken);
       setNewMessage("");
-      // ⛔ Ne pas faire de setMessages ici !
     } catch (err) {
       console.error("Envoi échoué :", err);
     }
   }
+
+  useEffect(() => {
+    if (conversationId && accessToken) {
+      markConversationAsRead(conversationId, accessToken);
+    }
+  }, [conversationId, accessToken]);
 
   if (loading) {
     return (
