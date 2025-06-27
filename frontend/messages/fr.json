@@ -173,6 +173,10 @@
     "noFriends": "Aucun ami trouvé",
     "error": "Erreur lors du chargement des amis"
   },
+   "createbreathpage": {
+    "Cancel": "Annuler",
+    "Breath": "Souffle"
+    },
   "Post": {
     "loading": "Chargement..."
   }

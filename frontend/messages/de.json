@@ -172,6 +172,10 @@
     "noFriends": "Keine Freunde gefunden",
     "error": "Fehler beim Laden der Freunde"
   },
+  "createbreathpage": {
+  "Cancel": "Abbrechen",
+  "Breath": "Atemzug"
+  },
   "Post": {
     "loading": "Laden..."
   }

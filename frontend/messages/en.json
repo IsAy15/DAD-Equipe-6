@@ -177,5 +177,9 @@
   },
   "Post": {
     "loading": "Loading..."
+  },
+  "createbreathpage": {
+    "Cancel": "Cancel",
+    "Breath": "Breath"
   }
 }

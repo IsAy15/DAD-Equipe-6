@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { postBreeze, fetchUserProfile } from "@/utils/api";
 import UserAvatar from "@/components/UserAvatar";
 import { useAuth } from "@/contexts/authcontext";
+import { useTranslations } from "next-intl";
 import React from "react";
 import Link from "next/link";
 
@@ -15,6 +16,7 @@ export default function CreateBreathPage() {
   const [tags, setTags] = useState([]); // Ajout état pour les tags
   const fileInputRef = useRef(null);
   const { user, accessToken } = useAuth();
+  const t = useTranslations("createbreathpage");
   const contentEditableRef = useRef(null);
 
   // Extraction des hashtags à chaque changement de texte
@@ -122,14 +124,14 @@ export default function CreateBreathPage() {
           onClick={handleCancel}
           className="btn btn-outline btn-primary btn-sm font-semibold"
         >
-          Cancel
+          {t("Cancel")}
         </button>
 
         <button
           onClick={handleSubmit}
           className="btn btn-primary btn-sm font-semibold"
         >
-          Breath
+           {t("Breath")}
           <span className="icon-[tabler--wind] size-6" />
         </button>
       </header>
