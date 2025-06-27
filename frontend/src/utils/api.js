@@ -144,6 +144,11 @@ export async function fetchUserFeed(token) {
   return res.data;
 }
 
+export async function fetchFYP() {
+  const res = await apiClient.get(`/api/posts/fyp`);
+  return res.data;
+}
+
 export async function followUser(targetUserId, token) {
   const res = await apiClient.post(
     `api/friend-requests/follow/${targetUserId}`,

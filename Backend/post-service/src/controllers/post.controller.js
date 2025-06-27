@@ -286,4 +286,86 @@ module.exports = {
         .json({ message: "Failed to retrieve post", details: err.message });
     }
   },
+
+  getForYouFeed: async (req, res) => {
+    try {
+      const user_id = req.userId;
+      if (!user_id) {
+        return res.status(400).json({ message: "User id is required" });
+      }
+
+      // Récupère les abonnements de l'utilisateur
+      let followingIds = [];
+      try {
+        const response = await axios.get(
+          `http://gateway:8080/api/users/${user_id}/following`
+        );
+        followingIds = response.data.following || [];
+      } catch (err) {
+        console.error("Failed to fetch following list:", err.message);
+      }
+
+      // Récupère les posts des abonnements
+      let followingPosts = [];
+      if (followingIds.length > 0) {
+        followingPosts = await Post.find({ author: { $in: followingIds } })
+          .sort({ createdAt: -1 })
+          .limit(20)
+          .lean()
+          .exec();
+      }
+
+      // Récupère les posts populaires (hors abonnements)
+      const now = new Date();
+      const trendingPosts = await Post.aggregate([
+        { $match: { author: { $nin: followingIds.concat([user_id]) } } },
+        {
+          $addFields: {
+            likesCount: { $size: "$likes" },
+            commentsCount: { $size: "$comments" },
+            ageInHours: {
+              $divide: [{ $subtract: [now, "$createdAt"] }, 1000 * 60 * 60],
+            },
+          },
+        },
+        {
+          $addFields: {
+            score: {
+              $subtract: [
+                {
+                  $add: ["$likesCount", { $multiply: [0.5, "$commentsCount"] }],
+                },
+                { $multiply: [0.3, "$ageInHours"] },
+              ],
+            },
+          },
+        },
+        { $sort: { score: -1 } },
+        { $limit: 20 },
+      ]);
+
+      // Fusionne et retire les doublons par _id
+      const postMap = new Map();
+      for (const post of followingPosts) {
+        postMap.set(String(post._id), post);
+      }
+      for (const post of trendingPosts) {
+        if (!postMap.has(String(post._id))) {
+          postMap.set(String(post._id), post);
+        }
+      }
+      const allPosts = Array.from(postMap.values());
+
+      // Mélange aléatoirement
+      for (let i = allPosts.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allPosts[i], allPosts[j]] = [allPosts[j], allPosts[i]];
+      }
+
+      return res.status(200).json(allPosts);
+    } catch (err) {
+      console.error("Error generating For You feed:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  },
 };

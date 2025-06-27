@@ -159,7 +159,9 @@ router.get(
   postController.getPostsByUserId
 );
 
-router.get("/feed", [ verifyJWT], postController.getPostsOfSubscribdedTo);
+router.get("/feed", [verifyJWT], postController.getPostsOfSubscribdedTo);
+
+router.get("/fyp", [verifyJWT], postController.getForYouFeed);
 
 router.post("/", verifyJWT, postController.createPost);
 
@@ -181,7 +183,11 @@ router.get(
   postController.getPostById
 );
 
-router.get("/search/recent", [verifyJWT], postController.searchRecentPostsByTag);
+router.get(
+  "/search/recent",
+  [verifyJWT],
+  postController.searchRecentPostsByTag
+);
 router.get(
   "/search/liked",
   [verifyJWT],

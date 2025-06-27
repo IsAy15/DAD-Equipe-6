@@ -112,6 +112,7 @@
     "searchPlaceholder": "Search...",
     "recentSearch": "Recent searches",
     "resultfor": "Results for",
+    "loading": "Loading...",
     "noResults": "No results found"
   },
   "notificationspage": {
@@ -173,5 +174,8 @@
     "description": "Select a user to start a new conversation",
     "noFriends": "No friends found",
     "error": "Error loading friends"
+  },
+  "Post": {
+    "loading": "Loading..."
   }
 }

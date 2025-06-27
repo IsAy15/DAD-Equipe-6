@@ -102,6 +102,7 @@
     "searchPlaceholder": "搜索...",
     "recentSearch": "最近搜索",
     "resultfor": "结果：",
+    "loading": "正在加载...",
     "noResults": "未找到结果"
   },
   "notificationspage": {
@@ -163,5 +164,8 @@
     "description": "选择一个用户开始新的会话",
     "noFriends": "未找到好友",
     "error": "加载好友时出错"
+  },
+  "Post": {
+    "loading": "正在加载..."
   }
 }

@@ -237,7 +237,7 @@ export default function SearchPage() {
             {t("resultfor")} <strong>"{query}"</strong> …
             <ul className="mt-4 space-y-2">
               {loading ? (
-                <li className="animate-pulse">Loading...</li>
+                <li className="animate-pulse">{t("loading")}</li>
               ) : error ? (
                 <li className="text-red-500">{error}</li>
               ) : query.startsWith("#") ? (
@@ -248,7 +248,7 @@ export default function SearchPage() {
                     </li>
                   ))
                 ) : (
-                  <li>No posts found for this tag</li>
+                  <li>{t("noResults")}</li>
                 )
               ) : users.length > 0 ? (
                 users.map((user) => (

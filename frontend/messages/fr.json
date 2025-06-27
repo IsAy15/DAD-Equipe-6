@@ -155,6 +155,7 @@
     "searchPlaceholder": "Rechercher...",
     "recentSearch": "Recherches récentes",
     "resultfor": "Résultats pour",
+    "loading": "Chargement...",
     "noResults": "Aucun résultat trouvé"
   },
   "notificationspage": {
@@ -171,5 +172,8 @@
     "description": "Sélectionnez un utilisateur pour commencer une nouvelle conversation",
     "noFriends": "Aucun ami trouvé",
     "error": "Erreur lors du chargement des amis"
+  },
+  "Post": {
+    "loading": "Chargement..."
   }
 }
