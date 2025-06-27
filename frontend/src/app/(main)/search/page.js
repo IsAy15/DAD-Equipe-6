@@ -11,8 +11,10 @@ import {
 import { useAuth } from "@/contexts/authcontext";
 import Post from "@/components/Post";
 import ProfileCard from "@/components/ProfileCard";
+import { useTranslations } from "next-intl";
 
 export default function SearchPage() {
+  const t = useTranslations("searchPage");
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   const { user: myUser, accessToken } = useAuth();
