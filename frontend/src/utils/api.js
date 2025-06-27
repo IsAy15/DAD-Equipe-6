@@ -159,9 +159,11 @@ export async function unfollowUser(targetUserId, token) {
   );
   return res.data;
 }
-export async function postBreeze(text, image, token) {
+export async function postBreeze(text, tags, image, token) {
   const res = await apiClient.post("/api/posts/", {
     content: text,
+    tags: tags,
+    image: image,
   });
   return res.data;
 }
