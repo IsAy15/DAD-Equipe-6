@@ -165,6 +165,10 @@
     "noFriends": "未找到好友",
     "error": "加载好友时出错"
   },
+  "createbreathpage": {
+  "Cancel": "取消",
+  "Breath": "呼吸"
+  },
   "Post": {
     "loading": "正在加载..."
   }
