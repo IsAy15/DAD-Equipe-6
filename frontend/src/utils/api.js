@@ -21,7 +21,7 @@ const config = {
 };
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "http://adrien-serv.ddns.net:8080",
   timeout: 5000,
 });
 
