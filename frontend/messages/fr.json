@@ -154,7 +154,7 @@
   },
   "notificationspage": {
     "title": "Notifications",
-    "all": "Toutes",
-    "mentions": "Mentions"
+    "noNotifications": "Aucune notification",
+    "seeMore": "Voir plus"
   }
 }

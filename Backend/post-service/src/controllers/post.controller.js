@@ -13,14 +13,14 @@ module.exports = {
         .exec();
 
       if (posts?.length == 0) {
-        return res.status(404).json({ message: "No post found for this user" });
+        return res.status(200).json({ message: "No post found for this user" });
       }
 
       if (posts) {
         return res.status(200).json(posts);
       }
 
-      return res.status(404).json({ message: "No posts found for this user" });
+      return res.status(200).json({ message: "No posts found for this user" });
     } catch (err) {
       return res
         .status(500)
