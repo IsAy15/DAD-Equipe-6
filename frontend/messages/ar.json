@@ -62,7 +62,8 @@
     "settings": "الإعدادات",
     "theme": "المظهر",
     "language": "اللغة",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "bookmarks": "المفضلة"
   },
   "AppearanceSettings": {
     "theme": "المظهر",
@@ -77,7 +78,9 @@
     "noPosts": "لم يتم العثور على منشورات"
   },
   "profileCard": {
-    "userNotFound": "المستخدم غير موجود"
+    "userNotFound": "المستخدم غير موجود",
+    "following": "المتابَعون",
+    "followers": "المتابِعون"
   },
   "Comment": {
     "cancel": "إلغاء",
@@ -104,7 +107,10 @@
   "searchPage": {
     "searchLabel": "ابحث عن مستخدمين أو منشورات أو وسوم",
     "searchPlaceholder": "بحث...",
-    "recentSearch": "عمليات البحث الأخيرة"
+    "recentSearch": "عمليات البحث الأخيرة",
+    "resultfor": "النتائج لـ",
+    "loading": "جاري التحميل...",
+    "noResults": "لم يتم العثور على نتائج"
   },
   "notificationspage": {
     "title": "الإشعارات",
@@ -155,5 +161,18 @@
     "typeMessage": "اكتب رسالتك هنا...",
     "send": "إرسال",
     "loading": "جاري تحميل الرسائل..."
+  },
+  "Conversation": {
+    "title": "المحادثة",
+    "messagePlaceholder": "اكتب رسالة..."
+  },
+  "NewMessagePage": {
+    "title": "محادثة جديدة",
+    "description": "اختر مستخدمًا لبدء محادثة جديدة",
+    "noFriends": "لم يتم العثور على أصدقاء",
+    "error": "حدث خطأ أثناء تحميل الأصدقاء"
+  },
+  "Post": {
+    "loading": "جاري التحميل..."
   }
 }

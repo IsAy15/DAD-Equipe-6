@@ -144,6 +144,11 @@ export async function fetchUserFeed(token) {
   return res.data;
 }
 
+export async function fetchFYP() {
+  const res = await apiClient.get(`/api/posts/fyp`);
+  return res.data;
+}
+
 export async function followUser(targetUserId, token) {
   const res = await apiClient.post(
     `api/friend-requests/follow/${targetUserId}`,
@@ -159,9 +164,11 @@ export async function unfollowUser(targetUserId, token) {
   );
   return res.data;
 }
-export async function postBreeze(text, image, token) {
+export async function postBreeze(text, tags, image, token) {
   const res = await apiClient.post("/api/posts/", {
     content: text,
+    tags: tags,
+    image: image,
   });
   return res.data;
 }
@@ -361,4 +368,14 @@ export async function readAndDeleteNotification(notificationId, token) {
     },
   });
   return res.data;
+}
+
+export async function markConversationAsRead(userId, token) {
+  return apiClient.post(
+    `/messages/conversations/${userId}/read`,
+    {},
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
 }

@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { useLocale } from "next-intl";
 
 const loadingContent = (
   <li
@@ -32,6 +33,18 @@ export default function MessagesPage() {
   const t = useTranslations("Messages");
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const locale = useLocale();
+
+  function getRelativeTime(date) {
+    const now = new Date();
+    const diff = Math.floor((now - new Date(date)) / 1000);
+
+    if (diff < 60) return `${diff}s`;
+    if (diff < 3600) return `${Math.floor(diff / 60)} min`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} h`;
+    if (diff < 2592000) return `${Math.floor(diff / 86400)} j`;
+    return new Date(date).toLocaleDateString(locale);
+  }
 
   useEffect(() => {
     if (!user || !user.id) {
@@ -58,7 +71,7 @@ export default function MessagesPage() {
               username: userProfile.username,
               lastMessage: lastMessageText,
               time: lastMessageObj.createdAt
-                ? new Date(lastMessageObj.createdAt).toLocaleString()
+                ? getRelativeTime(lastMessageObj.createdAt)
                 : "",
               unread: lastMessageObj.isRead === false,
             };
@@ -68,9 +81,7 @@ export default function MessagesPage() {
       } catch (error) {
         console.error("Failed to fetch messages:", error);
       } finally {
-        setTimeout(() => {
-          setLoading(false);
-        }, 1000);
+        setLoading(false);
       }
     }
     loadMessages();
@@ -80,7 +91,7 @@ export default function MessagesPage() {
     <div className="flex flex-col bg-base-100">
       {/* Header */}
       <div className="p-4 bg-base-100 shadow flex items-center">
-        <h1 className="text-xl font-bold flex-1">Messages</h1>
+        <h1 className="text-xl font-bold flex-1">{t("title")}</h1>
         <button
           className="btn btn-square btn-primary"
           aria-label="Nouveau message"

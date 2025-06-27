@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 export default function CommentExpander({ postId }) {
   const t = useTranslations("CommentExpander");
   const { accessToken } = useAuth();
-  const [comments, setComments] = useState(null);
+  const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(5);
   const [error, setError] = useState(null);
@@ -108,7 +108,7 @@ export default function CommentExpander({ postId }) {
     );
   }
 
-  if (!comments || comments.length === 0) {
+  if (!Array.isArray(comments) || comments.length === 0) {
     return (
       <div>
         <CommentInput post_id={postId} onAddComment={handleAddComment} />
@@ -119,7 +119,9 @@ export default function CommentExpander({ postId }) {
     );
   }
 
-  const visibleComments = comments.slice(0, visibleCount);
+  const visibleComments = Array.isArray(comments)
+    ? comments.slice(0, visibleCount)
+    : [];
   const hasMore = comments.length > visibleCount;
 
   return (

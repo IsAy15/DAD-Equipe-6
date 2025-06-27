@@ -27,7 +27,6 @@ export default function RegisterForm() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
     try {
       await register(email, username, password);
       router.push(searchParams.get("from") || "/home");

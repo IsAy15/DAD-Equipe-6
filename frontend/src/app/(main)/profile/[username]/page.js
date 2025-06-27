@@ -29,6 +29,7 @@ export default function UserPage({ params }) {
   // Ajoutez ces deux lignes :
   const [posts, setPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
 
   useEffect(() => {
     async function loadProfile() {
@@ -123,10 +124,7 @@ export default function UserPage({ params }) {
         <button
           type="button"
           className="btn btn-primary btn-outline px-6 py-2 font-semibold"
-          aria-haspopup="dialog"
-          aria-expanded="false"
-          aria-controls="slide-up-animated-modal"
-          data-overlay="#slide-up-animated-modal"
+          onClick={() => setShowEditProfileModal(true)}
         >
           {t("editProfile")}
         </button>
@@ -187,7 +185,10 @@ export default function UserPage({ params }) {
 
   return (
     <div className="flex flex-col items-center max-sm:p-6 p-8 gap-4">
-      <EditProfile />
+      <EditProfile
+        open={showEditProfileModal}
+        onClose={() => setShowEditProfileModal(false)}
+      />
       <div className="w-full">
         <div className="flex gap-4 items-center justify-between w-full">
           <UserAvatar user={userProfile} size="lg" />

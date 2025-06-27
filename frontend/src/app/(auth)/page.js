@@ -26,8 +26,6 @@ export default function LoginForm() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
-
     try {
       await login(identifier, password, rememberMe);
       router.push(searchParams.get("from") || "/home");
@@ -166,7 +164,10 @@ export default function LoginForm() {
             <button
               className="btn btn-text btn-block"
               onClick={() =>
-                notyf.open({type: "warning", message:"Fonctionnalité en cours de développement"})
+                notyf.open({
+                  type: "warning",
+                  message: "Fonctionnalité en cours de développement",
+                })
               }
             >
               <img

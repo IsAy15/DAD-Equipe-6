@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/authcontext";
-import { fetchNotifications } from "@/utils/api";
+import { fetchNotifications, readAndDeleteNotification } from "@/utils/api";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 
@@ -12,7 +12,6 @@ export default function NotificationsPage() {
   const { accessToken } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("all"); // 'all' ou 'mentions'
   const t = useTranslations("notificationspage");
   const locale = useLocale();
 
@@ -30,6 +29,20 @@ export default function NotificationsPage() {
     load();
   }, [accessToken]);
 
+  const handleNotificationClick = async (notification) => {
+    try {
+      await readAndDeleteNotification(notification._id, accessToken);
+      if (notification.link) {
+        router.push(notification.link);
+      }
+    } catch (err) {
+      console.error("Erreur lors de la suppression de la notification :", err);
+      if (notification.link) {
+        router.push(notification.link);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-base-200">
@@ -37,10 +50,6 @@ export default function NotificationsPage() {
       </div>
     );
   }
-
-  const displayed = notifications.filter((n) =>
-    filter === "all" ? true : n.action.toLowerCase().includes("mention")
-  );
 
   // Helper to get relative time
   function getRelativeTime(date) {
@@ -68,44 +77,18 @@ export default function NotificationsPage() {
         <h1 className="text-lg font-semibold"> </h1>
       </header>
 
-      {/* Filtres */}
-      <div className="bg-base-100 border-b">
-        <div className="max-w-md mx-auto flex">
-          <button
-            onClick={() => setFilter("all")}
-            className={`flex-1 py-2 text-center font-medium ${
-              filter === "all"
-                ? "text-primary border-b-2 border-primary"
-                : "text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            {t("all")}
-          </button>
-          <button
-            onClick={() => setFilter("mentions")}
-            className={`flex-1 py-2 text-center font-medium ${
-              filter === "mentions"
-                ? "text-primary border-b-2 border-primary"
-                : "text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            {t("mentions")}
-          </button>
-        </div>
-      </div>
-
       {/* Liste */}
       <main className="flex-1 overflow-auto px-4 py-4 space-y-2 bg-base-200">
         <ul>
-          {displayed.length === 0 ? (
-            <p className="text-center text-gray-600">
-              {filter === "all"
-                ? "Vous n'avez aucune notification."
-                : "Aucune mention."}
-            </p>
+          {notifications.length === 0 ? (
+            <p className="text-center text-gray-600">{t("noNotifications")}</p>
           ) : (
-            displayed.map((n) => (
-              <li key={n._id} className="p-3 card mb-2 bg-base-100">
+            notifications.map((n) => (
+              <li
+                key={n._id}
+                className={`p-3 card mb-2 bg-base-100 cursor-pointer transition hover:bg-primary/10`}
+                onClick={() => handleNotificationClick(n)}
+              >
                 <div className="flex items-center justify-between ">
                   <div>
                     <p className="font-semibold">{n.action}</p>
@@ -115,11 +98,6 @@ export default function NotificationsPage() {
                     {getRelativeTime(n.createdAt)}
                   </span>
                 </div>
-                {n.link && (
-                  <Link href={n.link} className="text-accent mt-2 block">
-                    Voir plus
-                  </Link>
-                )}
               </li>
             ))
           )}

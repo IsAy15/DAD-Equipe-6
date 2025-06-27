@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/authcontext";
-import { fetchUserFeed } from "@/utils/api";
+import { fetchUserFeed, fetchFYP } from "@/utils/api";
 import Feed from "@/components/Feed";
 import { useTranslations } from "next-intl";
 
@@ -11,18 +11,25 @@ export default function HomePage() {
   const t = useTranslations("homepage");
   const [posts, setPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
+  const [forYouPosts, setFYP] = useState([]);
+  const [loadingFYP, setLoadingFYP] = useState(true);
   const [selectedTab, setSelectedTab] = useState("forYou"); // 'home' ou 'profile'
 
   useEffect(() => {
     async function loadPosts() {
       setLoadingPosts(true);
+      setLoadingFYP(true);
       try {
+        const userFYP = await fetchFYP(accessToken);
+        setFYP(userFYP || []);
         const userPosts = await fetchUserFeed(accessToken);
         setPosts(userPosts || []);
       } catch {
         setPosts([]);
+        setFYP([]);
       }
       setLoadingPosts(false);
+      setLoadingFYP(false);
     }
     loadPosts();
   }, [accessToken]);
@@ -55,7 +62,9 @@ export default function HomePage() {
 
       {/* Contenu de l’onglet Home */}
       {selectedTab === "forYou" && (
-        <section role="tabpanel" className="space-y-4"></section>
+        <section role="tabpanel" className="space-y-4">
+          <Feed posts={forYouPosts} loadingPosts={loadingFYP} />
+        </section>
       )}
 
       {/* Contenu de l’onglet Profile */}

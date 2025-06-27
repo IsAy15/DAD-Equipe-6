@@ -65,7 +65,8 @@
     "language": "Language",
     "css_components": "CSS Components",
     "js_components": "JS Components",
-    "logout": "Log out"
+    "logout": "Log out",
+    "bookmarks": "Bookmarks"
   },
   "AppearanceSettings": {
     "theme": "Theme",
@@ -80,7 +81,9 @@
     "noPosts": "No posts found"
   },
   "profileCard": {
-    "userNotFound": "User not found"
+    "userNotFound": "User not found",
+    "following": "Following",
+    "followers": "Followers"
   },
   "Comment": {
     "cancel": "Cancel",
@@ -107,7 +110,10 @@
   "searchPage": {
     "searchLabel": "Search for users, posts or hashtags",
     "searchPlaceholder": "Search...",
-    "recentSearch": "Recent searches"
+    "recentSearch": "Recent searches",
+    "resultfor": "Results for",
+    "loading": "Loading...",
+    "noResults": "No results found"
   },
   "notificationspage": {
     "title": "title",
@@ -158,5 +164,18 @@
     "typeMessage": "Type your message here...",
     "send": "Send",
     "loading": "Loading messages..."
+  },
+  "Conversation": {
+    "title": "Conversation",
+    "messagePlaceholder": "Type a message..."
+  },
+  "NewMessagePage": {
+    "title": "New conversation",
+    "description": "Select a user to start a new conversation",
+    "noFriends": "No friends found",
+    "error": "Error loading friends"
+  },
+  "Post": {
+    "loading": "Loading..."
   }
 }

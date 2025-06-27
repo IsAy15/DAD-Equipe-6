@@ -62,7 +62,8 @@
     "settings": "Einstellungen",
     "theme": "Thema",
     "language": "Sprache",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "bookmarks": "Lesezeichen"
   },
   "AppearanceSettings": {
     "theme": "Thema",
@@ -77,7 +78,9 @@
     "noPosts": "Keine Beiträge gefunden"
   },
   "profileCard": {
-    "userNotFound": "Benutzer nicht gefunden"
+    "userNotFound": "Benutzer nicht gefunden",
+    "following": "folgende",
+    "followers": "anhänger"
   },
   "Comment": {
     "cancel": "Abbrechen",
@@ -104,7 +107,10 @@
   "searchPage": {
     "searchLabel": "Suche nach Nutzern, Beiträgen oder Hashtags",
     "searchPlaceholder": "Suchen...",
-    "recentSearch": "Letzte Suchen"
+    "recentSearch": "Letzte Suchen",
+    "resultfor": "Ergebnisse für",
+    "loading": "Laden...",
+    "noResults": "Keine Ergebnisse gefunden"
   },
   "notificationspage": {
     "title": "Benachrichtigungen",
@@ -112,48 +118,61 @@
     "mentions": "Erwähnungen"
   },
   "Profile": {
-    "title": "الملف الشخصي",
-    "userNotFound": "المستخدم غير موجود",
-    "editProfile": "تعديل الملف الشخصي",
-    "changePassword": "تغيير كلمة المرور",
-    "profilePicture": "صورة الملف الشخصي",
-    "username": "اسم المستخدم",
-    "email": "البريد الإلكتروني",
-    "bio": "نبذة",
-    "joined": "انضم منذ",
-    "follower": "متابع",
-    "followers": "متابعون",
-    "following": "يتابع",
-    "followings": "يتابعهم",
+    "title": "Profil",
+    "userNotFound": "Benutzer nicht gefunden",
+    "editProfile": "Profil bearbeiten",
+    "changePassword": "Passwort ändern",
+    "profilePicture": "Profilbild",
+    "username": "Benutzername",
+    "email": "E-Mail",
+    "bio": "Bio",
+    "joined": "Mitglied seit",
+    "follower": "follower",
+    "followers": "anhänger",
+    "following": "Folgt",
+    "followings": "folge ich",
     "status": {
-      "follow": "متابعة",
-      "following": "يتابع",
-      "unfollow": "إلغاء المتابعة",
-      "friends": "أصدقاء"
+      "follow": "Folgen",
+      "following": "Folgt",
+      "unfollow": "Entfolgen",
+      "friends": "Freunde"
     }
   },
   "EditProfile": {
-    "title": "تعديل الملف الشخصي",
-    "username": "اسم المستخدم",
-    "usernamePlaceholder": "أدخل اسم المستخدم",
-    "usernameError": "اسم مستخدم غير صالح/مستخدم بالفعل",
-    "email": "البريد الإلكتروني",
-    "emailPlaceholder": "أدخل بريدك الإلكتروني",
-    "emailError": "عنوان بريد إلكتروني غير صالح",
-    "bio": "نبذة",
-    "bioPlaceholder": "حدثنا عن نفسك ببضع كلمات",
-    "profilePicture": "صورة الملف الشخصي",
-    "saveChanges": "حفظ",
-    "cancel": "إلغاء"
+    "title": "Profil bearbeiten",
+    "username": "Benutzername",
+    "usernamePlaceholder": "Geben Sie Ihren Benutzernamen ein",
+    "usernameError": "Ungültiger oder bereits vergebener Benutzername",
+    "email": "E-Mail",
+    "emailPlaceholder": "Geben Sie Ihre E-Mail ein",
+    "emailError": "Ungültige E-Mail-Adresse",
+    "bio": "Bio",
+    "bioPlaceholder": "Erzählen Sie uns in wenigen Worten von sich",
+    "profilePicture": "Profilbild",
+    "saveChanges": "Speichern",
+    "cancel": "Abbrechen"
   },
   "Messages": {
-    "title": "الرسائل",
-    "noMessages": "لم يتم العثور على رسائل",
-    "newMessage": "رسالة جديدة",
-    "searchPlaceholder": "ابحث عن الرسائل أو المستخدمين",
-    "sendMessage": "إرسال رسالة",
-    "typeMessage": "اكتب رسالتك هنا...",
-    "send": "إرسال",
-    "loading": "جاري تحميل الرسائل..."
+    "title": "Nachrichten",
+    "noMessages": "Keine Nachrichten gefunden",
+    "newMessage": "Neue Nachricht",
+    "searchPlaceholder": "Nachrichten oder Nutzer suchen",
+    "sendMessage": "Nachricht senden",
+    "typeMessage": "Schreiben Sie Ihre Nachricht hier...",
+    "send": "Senden",
+    "loading": "Nachrichten werden geladen..."
+  },
+  "Conversation": {
+    "title": "Konversation",
+    "messagePlaceholder": "Nachricht eingeben..."
+  },
+  "NewMessagePage": {
+    "title": "Neue Unterhaltung",
+    "description": "Wähle einen Nutzer, um eine neue Unterhaltung zu starten",
+    "noFriends": "Keine Freunde gefunden",
+    "error": "Fehler beim Laden der Freunde"
+  },
+  "Post": {
+    "loading": "Laden..."
   }
 }

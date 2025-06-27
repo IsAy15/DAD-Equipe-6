@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   fetchTaggedPosts,
   fetchPost,
@@ -12,10 +13,12 @@ import Post from "@/components/Post";
 import ProfileCard from "@/components/ProfileCard";
 
 export default function SearchPage() {
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("q") || "";
   const { user: myUser, accessToken } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [recentSearches, setRecentSearches] = useState([]);
   const [taggedPosts, setTaggedPosts] = useState([]);
   const [users, setUsers] = useState([]);
@@ -44,6 +47,17 @@ export default function SearchPage() {
       setRecentSearches(filtered);
     }
   }, []);
+
+  // Déclenche la recherche automatiquement si initialQuery est présent
+  useEffect(() => {
+    if (initialQuery) {
+      // Simule un event pour onChange
+      onChange({ target: { value: initialQuery } });
+    } else {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQuery]);
 
   const onChange = async (e) => {
     const value = e.target.value;
@@ -123,12 +137,12 @@ export default function SearchPage() {
             id="searchInput"
             type="search"
             className="grow outline-none text-base-content placeholder:text-base-content/40"
-            placeholder="Search"
+            placeholder={t("searchPlaceholder")}
             value={query}
             onChange={onChange}
           />
           <label className="sr-only" htmlFor="searchInput">
-            Search
+            {t("searchLabel")}
           </label>
 
           <span className="my-auto flex gap-2 text-base-content/60">
@@ -154,7 +168,7 @@ export default function SearchPage() {
         {query.trim() === "" ? (
           <>
             <h2 className="font-semibold text-base-content/80 mb-2">
-              Recent searches
+              {t("recentSearch")}
             </h2>
             <div className="flex flex-wrap gap-4">
               {recentSearches.map((item, idx) => (
@@ -220,10 +234,10 @@ export default function SearchPage() {
           </>
         ) : (
           <div className="text-base-content/80">
-            Résultats pour <strong>"{query}"</strong> …
+            {t("resultfor")} <strong>"{query}"</strong> …
             <ul className="mt-4 space-y-2">
               {loading ? (
-                <li className="animate-pulse">Loading...</li>
+                <li className="animate-pulse">{t("loading")}</li>
               ) : error ? (
                 <li className="text-red-500">{error}</li>
               ) : query.startsWith("#") ? (
@@ -234,7 +248,7 @@ export default function SearchPage() {
                     </li>
                   ))
                 ) : (
-                  <li>No posts found for this tag</li>
+                  <li>{t("noResults")}</li>
                 )
               ) : users.length > 0 ? (
                 users.map((user) => (
@@ -243,7 +257,7 @@ export default function SearchPage() {
                   </li>
                 ))
               ) : (
-                <li>No users found</li>
+                <li> {t("noResults")}</li>
               )}
             </ul>
           </div>

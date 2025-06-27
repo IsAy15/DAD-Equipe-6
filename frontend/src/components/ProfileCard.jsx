@@ -30,10 +30,8 @@ export default function ProfileCard({ user, full = false }) {
       return;
     }
     if (user?.username) {
-      setTimeout(() => {
-        setLoading(false);
-        setError(null);
-      }, 1000);
+      setLoading(false);
+      setError(null);
     } else {
       setLoading(true);
       setError("Chargement du profil...");
@@ -58,9 +56,6 @@ export default function ProfileCard({ user, full = false }) {
     setError(null);
     const fetchProfile = async () => {
       try {
-        if (!full) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
         setError(null);
 
         // Charger le statut de suivi
@@ -139,13 +134,13 @@ export default function ProfileCard({ user, full = false }) {
               <span className="text-base-content font-semibold">
                 {userProfile?.followingCount}
               </span>{" "}
-              abonnements
+              {t("following")}
             </div>
             <div className="h-4 w-28 text-base-content/80">
               <span className="text-base-content font-semibold">
                 {userProfile?.followersCount}
               </span>{" "}
-              abonnés
+              {t("followers")}
             </div>
           </div>
           {/* Bouton suivre/désabonner à droite */}

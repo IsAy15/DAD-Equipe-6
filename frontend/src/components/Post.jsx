@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/authcontext";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Post({ post, link = true }) {
   const locale = useLocale();
@@ -26,6 +27,28 @@ export default function Post({ post, link = true }) {
     }
     loadAuthor();
   }, [post.author]);
+
+  // Fonction utilitaire pour transformer les # en liens
+  function renderContentWithTags(content) {
+    if (!content) return null;
+    const parts = content.split(/(#[\w]+)/g);
+    return parts.map((part, i) => {
+      if (/^#[\w]+$/.test(part)) {
+        const tag = part.slice(1);
+        return (
+          <Link
+            key={i}
+            href={`/search?q=${encodeURIComponent(part)}`}
+            className="text-accent hover:underline"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {part}
+          </Link>
+        );
+      }
+      return part;
+    });
+  }
 
   return (
     <div
@@ -62,7 +85,7 @@ export default function Post({ post, link = true }) {
           {new Date(post.createdAt).toLocaleDateString(locale)}
         </span>
       </div>
-      <p>{post.content}</p>
+      <p>{renderContentWithTags(post.content)}</p>
       {post.mediaUrls && post.mediaUrls.length > 0 && (
         <div className="mt-4">
           {post.mediaUrls.map((url, index) => (

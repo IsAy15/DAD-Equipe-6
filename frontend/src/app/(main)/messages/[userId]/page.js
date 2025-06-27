@@ -3,11 +3,17 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import UserAvatar from "@/components/UserAvatar";
-import { sendMessage, getConversations, fetchUserProfile } from "@/utils/api";
+import {
+  sendMessage,
+  getConversations,
+  fetchUserProfile,
+  markConversationAsRead,
+} from "@/utils/api";
 import { useAuth } from "@/contexts/authcontext";
 import socket from "@/utils/socket";
-
+import { useTranslations } from "next-intl";
 export default function ConversationPage() {
+  const t = useTranslations("Conversation");
   const { userId: conversationId } = useParams();
   const router = useRouter();
   const { user, accessToken } = useAuth();
@@ -146,11 +152,16 @@ export default function ConversationPage() {
     try {
       await sendMessage(conversationId, text, accessToken);
       setNewMessage("");
-      // ⛔ Ne pas faire de setMessages ici !
     } catch (err) {
       console.error("Envoi échoué :", err);
     }
   }
+
+  useEffect(() => {
+    if (conversationId && accessToken) {
+      markConversationAsRead(conversationId, accessToken);
+    }
+  }, [conversationId, accessToken]);
 
   if (loading) {
     return (
@@ -176,7 +187,7 @@ export default function ConversationPage() {
         >
           <span className="icon-[tabler--arrow-left] size-6" />
         </button>
-        <h2 className="text-lg font-semibold">Conversation</h2>
+        <h2 className="text-lg font-semibold">{t("title")}</h2>
       </header>
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
@@ -228,7 +239,7 @@ export default function ConversationPage() {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          placeholder="Type a message…"
+          placeholder={t("messagePlaceholder")}
           className="flex-1 rounded-full border px-4 py-2 focus:border-accent focus:outline-none"
         />
         <button

@@ -3,7 +3,7 @@ import { updateUserProfile } from "../utils/api";
 import { useAuth } from "@/contexts/authcontext";
 import { useState } from "react";
 
-export default function EditProfile() {
+export default function EditProfile({ open, onClose }) {
   const { user, token } = useAuth();
   const t = useTranslations("EditProfile");
   const [uploading, setUploading] = useState(false);
@@ -44,19 +44,24 @@ export default function EditProfile() {
   return (
     <div
       id="slide-up-animated-modal"
-      className="overlay modal overlay-open:opacity-100 overlay-open:duration-300 hidden"
+      className={
+        open
+          ? "fixed inset-0 z-[9999] flex items-center justify-center"
+          : "hidden"
+      }
+      style={{ background: "rgba(0,0,0,0.5)" }}
       role="dialog"
       tabIndex="-1"
     >
-      <div className="overlay-animation-target modal-dialog overlay-open:mt-4 overlay-open:opacity-100 overlay-open:duration-300 mt-12 transition-all ease-out">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h3 className="modal-title">{t("title")}</h3>
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 relative animate-fade-in">
+        <div className="modal-content p-6">
+          <div className="modal-header flex items-center justify-between mb-4">
+            <h3 className="modal-title text-xl font-bold">{t("title")}</h3>
             <button
               type="button"
-              className="btn btn-text btn-circle btn-sm absolute end-3 top-3"
+              className="btn btn-text btn-circle btn-sm"
               aria-label="Close"
-              data-overlay="#slide-up-animated-modal"
+              onClick={onClose}
             >
               <span className="icon-[tabler--x] size-4"></span>
             </button>
@@ -69,17 +74,21 @@ export default function EditProfile() {
                 </label>
                 <div className="p-4">
                   {avatar && (
-                    <div className="mt-4">
-                      <img src={avatar} alt="uploaded" className="w-48" />
+                    <div className="mt-4 flex justify-center">
+                      <img
+                        src={avatar}
+                        alt="uploaded"
+                        className="w-32 h-32 rounded-full object-cover border"
+                      />
                     </div>
                   )}
                   {uploading && (
-                    <div className="loading loading-spinner loading-lg"></div>
+                    <div className="loading loading-spinner loading-lg mx-auto"></div>
                   )}
                   <input
                     type="file"
                     accept="image/*"
-                    className="input"
+                    className="input mt-2"
                     onChange={handleAvatar}
                   />
                 </div>
@@ -108,23 +117,23 @@ export default function EditProfile() {
                   value={bio}
                 ></textarea>
               </div>
+              <div className="modal-footer flex justify-end gap-2 mt-6">
+                <button
+                  type="button"
+                  className="btn btn-soft btn-secondary"
+                  onClick={onClose}
+                >
+                  {t("cancel")}
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleSubmit}
+                  disabled={uploading}
+                >
+                  {t("saveChanges")}
+                </button>
+              </div>
             </form>
-          </div>
-          <div className="modal-footer">
-            <button
-              type="button"
-              className="btn btn-soft btn-secondary"
-              data-overlay="#slide-up-animated-modal"
-            >
-              {t("cancel")}
-            </button>
-            <button
-              className="btn btn-primary"
-              onClick={handleSubmit}
-              disabled={uploading}
-            >
-              {t("saveChanges")}
-            </button>
           </div>
         </div>
       </div>
