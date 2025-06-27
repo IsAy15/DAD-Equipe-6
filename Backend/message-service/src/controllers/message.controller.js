@@ -20,7 +20,7 @@ exports.sendMessage = async (req, res) => {
       userId: receiver,
       type: "message",
       content: `You received a new message.`,
-      link: `/messages`,
+      link: `/messages/${sender}`,
     });
 
     // Récupération de l'instance de Socket.IO
