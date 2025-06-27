@@ -110,5 +110,50 @@
     "title": "الإشعارات",
     "all": "الكل",
     "mentions": "الإشارات"
+  },
+  "Profile": {
+    "title": "الملف الشخصي",
+    "userNotFound": "المستخدم غير موجود",
+    "editProfile": "تعديل الملف الشخصي",
+    "changePassword": "تغيير كلمة المرور",
+    "profilePicture": "صورة الملف الشخصي",
+    "username": "اسم المستخدم",
+    "email": "البريد الإلكتروني",
+    "bio": "نبذة",
+    "joined": "انضم منذ",
+    "follower": "متابع",
+    "followers": "متابعون",
+    "following": "يتابع",
+    "followings": "يتابعهم",
+    "status": {
+      "follow": "متابعة",
+      "following": "يتابع",
+      "unfollow": "إلغاء المتابعة",
+      "friends": "أصدقاء"
+    }
+  },
+  "EditProfile": {
+    "title": "تعديل الملف الشخصي",
+    "username": "اسم المستخدم",
+    "usernamePlaceholder": "أدخل اسم المستخدم",
+    "usernameError": "اسم مستخدم غير صالح/مستخدم بالفعل",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "emailError": "عنوان بريد إلكتروني غير صالح",
+    "bio": "نبذة",
+    "bioPlaceholder": "حدثنا عن نفسك ببضع كلمات",
+    "profilePicture": "صورة الملف الشخصي",
+    "saveChanges": "حفظ",
+    "cancel": "إلغاء"
+  },
+  "Messages": {
+    "title": "الرسائل",
+    "noMessages": "لم يتم العثور على رسائل",
+    "newMessage": "رسالة جديدة",
+    "searchPlaceholder": "ابحث عن الرسائل أو المستخدمين",
+    "sendMessage": "إرسال رسالة",
+    "typeMessage": "اكتب رسالتك هنا...",
+    "send": "إرسال",
+    "loading": "جاري تحميل الرسائل..."
   }
 }
