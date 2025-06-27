@@ -41,7 +41,6 @@ export default function SearchPage() {
       const filtered = JSON.parse(data).filter(
         (item) => now - item.date < 24 * 60 * 60 * 1000
       );
-      console.log("Chargement recherches récentes :", filtered);
       setRecentSearches(filtered);
     }
   }, []);
