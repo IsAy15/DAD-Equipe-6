@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const socket = io("http://adrien-serv.ddns.net/messages_socket", {
+const socket = io("http://adrien-serv.ddns.net:8080/messages_socket", {
   autoConnect: false, // on connectera manuellement après avoir le user.id
 });
 
