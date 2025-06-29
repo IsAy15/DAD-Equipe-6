@@ -9,7 +9,8 @@ const cors = require("cors");
 const app = express();
 const port = 3003;
 
-app.use(cors());
+const corsOptions = require('./config/corsOptions');
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(logger);
 swaggerDocs(app, port);
@@ -25,9 +26,10 @@ mongoose
       require("./src/routes/comment.routes.js")
     );
     app.use(
-      "/api/posts/:post_id/likes",
+      "/api/posts/likes",
       require("./src/routes/like.routes.js")
     );
+
     app.listen(port, () => {
       console.log("Post Service is running on port", port);
     });

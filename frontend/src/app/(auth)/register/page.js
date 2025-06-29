@@ -9,7 +9,6 @@ export default function RegisterForm() {
   const t = useTranslations("Auth");
 
   const { register } = useAuth();
-
   const notyf = useNotyf();
 
   const [username, setUsername] = useState("");
@@ -295,7 +294,9 @@ export default function RegisterForm() {
                 >
                   {t("acceptTermsText")}{" "}
                   <a
-                    href="#"
+                    href="/register/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="link link-animated link-primary font-normal"
                   >
                     {t("acceptTermsLink")}
@@ -356,4 +357,13 @@ export default function RegisterForm() {
       </div>
     </div>
   );
+}
+
+export async function refreshAccessToken(userId) {
+  const response = await apiClient.post(
+    "/refresh-token",
+    { userId },
+    { withCredentials: true }
+  );
+  return response.data.accessToken;
 }

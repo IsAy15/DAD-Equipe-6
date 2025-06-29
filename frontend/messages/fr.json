@@ -62,7 +62,8 @@
     "messages": "Messages",
     "theme": "Thème",
     "language": "Langue",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "bookmarks": "Favoris"
   },
   "AppearanceSettings": {
     "theme": "Thème",
@@ -106,5 +107,77 @@
     "profilePicture": "Photo de profil",
     "saveChanges": "Enregistrer",
     "cancel": "Annuler"
+  },
+  "Messages": {
+    "title": "Messages",
+    "noMessages": "Aucun message trouvé",
+    "newMessage": "Nouveau message",
+    "searchPlaceholder": "Rechercher des messages ou des utilisateurs",
+    "sendMessage": "Envoyer un message",
+    "typeMessage": "Tapez votre message ici...",
+    "send": "Envoyer",
+    "loading": "Chargement des messages..."
+  },
+  "Feed": {
+    "loading": "Chargement du fil d'actualité...",
+    "noPosts": "Aucun post trouvé"
+  },
+  "profileCard": {
+    "userNotFound": "Utilisateur non trouvé",
+    "following": "Abonnements",
+    "followers": "Abonnés"
+  },
+  "Comment": {
+    "cancel": "Annuler",
+    "send": "Envoyer",
+    "save": "Enregistrer",
+    "replyTo": "Répondre à",
+    "reply": "Répondre"
+  },
+  "CommentInput": {
+    "placeholder": "Écrivez un commentaire...",
+    "addImage": "Ajouter une image",
+    "addVideo": "Ajouter une vidéo",
+    "featureInDevelopment": "Cette fonctionnalité est en cours de développement",
+    "addEmoji": "Ajouter un emoji"
+  },
+  "CommentExpander": {
+    "errorFetchComments": "Erreur lors de la récupération des commentaires",
+    "noComments": "Aucun commentaire trouvé",
+    "showMore": "Afficher plus"
+  },
+  "homepage": {
+    "forYou": "Pour vous",
+    "follow": "Suivis"
+  },
+  "searchPage": {
+    "searchLabel": "Rechercher des utilisateurs, des posts ou des hashtags",
+    "searchPlaceholder": "Rechercher...",
+    "recentSearch": "Recherches récentes",
+    "resultfor": "Résultats pour",
+    "loading": "Chargement...",
+    "noResults": "Aucun résultat trouvé"
+  },
+  "notificationspage": {
+    "title": "Notifications",
+    "all": "Toutes",
+    "mentions": "Mentions"
+  },
+  "Conversation": {
+    "title": "Conversation",
+    "messagePlaceholder": "Tapez un message..."
+  },
+  "NewMessagePage": {
+    "title": "Nouvelle conversation",
+    "description": "Sélectionnez un utilisateur pour commencer une nouvelle conversation",
+    "noFriends": "Aucun ami trouvé",
+    "error": "Erreur lors du chargement des amis"
+  },
+   "createbreathpage": {
+    "Cancel": "Annuler",
+    "Breath": "Souffle"
+    },
+  "Post": {
+    "loading": "Chargement..."
   }
 }

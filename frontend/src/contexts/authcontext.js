@@ -1,13 +1,20 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
-import { registerUser, loginUser } from "@/utils/api";
+import { registerUser, loginUser, fetchUserProfile, refreshToken } from "@/utils/api";
 import Cookies from "js-cookie";
+import { bindAuthContext, bindLogout } from '@/utils/api';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
   const [identifier, setIdentifier] = useState(null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    bindAuthContext(setAccessTokenFromApi);
+    bindLogout(logout);
+  }, []);
 
   useEffect(() => {
     // Vérifie si un token est stocké dans les cookies
@@ -18,6 +25,33 @@ export const AuthProvider = ({ children }) => {
       setIdentifier(storedIdentifier);
     }
   }, []);
+
+  // Met à jour l'état de l'utilisateur si le token change
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (identifier) {
+        try {
+          const userProfile = await fetchUserProfile(identifier);
+          setUser(userProfile);
+        } catch (err) {
+          console.error("Error fetching user profile:", err);
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    };
+    fetchUser();
+  }, [identifier]);
+
+  const setAccessTokenFromApi = (newAccessToken) => {
+    setAccessToken(newAccessToken);
+    Cookies.set("accessToken", newAccessToken, {
+          secure: true,
+          sameSite: "strict",
+          expires: 7,
+        });
+  }
 
   // — Inscription
   const register = async (email, username, password) => {
@@ -75,7 +109,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ accessToken, identifier, register, login, logout }}
+      value={{ accessToken, user, register, login, logout }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,12 +1,14 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const controller = require('../controllers/notification.controller');
+const controller = require("../controllers/notification.controller");
+const verifyJWT = require("../middlewares/verifyJWT");
 
-router.post('/', controller.createNotification);
-router.get('/:userId', controller.getUserNotifications);
-router.get('/:userId/count', controller.getNotificationCount);
-router.delete('/:notificationId', controller.readAndDelete);
-router.delete('/all/:userId', controller.readAllAndDelete);
-router.post('/on-post-created', controller.onPostCreated);
+router.post("/", controller.createNotification);
+router.get("/", verifyJWT, controller.getUserNotifications);
+router.get("/count", verifyJWT, controller.getNotificationCount);
+router.delete("/all", verifyJWT, controller.readAllAndDelete);
+router.post("/on-post-created", verifyJWT, controller.onPostCreated);
+router.patch("/:notificationId", verifyJWT, controller.readAndUpdate);
+router.delete("/:notificationId", verifyJWT, controller.readAndDelete);
 
 module.exports = router;

@@ -2,61 +2,72 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
 
-const { randomBytes } = require("crypto");
-
-const generateRefreshToken = () => randomBytes(64).toString("hex");
-
-
 exports.refreshToken = async (req, res) => {
-  const { refreshToken: oldRefreshToken, userId } = req.body;
+  const oldRefreshToken = req.cookies.refreshToken;
 
-  if (!oldRefreshToken || !userId) {
-    return res.status(400).json({ message: "Refresh token and user ID required" });
+  if (!oldRefreshToken) {
+    return res.status(400).json({ message: "Refresh token is required" });
   }
 
   try {
     const userServiceURL = process.env.USER_SERVICE_URL;
 
-    // 1. Vérifie l'ancien refreshToken
-    await axios.post(
-      `${userServiceURL}/api/users/${userId}/refreshTokens/validate`,
-      { refreshToken: oldRefreshToken }
+    const decoded = jwt.verify(
+      oldRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET
     );
+
+    const username = decoded.userInfo.username;
+    const userId = decoded.userInfo.userId;
+
+    // 1. Vérifie l'ancien refreshToken
+    const userExists = await axios.get(
+      `${userServiceURL}/api/users/check-username?username=${username}`
+    );
+
+    if (userExists == false) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
     // 2. Génère un nouveau accessToken
-    const newAccessToken = jwt.sign(
-      { userId },
-      process.env.ACCESS_JWT_KEY,
-      { expiresIn: "10m" }
-    );
+    const newAccessToken = jwt.sign({ userId }, process.env.ACCESS_JWT_KEY, {
+      expiresIn: "15m",
+    });
 
     // 3. Génère un nouveau refreshToken (rotation)
-    const newRefreshToken = generateRefreshToken();
-
-    // 4. Remplace dans la base (remplace l'ancien)
-    await axios.post(
-      `${userServiceURL}/api/users/${userId}/refreshTokens`,
-      { refreshToken: newRefreshToken }
+    const newRefreshToken = jwt.sign(
+      {
+        userInfo: {
+          userId: userId,
+          username: username,
+        },
+      },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "1d" }
     );
 
+    // 4. Remplace dans la base (remplace l'ancien)
+    await axios.post(`${userServiceURL}/api/users/${userId}/refreshTokens`, {
+      refreshToken: newRefreshToken,
+    });
+
     // 5. Met à jour le cookie
-    res.cookie('refreshToken', newRefreshToken, {
+    res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: false, // true en prod HTTPS
-      sameSite: 'Strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 jours
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
     });
 
     // 6. Réponse au client
     return res.status(200).json({ accessToken: newAccessToken });
-
   } catch (err) {
     console.error("Refresh token error:", err.message);
-    return res.status(403).json({ message: "Invalid or expired refresh token" });
+    return res
+      .status(403)
+      .json({ message: "Invalid or expired refresh token" });
   }
 };
-
-
 
 exports.register = async (req, res) => {
   try {
@@ -85,10 +96,19 @@ exports.register = async (req, res) => {
         username: user.username,
       },
       process.env.ACCESS_JWT_KEY,
-      { expiresIn: "10m" } // Token court (10 min)
+      { expiresIn: "10s" } // Token court (10 s)
     );
 
-    const refreshToken = generateRefreshToken();
+    const refreshToken = jwt.sign(
+      {
+        userInfo: {
+          userId: user.userId,
+          username: user.username,
+        },
+      },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "1d" }
+    );
 
     // Stocker le refreshToken côté user-service
     await axios.post(
@@ -96,19 +116,18 @@ exports.register = async (req, res) => {
       { refreshToken }
     );
 
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: false,
-      sameSite: 'Strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // durée de vie 7 jours
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // durée de vie 7 jours
     });
 
-    return res.status(201).json({
+    res.status(201).json({
       msg: "New User created!",
       accessToken,
       userId: user.userId,
     });
-
   } catch (err) {
     if (err.response) {
       console.error(
@@ -126,7 +145,6 @@ exports.register = async (req, res) => {
   }
 };
 
-
 // LOGIN : demande les données à user-service
 exports.login = async (req, res) => {
   try {
@@ -134,7 +152,9 @@ exports.login = async (req, res) => {
     console.log("Login request body:", req.body);
 
     if (!identifier || !password) {
-      return res.status(400).json({ message: "Missing identifier or password" });
+      return res
+        .status(400)
+        .json({ message: "Missing identifier or password" });
     }
 
     const userServiceURL = process.env.USER_SERVICE_URL;
@@ -147,46 +167,56 @@ exports.login = async (req, res) => {
 
     const isPasswordValid = bcrypt.compareSync(password, user.hashedPassword);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid email/username or password" });
+      return res
+        .status(401)
+        .json({ message: "Invalid email/username or password" });
     }
 
     // Création du accessToken court (10 min)
     const accessToken = jwt.sign(
       { userId: user.id, username: user.username },
       process.env.ACCESS_JWT_KEY,
-      { expiresIn: "10m" }
+      { expiresIn: "10s" }
     );
 
-    const refreshToken = generateRefreshToken();
+    const refreshToken = jwt.sign(
+      {
+        userInfo: {
+          userId: user.id,
+          username: user.username,
+        },
+      },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "1d" }
+    );
 
     // Stocker le refreshToken côté user-service
-    await axios.post(
-      `${userServiceURL}/api/users/${user.id}/refreshTokens`,
-      { refreshToken }
-    );
-
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'Strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // durée de vie 7 jours
+    await axios.post(`${userServiceURL}/api/users/${user.id}/refreshTokens`, {
+      refreshToken,
     });
 
-    return res.status(200).json({
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // durée de vie 7 jours
+    });
+
+    res.status(200).json({
       message: "You are now connected!",
       accessToken,
       userId: user.id,
     });
-
   } catch (err) {
     if (err.response && err.response.status === 404) {
-      return res.status(401).json({ message: "Invalid email/username or password" });
+      return res
+        .status(401)
+        .json({ message: "Invalid email/username or password" });
     }
     console.error("Login error:", err.message);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", err });
   }
 };
-
 
 // AUTHENTICATE : vérifie le token JWT
 exports.verifyToken = (req, res) => {
@@ -197,6 +227,7 @@ exports.verifyToken = (req, res) => {
   }
 
   const token = authHeader.slice(7); // Enlève "Bearer "
+  console.log(token);
 
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_JWT_KEY);
@@ -205,7 +236,6 @@ exports.verifyToken = (req, res) => {
     return res.status(403).json({ message: "Invalid or expired token" });
   }
 };
-
 
 exports.logout = async (req, res) => {
   const { userId } = req.body;
@@ -221,14 +251,13 @@ exports.logout = async (req, res) => {
     await axios.delete(`${userServiceURL}/api/users/${userId}/refreshTokens`);
 
     // Suppression du cookie côté client
-    res.clearCookie('refreshToken', {
+    res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: false, // ou true si HTTPS
-      sameSite: 'Strict'
+      sameSite: "Strict",
     });
 
     return res.status(200).json({ message: "Successfully logged out" });
-
   } catch (err) {
     console.error("Logout error:", err.message);
     return res.status(500).json({ message: "Logout failed" });

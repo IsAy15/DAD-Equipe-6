@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-
+const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema({
   sender: { type: String, required: true },
@@ -8,7 +7,8 @@ const messageSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   editedCount: { type: Number, default: 0 },
   lastEditedAt: { type: Date, default: null },
-  isDeleted: { type: Boolean, default: false }
+  isDeleted: { type: Boolean, default: false },
+  isRead: { type: Boolean, default: false },
 });
 
-module.exports = mongoose.model('Message', messageSchema);
+module.exports = mongoose.model("Message", messageSchema);

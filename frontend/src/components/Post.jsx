@@ -1,10 +1,19 @@
 import ProfileCard from "./ProfileCard";
 import UserAvatar from "./UserAvatar";
-import { fetchUserProfile } from "@/utils/api";
+import LikeButton from "./LikeButton";
+import { likeBreeze, fetchUserProfile } from "@/utils/api";
 import React, { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/authcontext";
+import { useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-export default function Post({ post }) {
+export default function Post({ post, link = true }) {
+  const locale = useLocale();
   const [author, setAuthor] = useState(null);
+  const { user } = useAuth();
+  const isLiked = post.likes.includes(user.id);
+  const router = useRouter();
 
   useEffect(() => {
     async function loadAuthor() {
@@ -19,8 +28,36 @@ export default function Post({ post }) {
     loadAuthor();
   }, [post.author]);
 
+  // Fonction utilitaire pour transformer les # en liens
+  function renderContentWithTags(content) {
+    if (!content) return null;
+    const parts = content.split(/(#[\w]+)/g);
+    return parts.map((part, i) => {
+      if (/^#[\w]+$/.test(part)) {
+        const tag = part.slice(1);
+        return (
+          <Link
+            key={i}
+            href={`/search?q=${encodeURIComponent(part)}`}
+            className="text-accent hover:underline"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {part}
+          </Link>
+        );
+      }
+      return part;
+    });
+  }
+
   return (
-    <div className="">
+    <div
+      onClick={() => {
+        if (link) {
+          router.push(`/post/${post._id}`);
+        }
+      }}
+    >
       <div className="flex items-center gap-3 mb-2">
         <div className="tooltip tooltip-toggle" aria-label="Popover Button">
           <UserAvatar size="xs" user={author} />
@@ -29,7 +66,7 @@ export default function Post({ post }) {
             role="popover"
           >
             <div className="tooltip-body bg-base-200 max-w-xs card p-4 text-start outline-solid">
-              <ProfileCard identifier={post.author} full={true} />
+              <ProfileCard user={author} full={true} />
             </div>
           </div>
         </div>
@@ -39,16 +76,16 @@ export default function Post({ post }) {
             : "Utilisateur inconnu"}
         </span>
         <span
-          className="text-gray-500 text-sm tooltip tooltip-toggle"
-          title={new Date(post.createdAt).toLocaleString("fr-FR", {
+          className="text-base-content/50 text-sm tooltip tooltip-toggle"
+          title={new Date(post.createdAt).toLocaleString(locale, {
             dateStyle: "full",
             timeStyle: "short",
           })}
         >
-          {new Date(post.createdAt).toLocaleDateString("fr-FR")}
+          {new Date(post.createdAt).toLocaleDateString(locale)}
         </span>
       </div>
-      <p>{post.content}</p>
+      <p>{renderContentWithTags(post.content)}</p>
       {post.mediaUrls && post.mediaUrls.length > 0 && (
         <div className="mt-4">
           {post.mediaUrls.map((url, index) => (
@@ -61,6 +98,14 @@ export default function Post({ post }) {
           ))}
         </div>
       )}
+      <LikeButton
+        isLiked={isLiked}
+        count={post.likes.length}
+        onLike={likeBreeze}
+        idToLike={post._id}
+        onClick={(e) => e.stopPropagation()}
+      />
+
       <hr className="border-t border-base-content/30 mt-4 w-full" />
     </div>
   );

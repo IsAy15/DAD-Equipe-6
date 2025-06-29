@@ -8,8 +8,9 @@ const userFollowRoutes = require("./src/routes/user-follow.routes");
 const friendRequestRoutes = require("./src/routes/friend-request.routes");
 
 const app = express();
+const corsOptions = require('./config/corsOptions');
 const cors = require("cors");
-app.use(cors());
+app.use(cors(corsOptions));
 const port = 3001;
 
 app.use(express.json());
